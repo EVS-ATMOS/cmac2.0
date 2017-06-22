@@ -1,10 +1,5 @@
-Work Associated with the X-SAPR System at the Southern Great Plains
-===================================================================
-
-Code is still in the works.
-
-CMAC
-----
+CMAC 2.0
+========
 
 CMAC: Corrected Precipitation Radar Moments in Antenna Coordinates
 
