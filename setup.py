@@ -27,7 +27,7 @@ PLATFORMS = "Linux"
 MAJOR = 0
 MINOR = 1
 MICRO = 0
-# SCRIPTS = glob.glob('scripts/*')
+SCRIPTS = glob.glob('scripts/*')
 TEST_SUITE = 'nose.collector'
 TESTS_REQUIRE = ['nose']
 VERSION = '%d.%d.%d' % (MAJOR, MINOR, MICRO)
@@ -59,7 +59,7 @@ def setup_package():
         # install_requires=INSTALL_REQUIRES,
         test_suite=TEST_SUITE,
         tests_require=TESTS_REQUIRE,
-        # scripts=SCRIPTS,
+        scripts=SCRIPTS,
     )
 
 if __name__ == '__main__':
