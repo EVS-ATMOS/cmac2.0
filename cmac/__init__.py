@@ -12,6 +12,7 @@ Functions
     :toctree: generated/
 
     cmac
+    quicklooks
     std_convoluted_radar
     snr_and_sounding
     get_texture
@@ -28,6 +29,7 @@ Functions
 # Note: .processing_code has imports for all functions. This, however,
 # will change on the decision of which functions are private or not. 
 from .cmac import cmac
+from .cmac_quicklooks import quicklooks
 from .processing_code import std_convoluted_radar, snr_and_sounding
 from .processing_code import get_texture, cum_score_fuzzy_logic
 from .processing_code import fix_rain_above_bb, do_my_fuzz
