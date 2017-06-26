@@ -1,0 +1,65 @@
+#!/usr/bin/env python
+""" Creates a radar object with applied CMAC 2.0 and quicklooks pertaining
+to CMAC 2.0. """
+
+import os
+
+import argparse
+import netCDF4
+import pyart
+
+from cmac import cmac
+from cmac import quicklooks
+
+
+def main():
+    """ The main function utilizes the cmac function and quicklooks function
+    to produce a CMAC radar and images pertaining to CMAC. """
+    parser = argparse.ArgumentParser(
+        description='Create a radar object with applied CMAC2.0.')
+    parser.add_argument(
+        'radar_file', type=str, help='Radar file to use for calculations.')
+    parser.add_argument(
+        'sonde_file', type=str,
+        help='Sonde file to use for CMAC calculation.')
+    parser.add_argument(
+        '-ro', '--radar_filepath', type=str, default=None,
+        help=('Out file path and name to use for the CMAC radar.'
+              + ' If not provided, radar is written to users home directory'))
+    parser.add_argument(
+        '-id', '--image_directory', type=str, default=None,
+        help=('Path to image directory to save CMAC radar images.'
+              + ' If not provided, images are written to users home directory'))
+    parser.add_argument(
+        '-alt', '--altitude', type=float, default=320.0,
+        help='Value to use as default altitude for the radar object')
+    parser.add_argument(
+        '-sw', '--sweep', type=int, default=3,
+        help='Value for the sweep to plot.')
+    parser.add_argument(
+        '-maxlat', '--max_latitude', type=float, default=37.0,
+        help='Value to use as max latitude for the bounds of the plots.')
+    parser.add_argument(
+        '-minlat', '--min_latitude', type=float, default=36.0,
+        help='Value to use as min latitude for the bounds of the plots.')
+    parser.add_argument(
+        '-maxlon', '--max_longitude', type=float, default=-97.0,
+        help='Value to use as max longitude for the bounds of the plots.')
+    parser.add_argument(
+        '-minlon', '--min_longitude', type=float, default=-98.3,
+        help='Value to use as min longitude for the bounds of the plots.')
+    args = parser.parse_args()
+
+    radar = pyart.io.read(args.radar_file)
+    sonde = netCDF4.Dataset(args.sonde_file)
+
+    cmac_radar = cmac(radar, sonde, alt=args.altitude)
+    quicklooks(cmac_radar, image_directory=args.image_directory,
+               sweep=args.sweep, max_lat=args.max_latitude,
+               min_lat=args.min_latitude, max_lon=args.max_longitude,
+               min_lon=args.min_longitude)
+    if args.radar_filepath is None:
+        pyart.io.write_cfradial(
+            cmac_radar, os.path.expanduser('~')+'/cmac_radar.nc')
+    else:
+        pyart.io.write_cfradial(cmac_radar, args.radar_filepath)
