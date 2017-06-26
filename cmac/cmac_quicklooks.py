@@ -7,8 +7,8 @@ import matplotlib.pylot as plt
 import pyart
 
 
-def quicklooks(radar, image_filepath=None, sweep=3
-               max_lat=37.0, min_lat=36.0, max_lon-97.0, min_lon=-98.3):
+def quicklooks(radar, image_directory=None, sweep=3,
+               max_lat=37.0, min_lat=36.0, max_lon=-97.0, min_lon=-98.3):
     """
     Quicklooks, images produced with regards to CMAC
 
@@ -19,7 +19,7 @@ def quicklooks(radar, image_filepath=None, sweep=3
     
     Optional Parameters
     -------------------
-    image_filepath : str
+    image_directory : str
         File path to the image folder of which to save the CMAC images. If no
         image file path is given, image path defaults to users home directory.
     sweep : int
@@ -35,8 +35,8 @@ def quicklooks(radar, image_filepath=None, sweep=3
 
     """
 
-    if image_filepath is None:
-        image_filepath = os.path.expanduser('~')
+    if image_directory is None:
+        image_directory = os.path.expanduser('~')
 
     # Plot of reflectivity before CMAC.
     lal = np.arange(min_lat, max_lat, .2)
@@ -50,7 +50,7 @@ def quicklooks(radar, image_filepath=None, sweep=3
                          min_lat=min_lat, min_lon=min_lon,
                          max_lat=max_lat, max_lon=max_lon,
                          lat_lines=lal, lon_lines=lol)
-    plt.savefig(image_filepath + '/cmac_uncorrected_reflectivity.png')
+    plt.savefig(image_directory+'/cmac_uncorrected_reflectivity.png')
 
     # Four panel plot of gate_id, velocity_texture, reflectivity, and
     # cross_correlation_ratio.
@@ -92,7 +92,7 @@ def quicklooks(radar, image_filepath=None, sweep=3
                          vmax=1, min_lon=min_lon, max_lon=max_lon,
                          min_lat=min_lat, max_lat=max_lat, resolution='l',
                          cmap=pyart.graph.cm.Carbone42)
-    plt.savefig(image_filepath + '/cmac_four_panel_plot.png')
+    plt.savefig(image_directory+'/cmac_four_panel_plot.png')
 
     # Plot of reflectivity with applied gates.
     cmac_gates = pyart.correct.GateFilter(radar)
@@ -110,4 +110,4 @@ def quicklooks(radar, image_filepath=None, sweep=3
                          max_lat=max_lat, max_lon=max_lon,
                          lat_lines=lal, lon_lines=lol,
                          gatefilter=cmac_gates)
-    plt.savefig(image_filepath + '/cmac_corrected_reflectivity.png')
+    plt.savefig(image_directory+'/cmac_corrected_reflectivity.png')
