@@ -60,6 +60,9 @@ def main():
                min_lon=args.min_longitude)
     if args.radar_filepath is None:
         pyart.io.write_cfradial(
-            cmac_radar, os.path.expanduser('~')+'/cmac_radar.nc')
+            os.path.expanduser('~')+'/cmac_radar.nc', cmac_radar)
     else:
-        pyart.io.write_cfradial(cmac_radar, args.radar_filepath)
+        pyart.io.write_cfradial(args.radar_filepath, cmac_radar)
+
+if __name__ == '__main__':
+    main()
