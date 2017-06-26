@@ -42,22 +42,27 @@ def cmac(radar, sonde, alt=320.0, **kwargs):
     hms_string = datetime.strftime(radar_start_date, '%H%M%S')
     print(ymd_string, hms_string)
 
-    print(sonde.variables.keys())
-
     z_dict, temp_dict = pyart.retrieve.map_profile_to_gates(
         sonde.variables['tdry'][:], sonde.variables['alt'][:], radar)
     texture = processing_code.get_texture(radar)
 
     snr = pyart.retrieve.calculate_snr_from_reflectivity(radar)
-
+    print('##')
+    print('## Radar fields are being added:')
     radar.add_field('sounding_temperature', temp_dict, replace_existing=True)
+    print('##    sounding_temperature')
     radar.add_field('height', z_dict, replace_existing=True)
+    print('##    height')
     radar.add_field('SNR', snr, replace_existing=True)
+    print('##    SNR')
     radar.add_field('velocity_texture', texture, replace_existing=True)
-    print(radar.fields.keys())
+    print('##    velocity_texture')
 
     my_fuzz, cats = processing_code.do_my_fuzz(radar, **kwargs)
     print(my_fuzz['notes'])
     radar.add_field('gate_id', my_fuzz,
                     replace_existing=True)
+    print('##    gate_id')
+    print('##')
+    print('## All CMAC fields have been added to the radar object.')
     return radar
