@@ -3,7 +3,7 @@ import operator
 
 import numpy as np
 import matplotlib
-import matplotlib.pylot as plt
+import matplotlib.pyplot as plt
 import pyart
 
 
@@ -73,7 +73,7 @@ def quicklooks(radar, image_directory=None, sweep=3,
     cbax=plt.gca()
     #labels = [item.get_text() for item in cbax.get_xticklabels()]
     #my_display.cbs[-1].ax.set_yticklabels(cats)
-    tick_locs = np.linspace(0, len(cats) - 1, len(cats)) + 0.5
+    tick_locs = np.linspace(0, len(sorted_cats) - 1, len(sorted_cats)) + 0.5
     display.cbs[-1].locator = matplotlib.ticker.FixedLocator(tick_locs)
     catty_list = [sorted_cats[i][0] for i in range(len(sorted_cats))]
     display.cbs[-1].formatter = matplotlib.ticker.FixedFormatter(catty_list)
