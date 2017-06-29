@@ -57,12 +57,10 @@ def cmac(radar, sonde, alt=320.0, **kwargs):
     print('##    SNR')
     radar.add_field('velocity_texture', texture, replace_existing=True)
     print('##    velocity_texture')
-
+    print('##    gate_id')
     my_fuzz, cats = processing_code.do_my_fuzz(radar, **kwargs)
-    print(my_fuzz['notes'])
     radar.add_field('gate_id', my_fuzz,
                     replace_existing=True)
-    print('##    gate_id')
     print('##')
     print('## All CMAC fields have been added to the radar object.')
     return radar
