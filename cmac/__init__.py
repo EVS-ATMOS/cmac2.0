@@ -13,7 +13,6 @@ Functions
 
     cmac
     quicklooks
-    std_convoluted_radar
     snr_and_sounding
     get_texture
     cum_score_fuzzy_logic
@@ -30,7 +29,7 @@ Functions
 # will change on the decision of which functions are private or not. 
 from .cmac_xsapr import cmac
 from .cmac_quicklooks import quicklooks
-from .processing_code import std_convoluted_radar, snr_and_sounding
+from .processing_code import snr_and_sounding
 from .processing_code import get_texture, cum_score_fuzzy_logic
 from .processing_code import fix_rain_above_bb, do_my_fuzz
 from .processing_code import extract_unmasked_data, csu_to_field
