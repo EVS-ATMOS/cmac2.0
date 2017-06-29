@@ -1,3 +1,5 @@
+""" Code that plots fields from the CMAC radar object. """
+
 import os
 import operator
 
@@ -16,7 +18,7 @@ def quicklooks(radar, image_directory=None, sweep=3,
     ---------
     radar : Radar
         Radar object that has CMAC applied to it.
-    
+
     Optional Parameters
     -------------------
     image_directory : str
@@ -58,15 +60,15 @@ def quicklooks(radar, image_directory=None, sweep=3,
     print('##')
     print('## Keys for each gate id are as follows:')
     for pair_str in radar.fields['gate_id']['notes'].split(','):
-        print('##    ' + str(pair_str))
+        print('##   ', str(pair_str))
         cat_dict.update({pair_str.split(':')[1]:int(pair_str.split(':')[0])})
     sorted_cats = sorted(cat_dict.items(), key=operator.itemgetter(1))
-    lab_colors=['green', 'cyan', 'blue', 'red', 'grey']
+    lab_colors = ['green', 'cyan', 'blue', 'red', 'grey']
     cmap = matplotlib.colors.ListedColormap(lab_colors)
 
     display = pyart.graph.RadarMapDisplay(radar)
     fig = plt.figure(figsize=[15, 10])
-    plt.subplot(2, 2, 1) 
+    plt.subplot(2, 2, 1)
     display.plot_ppi_map('gate_id', sweep=sweep, min_lon=min_lon,
                          max_lon=max_lon, min_lat=min_lat,
                          max_lat=max_lat, resolution='l', cmap=cmap,
@@ -79,16 +81,16 @@ def quicklooks(radar, image_directory=None, sweep=3,
     catty_list = [sorted_cats[i][0] for i in range(len(sorted_cats))]
     display.cbs[-1].formatter = matplotlib.ticker.FixedFormatter(catty_list)
     display.cbs[-1].update_ticks()
-    plt.subplot(2, 2, 2) 
+    plt.subplot(2, 2, 2)
     display.plot_ppi_map('reflectivity', sweep=sweep, vmin=-8, vmax=64,
                          min_lon=min_lon, max_lon=max_lon, min_lat=min_lat, max_lat=max_lat,
                          resolution='l', cmap=pyart.graph.cm.NWSRef)
 
-    plt.subplot(2, 2, 3) 
-    display.plot_ppi_map('velocity_texture', sweep=sweep, vmin=0, vmax=14, 
+    plt.subplot(2, 2, 3)
+    display.plot_ppi_map('velocity_texture', sweep=sweep, vmin=0, vmax=14,
                          min_lon=min_lon, max_lon=max_lon, min_lat=min_lat, max_lat=max_lat,
                          resolution='l', cmap=pyart.graph.cm.NWSRef)
-    plt.subplot(2, 2, 4) 
+    plt.subplot(2, 2, 4)
     display.plot_ppi_map('cross_correlation_ratio', sweep=sweep, vmin=.5,
                          vmax=1, min_lon=min_lon, max_lon=max_lon,
                          min_lat=min_lat, max_lat=max_lat, resolution='l',
