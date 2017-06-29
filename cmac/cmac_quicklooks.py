@@ -50,14 +50,15 @@ def quicklooks(radar, image_directory=None, sweep=3,
                          min_lat=min_lat, min_lon=min_lon,
                          max_lat=max_lat, max_lon=max_lon,
                          lat_lines=lal, lon_lines=lol)
-    plt.savefig(image_directory+'/cmac_uncorrected_reflectivity.png')
+    plt.savefig(image_directory + '/cmac_uncorrected_reflectivity.png')
 
     # Four panel plot of gate_id, velocity_texture, reflectivity, and
     # cross_correlation_ratio.
-    print(radar.fields['gate_id']['notes'])
     cat_dict = {}
+    print('##')
+    print('## Keys for each gate id are as follows:')
     for pair_str in radar.fields['gate_id']['notes'].split(','):
-        print(pair_str)
+        print('##    ' + str(pair_str))
         cat_dict.update({pair_str.split(':')[1]:int(pair_str.split(':')[0])})
     sorted_cats = sorted(cat_dict.items(), key=operator.itemgetter(1))
     lab_colors=['green', 'cyan', 'blue', 'red', 'grey']
@@ -70,9 +71,9 @@ def quicklooks(radar, image_directory=None, sweep=3,
                          max_lon=max_lon, min_lat=min_lat,
                          max_lat=max_lat, resolution='l', cmap=cmap,
                          vmin=0, vmax=5)
-    cbax=plt.gca()
-    #labels = [item.get_text() for item in cbax.get_xticklabels()]
-    #my_display.cbs[-1].ax.set_yticklabels(cats)
+    cbax = plt.gca()
+    # labels = [item.get_text() for item in cbax.get_xticklabels()]
+    # my_display.cbs[-1].ax.set_yticklabels(cats)
     tick_locs = np.linspace(0, len(sorted_cats) - 1, len(sorted_cats)) + 0.5
     display.cbs[-1].locator = matplotlib.ticker.FixedLocator(tick_locs)
     catty_list = [sorted_cats[i][0] for i in range(len(sorted_cats))]
@@ -92,7 +93,7 @@ def quicklooks(radar, image_directory=None, sweep=3,
                          vmax=1, min_lon=min_lon, max_lon=max_lon,
                          min_lat=min_lat, max_lat=max_lat, resolution='l',
                          cmap=pyart.graph.cm.Carbone42)
-    plt.savefig(image_directory+'/cmac_four_panel_plot.png')
+    plt.savefig(image_directory + '/cmac_four_panel_plot.png')
 
     # Plot of reflectivity with applied gates.
     cmac_gates = pyart.correct.GateFilter(radar)
@@ -110,4 +111,4 @@ def quicklooks(radar, image_directory=None, sweep=3,
                          max_lat=max_lat, max_lon=max_lon,
                          lat_lines=lal, lon_lines=lol,
                          gatefilter=cmac_gates)
-    plt.savefig(image_directory+'/cmac_corrected_reflectivity.png')
+    plt.savefig(image_directory + '/cmac_corrected_reflectivity.png')
