@@ -25,11 +25,13 @@ def main():
     parser.add_argument(
         '-ro', '--radar_filepath', type=str, default=None,
         help=('Out file path and name to use for the CMAC radar.'
-              + ' If not provided, radar is written to users home directory.'))
+              + ' If not provided, radar is written to users home'
+              + ' directory.'))
     parser.add_argument(
         '-id', '--image_directory', type=str, default=None,
         help=('Path to image directory to save CMAC radar images.'
-              + ' If not provided, images are written to users home directory.'))
+              + ' If not provided, images are written to users home'
+              + ' directory.'))
     parser.add_argument(
         '-alt', '--altitude', type=float, default=320.0,
         help='Value to use as default altitude for the radar object')
@@ -58,20 +60,23 @@ def main():
         pyart.io.write_cfradial(
             os.path.expanduser('~')+'/cmac_radar.nc', cmac_radar)
         print('## A CMAC radar object has been created at '
-              + os.path.expanduser('~')+'/cmac_radar.nc')
+              + os.path.expanduser('~') + '/cmac_radar.nc')
     else:
         pyart.io.write_cfradial(args.radar_filepath, cmac_radar)
         print('## A CMAC radar object has been created at '
-              +args.radar_filepath)
+              + args.radar_filepath)
 
     quicklooks(cmac_radar, image_directory=args.image_directory,
                sweep=args.sweep, max_lat=args.max_latitude,
                min_lat=args.min_latitude, max_lon=args.max_longitude,
                min_lon=args.min_longitude)
+    print('##')
     if args.image_directory is None:
         print('## Quicklooks have been saved in your home directory.')
     else:
-        print('## Quicklooks have been save to '+args.image_directory)
+        print('## Quicklooks have been save to ' + args.image_directory)
+    print('##')
+    print('## CMAC 2.0 Completed')
 
 if __name__ == '__main__':
     main()
