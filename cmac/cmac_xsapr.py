@@ -1,5 +1,5 @@
-# Still a work in progress, infant stage.
 """" Code that uses CMAC to remove and correct second trip returns. """
+# Still a work in progress, infant stage.
 
 # from boto.s3.connection import S3Connection
 from datetime import datetime
@@ -37,10 +37,10 @@ def cmac(radar, sonde, alt=320.0, **kwargs):
 
     radar_start_date = netCDF4.num2date(
         radar.time['data'][0], radar.time['units'])
-    print(radar_start_date)
-    ymd_string = datetime.strftime(radar_start_date, '%Y%m%d')
-    hms_string = datetime.strftime(radar_start_date, '%H%M%S')
-    print(ymd_string, hms_string)
+    print('##', str(radar_start_date))
+    # ymd_string = datetime.strftime(radar_start_date, '%Y%m%d')
+    # hms_string = datetime.strftime(radar_start_date, '%H%M%S')
+    # print('##', ymd_string, hms_string)
 
     z_dict, temp_dict = pyart.retrieve.map_profile_to_gates(
         sonde.variables['tdry'][:], sonde.variables['alt'][:], radar)
@@ -48,7 +48,7 @@ def cmac(radar, sonde, alt=320.0, **kwargs):
 
     snr = pyart.retrieve.calculate_snr_from_reflectivity(radar)
     print('##')
-    print('## Radar fields are being added:')
+    print('## These radar fields are being added:')
     radar.add_field('sounding_temperature', temp_dict, replace_existing=True)
     print('##    sounding_temperature')
     radar.add_field('height', z_dict, replace_existing=True)
