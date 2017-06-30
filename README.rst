@@ -9,9 +9,9 @@ coorelation coefficient are used, but also SNR and sounding data is used.
 
 More information can be found at https://www.arm.gov/data/data-sources/cmac-69
 
-The processing code was written by Scott Collis and the
-convolution code found within the processing code was written by Robert
-Jackson.
+The processing code was written by Scott Collis and the convolution code
+found within pyart, used in the velocity texture function, was written by
+Robert Jackson.
 
 Install
 -------
@@ -32,9 +32,8 @@ max_latitude, min_latitude, max_longitude, and min_longitude.
 
 An example::
 
-        xsapr_cmac '/home/user/cmac2.0/data/radar_file.nc' '/home/user/
-        cmac2.0/data/sonde_file.cdf'
+        xsapr_cmac '/home/user/cmac2.0/data/radar_file.nc' '/home/user/cmac2.0/data/sonde_file.cdf'
 
 Optional arguments can be called by using::
 
-        -ro -id -sw -maxlat -minlat -maxlon -minlon 
+        -ro -id -sw -maxlat -minlat -maxlon -minlon
