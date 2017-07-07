@@ -63,7 +63,13 @@ def quicklooks(radar, image_directory=None, sweep=3,
         print('##   ', str(pair_str))
         cat_dict.update({pair_str.split(':')[1]:int(pair_str.split(':')[0])})
     sorted_cats = sorted(cat_dict.items(), key=operator.itemgetter(1))
-    lab_colors = ['green', 'cyan', 'blue', 'red', 'grey']
+    cat_colors = {'rain': 'green',
+                  'multi_trip': 'red',
+                  'no_scatter': 'gray',
+                  'snow': 'cyan',
+                  'melting': 'yellow'}
+    lab_colors = ['red', 'cyan', 'grey', 'green', 'yellow']
+    lab_colors = [cat_colors[kitty[0]] for kitty in sorted_cats]
     cmap = matplotlib.colors.ListedColormap(lab_colors)
 
     display = pyart.graph.RadarMapDisplay(radar)
