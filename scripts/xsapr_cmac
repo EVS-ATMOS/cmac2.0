@@ -8,8 +8,7 @@ import argparse
 import netCDF4
 import pyart
 
-from cmac import cmac
-from cmac import quicklooks
+from cmac import cmac, quicklooks
 
 
 def main():
@@ -23,7 +22,7 @@ def main():
         'sonde_file', type=str,
         help='Sonde file to use for CMAC calculation.')
     parser.add_argument(
-        '-ro', '--radar_filepath', type=str, default=None,
+        '-o', '--out_radar', type=str, default=None,
         help=('Out file path and name to use for the CMAC radar.'
               + ' If not provided, radar is written to users home'
               + ' directory.'))
