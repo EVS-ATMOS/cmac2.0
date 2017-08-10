@@ -56,10 +56,12 @@ dependencies:
 - wheel=0.29.0=py36_0
 - xz=5.2.2=1
 - zlib=1.2.8=3
+- coincbc=2.9.9
 - pip:
   - git+https://github.com/ARM-DOE/pyart.git
   - git+https://github.com/EVS-ATMOS/cmac2.0.git
   - git+https://github.com/CSU-Radarmet/CSU_RadarTools.git
+  - git+https://github.com/jjhelmus/CyLP.git@py3
   - decorator==4.1.1
   - networkx==1.11
   - scikit-fuzzy==0.3
