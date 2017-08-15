@@ -17,5 +17,5 @@ export MPLBACKEND="agg"
 pbsdsh -c 1 -v -- $PBS_O_WORKDIR/start_scheduler.sh /home/rjackson/scheduler.json /home/rjackson/temp_dir &
 pbsdsh -u -v -- $PBS_O_WORKDIR/start_worker.sh /home/rjackson/scheduler.json /home/rjackson/temp_dir &
 
-./xsapr_cmac /lustre/or-hydra/cades-arm/proj-shared/cmac_sgpxsaprppiI5.00 /lustre/or-hydra/cades-arm/proj-shared/sgpsondewnpnC1.b1/ --scheduler_file=/home/rjackson/scheduler.json -o /home/rjackson/radar -id /home/rjackson/images
+./xsapr_cmac_dask /lustre/or-hydra/cades-arm/proj-shared/cmac_sgpxsaprppiI5.00 /lustre/or-hydra/cades-arm/proj-shared/sgpsondewnpnC1.b1/ --scheduler_file=/home/rjackson/scheduler.json -o /home/rjackson/radar -id /home/rjackson/images
 
