@@ -36,4 +36,4 @@ An example::
 
 Optional arguments can be called by using::
 
-        -ro -id -sw -maxlat -minlat -maxlon -minlon
+        -o -id -sw -maxlat -minlat -maxlon -minlon
