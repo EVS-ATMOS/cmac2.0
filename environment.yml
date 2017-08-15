@@ -102,15 +102,16 @@ dependencies:
 - yaml=0.1.6=0
 - zeromq=4.1.5=0
 - zict=0.1.2=py36_0
+- coincbc=2.9.9
 - pip:
-  - arm-pyart==1.9.0
-  - cmac==0.1.0
-  - csu-radartools==1.2
   - ipython-genutils==0.2.0
   - jupyter-client==5.1.0
   - jupyter-core==4.3.0
-  - networkx==1.11
   - prompt-toolkit==1.0.14
+  - decorator==4.1.1
+  - networkx==1.11
   - scikit-fuzzy==0.3
-prefix: /home/rjackson/anaconda3/envs/cmac_env
-
+  - git+https://github.com/ARM-DOE/pyart.git
+  - git+https://github.com/EVS-ATMOS/cmac2.0.git
+  - git+https://github.com/CSU-Radarmet/CSU_RadarTools.git
+  - git+https://github.com/jjhelmus/CyLP.git@py3
