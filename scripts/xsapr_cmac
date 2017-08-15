@@ -55,15 +55,15 @@ def main():
     sonde = netCDF4.Dataset(args.sonde_file)
 
     cmac_radar = cmac(radar, sonde, alt=args.altitude)
-    if args.radar_filepath is None:
+    if args.out_radar is None:
         pyart.io.write_cfradial(
             os.path.expanduser('~')+'/cmac_radar.nc', cmac_radar)
         print('## A CMAC radar object has been created at '
               + os.path.expanduser('~') + '/cmac_radar.nc')
     else:
-        pyart.io.write_cfradial(args.radar_filepath, cmac_radar)
+        pyart.io.write_cfradial(args.out_radar, cmac_radar)
         print('## A CMAC radar object has been created at '
-              + args.radar_filepath)
+              + args.out_radar)
 
     quicklooks(cmac_radar, image_directory=args.image_directory,
                sweep=args.sweep, max_lat=args.max_latitude,
