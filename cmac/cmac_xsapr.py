@@ -84,14 +84,14 @@ def cmac(radar, sonde, alt=320.0, **kwargs):
     radar.add_field('corrected_specific_diff_phase', kdp)
 
     print('##    specific_attenuation')
-    spec_at, cor_z = pyart.correct.calculate_attenuation(
+    spec_at, cor_z_atten = pyart.correct.calculate_attenuation(
         radar, 0, refl_field='reflectivity',
         ncp_field='normalized_coherent_power',
         rhv_field='cross_correlation_ratio',
         phidp_field='corrected_differential_phase')
     radar.add_field('specific_attenuation', spec_at)
-    print('##    corrected_reflectivity')
-    radar.add_field('corrected_reflectivity', cor_z)
+    print('##    corrected_reflectivity_attenuation')
+    radar.add_field('corrected_reflectivity_attenuation', cor_z_atten)
 
     print('##')
     print('## All CMAC fields have been added to the radar object.')
