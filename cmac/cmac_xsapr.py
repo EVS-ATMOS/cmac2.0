@@ -2,7 +2,6 @@
 Code that uses CMAC to remove and correct second trip returns, correct velocity,
 produce a quasi-vertical profile, and more. """
 
-from datetime import datetime
 
 import netCDF4
 import pyart
@@ -27,7 +26,7 @@ def cmac(radar, sonde, alt=320.0, **kwargs):
         Value to use as default altitude for the radar object.
 
     Returns
-    ------
+    -------
     radar : Radar
         Radar object with new CMAC added fields.
 
