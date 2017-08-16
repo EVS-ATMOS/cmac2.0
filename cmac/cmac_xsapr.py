@@ -1,15 +1,18 @@
-""" 
+"""
 Code that uses CMAC to remove and correct second trip returns, correct velocity,
 produce a quasi-vertical profile, and more. """
 
 
 import netCDF4
 import pyart
+import copy
+import np
+
 
 from . import processing_code
 
 
-def cmac(radar, sonde, alt=320.0, **kwargs):
+def cmac(radar, sonde, alt=320.0, attenuation_a_coef=None, **kwargs):
     """
     Corrected Moments in Antenna Coordinates
 
@@ -65,7 +68,7 @@ def cmac(radar, sonde, alt=320.0, **kwargs):
     for pair_str in radar.fields['gate_id']['notes'].split(','):
         cat_dict.update(
             {pair_str.split(':')[1]:int(pair_str.split(':')[0])})
-    
+
     print('##    corrected_velocity')
     cmac_gates = pyart.correct.GateFilter(radar)
     cmac_gates.exclude_all()
@@ -73,7 +76,7 @@ def cmac(radar, sonde, alt=320.0, **kwargs):
     cmac_gates.include_equal('gate_id', cat_dict['melting'])
     cmac_gates.include_equal('gate_id', cat_dict['snow'])
     corr_vel = pyart.correct.dealias_region_based(
-        radar, vel_field='velocity', keep_original=False, 
+        radar, vel_field='velocity', keep_original=False,
         gatefilter=cmac_gates, centered=True)
     radar.add_field('corrected_velocity', corr_vel, replace_existing=True)
 
@@ -84,14 +87,38 @@ def cmac(radar, sonde, alt=320.0, **kwargs):
     radar.add_field('corrected_specific_diff_phase', kdp)
 
     print('##    specific_attenuation')
+    if attenuation_a_coef is None:
+        attenuation_a_coef = 0.17 #X-Band
+
+
     spec_at, cor_z_atten = pyart.correct.calculate_attenuation(
         radar, 0, refl_field='reflectivity',
         ncp_field='normalized_coherent_power',
         rhv_field='cross_correlation_ratio',
-        phidp_field='corrected_differential_phase')
+        phidp_field='corrected_differential_phase',
+        a_coef=attenuation_a_coef)
+
     radar.add_field('specific_attenuation', spec_at)
     print('##    corrected_reflectivity_attenuation')
     radar.add_field('corrected_reflectivity_attenuation', cor_z_atten)
+
+    print('## Rainfall rate as a function of A ##')
+    R = 51.3 * (radar.fields['specific_attenuation']['data']) ** 0.81
+    rainrate = copy.deepcopy(radar.fields['specific_attenuation'])
+    rainrate['data'] = R
+    rainrate['valid_min'] = 0.0
+    rainrate['valid_max'] = 400.0
+    rainrate['standard_name'] = 'rainfall_rate'
+    rainrate['long_name'] = 'rainfall_rate'
+    rainrate['least_significant_digit'] = 1
+    rainrate['units'] = 'mm/hr'
+    radar.fields.update({'rain_rate_A': rainrate})
+
+    #This needs to be updated to a gatefilter
+    mask=radar.fields['reflectivity']['data'].mask
+
+    radar.fields['rain_rate_A']['data'][np.where(mask)]=0.0
+    radar.fields['rain_rate_A'].update({'comment':'Rain rate calculated from specific_attenuation, R=51.3*specific_attenuation**0.81, note R=0.0 where norm coherent power < 0.4 or rhohv < 0.8'})
 
     print('##')
     print('## All CMAC fields have been added to the radar object.')
