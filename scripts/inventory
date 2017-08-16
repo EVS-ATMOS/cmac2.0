@@ -59,11 +59,11 @@ def main():
         # Each raw time should have one corresponding time in out_times
         # and three times in image outputs
         nearest_out_time = nearest(out_times, the_time)
-        if(abs(nearest_out_time - the_time) < datetime.timedelta(minutes=1)):
+        if(abs(nearest_out_time - the_time) > datetime.timedelta(minutes=1)):
             print(("FAIL: " + str(the_time) + " (no radar file!)"))
 
         nearest_image_time = nearest(image_times, the_time)
-        if(abs(nearest_image_time - the_time) < datetime.timedelta(minutes=1)):
+        if(abs(nearest_image_time - the_time) > datetime.timedelta(minutes=1)):
             if(image_times.count(nearest_image_time) < 3):
                 print(("FAIL: " + str(nearest_image_time) + " (only " +
                         str(image_times.count(nearest_image_time)) +
