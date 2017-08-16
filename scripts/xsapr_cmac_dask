@@ -1,0 +1,142 @@
+#!/usr/bin/env python
+""" Creates a radar object with applied CMAC 2.0 and quicklooks pertaining
+to CMAC 2.0. """
+
+import os
+
+from matplotlib import use
+use('agg')
+import argparse
+import netCDF4
+import pyart
+import glob
+import datetime
+
+from cmac import cmac, quicklooks, get_sounding_times, get_sounding_file_name
+from distributed import Client, wait
+
+
+""" For dask we need the radar plotting routines all in one subroutine """ 
+def run_cmac_and_plotting(radar_file_path, sounding_times, args):
+    radar = pyart.io.read(radar_file_path)
+    radar_start_date = netCDF4.num2date(radar.time['data'][0],
+            radar.time['units'])
+    closest_time = min(sounding_times,
+                       key=lambda d: abs(d - radar_start_date))
+    sonde_file = get_sounding_file_name(args.sonde_path,
+                                        closest_time)
+    sonde = netCDF4.Dataset(sonde_file)
+    cmac_radar = cmac(radar, sonde, alt=args.altitude)
+
+    ## Free up some memory
+    del radar
+    year_str = "%04d" % radar_start_date.year
+    month_str = "%02d" % radar_start_date.month
+    day_str = "%02d" % radar_start_date.day
+    hour_str = "%02d" % radar_start_date.hour
+    minute_str = "%02d" % radar_start_date.minute
+    second_str = "%02d" % radar_start_date.second
+
+    if args.out_radar is None:
+        the_path = (os.path.expanduser('~') + '/'+ year_str + month_str +
+            second_str + '/')
+    else:
+        the_path = (args.out_radar + '/' + year_str +  month_str +
+            day_str + '/')
+    file_name = (the_path + '/CMAC.' + year_str + month_str + day_str + '.' +
+        hour_str + minute_str + second_str + '.nc')
+
+    if(not os.path.exists(the_path)):
+        os.makedirs(the_path)
+
+    pyart.io.write_cfradial(file_name, cmac_radar)
+    print('## A CMAC radar object has been created at ' + file_name)
+    img_directory = (args.image_directory + '/' + year_str + month_str +
+        day_str + '.' + hour_str + minute_str + second_str)
+    if(not os.path.exists(img_directory)):
+        os.makedirs(img_directory)
+    
+    quicklooks(cmac_radar, image_directory=img_directory,
+               sweep=args.sweep, max_lat=args.max_latitude,
+               min_lat=args.min_latitude, max_lon=args.max_longitude,
+               min_lon=args.min_longitude)
+    print('## Quicklooks have been saved at ' + img_directory)
+    print('##')
+
+
+def main():
+    """ The main function utilizes the cmac function and quicklooks function
+    to produce a CMAC radar and images pertaining to CMAC. """
+    parser = argparse.ArgumentParser(
+        description='Create a radar object with applied CMAC2.0.')
+    parser.add_argument(
+        'radar_path', type=str, help=('Radar path to use for calculations.' +
+                                      'The program will search recursively' + 
+                                      'for files in the directory.'))
+    parser.add_argument(
+        'sonde_path', type=str,
+        help='Sonde path to use for CMAC calculation.')
+    parser.add_argument(
+        '-o', '--out_radar', type=str, default=None,
+        help=('Out file path and name to use for the CMAC radar.'
+              + ' If not provided, radar is written to users home'
+              + ' directory.'))
+    parser.add_argument(
+        '-id', '--image_directory', type=str, default=None,
+        help=('Path to image directory to save CMAC radar images.'
+              + ' If not provided, images are written to users home'
+              + ' directory.'))
+    parser.add_argument(
+        '-alt', '--altitude', type=float, default=320.0,
+        help='Value to use as default altitude for the radar object')
+    parser.add_argument(
+        '-sw', '--sweep', type=int, default=3,
+        help='Value for the sweep to plot.')
+    parser.add_argument(
+        '-maxlat', '--max_latitude', type=float, default=37.0,
+        help='Value to use as max latitude for the bounds of the plots.')
+    parser.add_argument(
+        '-minlat', '--min_latitude', type=float, default=36.0,
+        help='Value to use as min latitude for the bounds of the plots.')
+    parser.add_argument(
+        '-maxlon', '--max_longitude', type=float, default=-97.0,
+        help='Value to use as max longitude for the bounds of the plots.')
+    parser.add_argument(
+        '-minlon', '--min_longitude', type=float, default=-98.3,
+        help='Value to use as min longitude for the bounds of the plots.')
+    parser.add_argument(
+        '-sched', '--scheduler_file', type=str, default='~/scheduler.json',
+        help='Path to dask scheduler json file')
+    args = parser.parse_args()
+
+    radar_files = glob.glob(args.radar_path + '/**/*', recursive=True)
+    sounding_times = get_sounding_times(args.sonde_path)
+    
+    # Connect to dask client
+    client = Client(scheduler_file=args.scheduler_file)
+    future_list = []
+    n_cores = sum(client.ncores().values())
+    print('## Opened dask cluster with ' + str(n_cores) + ' cores')
+    for the_file in radar_files:
+        # Only run so many at a time to save memory
+        # Wait for jobs to finish and clear memory from chunk
+        if(len(future_list) > n_cores*2):
+            wait(future_list)
+            del future_list
+            future_list = []
+        else:
+            future_list.append(client.submit(run_cmac_and_plotting, the_file,
+                                             sounding_times, args))
+
+    ## Do radar object loading on compute nodes. 
+    if args.image_directory is None:
+        print('## Quicklooks have been saved in your home directory.')
+    else:
+        print('## Quicklooks have been save to ' + args.image_directory)
+    print('##')
+    print('## CMAC 2.0 Completed')
+    client.shutdown()
+
+
+if __name__ == '__main__':
+    main()

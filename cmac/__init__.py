@@ -27,5 +27,6 @@ from .cmac_quicklooks import quicklooks
 from .processing_code import snr_and_sounding, do_my_fuzz
 from .processing_code import get_texture, cum_score_fuzzy_logic
 from .processing_code import return_csu_kdp, retrieve_qvp
-
+from .data_catalouging import get_sounding_times, get_sounding_file_name
+ 
 __all__ = [s for s in dir() if not s.startswith('_')]

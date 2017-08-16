@@ -1,0 +1,21 @@
+#PBS -l nodes=10:ppn=16
+#PBS -l walltime=24:00:00
+#PBS -q batch
+#PBS -l qos=std
+#PBS -W group_list=cades-arm
+#PBS -j oe
+#PBS -N IPythonMPI0
+
+echo "number of nodes"
+export PBS_NUM_NODES=`wc -l ${PBS_NODEFILE} | cut -f1 -d" "`
+echo $PBS_NUM_NODES
+source activate cmac_env
+cd /home/rjackson/cmac2.0/scripts
+export TMPDIR=/home/rjackson/temp_dir
+export MPLBACKEND="agg"
+
+pbsdsh -c 1 -v -- $PBS_O_WORKDIR/start_scheduler.sh /home/rjackson/scheduler.json /home/rjackson/temp_dir &
+pbsdsh -u -v -- $PBS_O_WORKDIR/start_worker.sh /home/rjackson/scheduler.json /home/rjackson/temp_dir &
+
+./xsapr_cmac_dask /lustre/or-hydra/cades-arm/proj-shared/cmac_sgpxsaprppiI5.00 /lustre/or-hydra/cades-arm/proj-shared/sgpsondewnpnC1.b1/ --scheduler_file=/home/rjackson/scheduler.json -o /home/rjackson/radar -id /home/rjackson/images
+

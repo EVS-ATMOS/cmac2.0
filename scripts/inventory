@@ -1,0 +1,74 @@
+#!/usr/bin/env python
+""" Inventory check for cmac2.0. Use this to check to see if
+    CMAC2.0 sucessfully processed/plotted files and to see
+    where failures occurred.  """
+
+import argparse
+import glob
+import datetime
+
+from dateutil.parser import parse
+
+def nearest(items, pivot):
+    return min(items, key=lambda x: abs(x - pivot))
+
+def main():
+    """ The main function takes in a raw data input directory,
+    a radar output directory, and an image output directory """
+    parser = argparse.ArgumentParser(
+        description='Check to see if CMAC2.0 processing succeeded.')
+    parser.add_argument(
+        'radar_path', type=str, help='Path to raw radar files')
+    parser.add_argument(
+        'outradar_path', type=str, help='Path to radar output files')
+    parser.add_argument(
+        'outimage_path', type=str, help='Path to image output files')
+    args = parser.parse_args()
+    
+    print("## Looking in " + args.radar_path + " for raw radar files")
+    the_radar_files = glob.glob((args.radar_path + '/**/*'), recursive=True)
+
+    the_out_files = glob.glob((args.outradar_path + '/**/*'),
+                              recursive=True)
+    the_image_files = glob.glob((args.outimage_path + '/**/*.png'),
+                                 recursive=True)
+    
+    radar_times = []
+    for file_name in the_radar_files:
+        where_xsw = file_name.find('XSW')
+        radar_times.append(
+            datetime.datetime.strptime(file_name[where_xsw+3:where_xsw+15],
+                                                 '%y%m%d%H%M%S'))
+
+    out_times = []
+    image_times = []
+    for file_name in the_out_files:
+        where_nc = file_name.find('.nc')
+        if(where_nc > -1):
+            out_times.append(datetime.datetime.strptime(
+                file_name[where_nc-15:where_nc-1], '%Y%m%d.%H%M%S'))
+
+    for image_name in the_image_files:
+        where_cmac = image_name.rfind('/cmac_')
+        if(where_cmac > -1):
+            image_times.append(datetime.datetime.strptime(
+                image_name[where_cmac-15:where_cmac-1], '%Y%m%d.%H%M%S'))
+    
+    radar_times.sort()
+    for the_time in radar_times:
+        # Each raw time should have one corresponding time in out_times
+        # and three times in image outputs
+        nearest_out_time = nearest(out_times, the_time)
+        if(abs(nearest_out_time - the_time) < datetime.timedelta(minutes=1)):
+            print(("FAIL: " + str(the_time) + " (no radar file!)"))
+
+        nearest_image_time = nearest(image_times, the_time)
+        if(abs(nearest_image_time - the_time) < datetime.timedelta(minutes=1)):
+            if(image_times.count(nearest_image_time) < 3):
+                print(("FAIL: " + str(nearest_image_time) + " (only " +
+                        str(image_times.count(nearest_image_time)) +
+                        " images)!"))
+
+
+if __name__ == '__main__':
+    main()
