@@ -43,16 +43,15 @@ def main():
         where_nc = file_name.find('.nc')
         if(where_nc > -1):
             out_times.append(datetime.datetime.strptime(
-                file_name[where_nc-15:where_nc-1], '%Y%m%d.%H%M%S'), 
-                file_name)
+                file_name[where_nc-15:where_nc-1], '%Y%m%d.%H%M%S'))
 
     for image_name in the_image_files:
         where_cmac = image_name.find('/cmac_')
         if(where_cmac > -1):
             image_times.append(datetime.datetime.strptime(
-                image_name[where_cmac-15:where_cmac-1], '%Y%m%d.%H%M%S',
-                file_name))
-
+                image_name[where_cmac-15:where_cmac-1], '%Y%m%d.%H%M%S'))
+    
+    radar_times.sort()
     for the_time in radar_times:
         # Each raw time should have one corresponding time in out_times
         # and three times in image outputs
