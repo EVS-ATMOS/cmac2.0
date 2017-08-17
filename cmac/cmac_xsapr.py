@@ -120,8 +120,8 @@ def cmac(radar, sonde, alt=320.0, attenuation_a_coef=None, **kwargs):
     radar.fields['rain_rate_A']['data'][np.where(mask)] = 0.0
     radar.fields['rain_rate_A'].update({
         'comment': ('Rain rate calculated from specific_attenuation,',
-        ' R=51.3*specific_attenuation**0.81, note R=0.0 where norm',
-        ' coherent power < 0.4 or rhohv < 0.8')})
+                    ' R=51.3*specific_attenuation**0.81, note R=0.0 where',
+                    ' norm coherent power < 0.4 or rhohv < 0.8')})
 
     print('##')
     print('## All CMAC fields have been added to the radar object.')
