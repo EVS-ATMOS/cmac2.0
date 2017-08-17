@@ -22,6 +22,9 @@ def main():
         'sonde_file', type=str,
         help='Sonde file to use for CMAC calculation.')
     parser.add_argument(
+        'clutter_file', type=str,
+        help='clutter file to use for addition of clutter gate id.')
+    parser.add_argument(
         '-o', '--out_radar', type=str, default=None,
         help=('Out file path and name to use for the CMAC radar.'
               + ' If not provided, radar is written to users home'
@@ -52,9 +55,11 @@ def main():
     args = parser.parse_args()
 
     radar = pyart.io.read(args.radar_file)
+    clutter_radar = pyart.io.read(args.clutter_file)
     sonde = netCDF4.Dataset(args.sonde_file)
+    clutter_field = clutter_radar.fields['xsapr_clutter']['data']
 
-    cmac_radar = cmac(radar, sonde, alt=args.altitude)
+    cmac_radar = cmac(radar, sonde, clutter_field, alt=args.altitude)
     if args.out_radar is None:
         pyart.io.write_cfradial(
             os.path.expanduser('~')+'/cmac_radar.nc', cmac_radar)
@@ -76,6 +81,11 @@ def main():
         print('## Quicklooks have been save to ' + args.image_directory)
     print('##')
     print('## CMAC 2.0 Completed')
+
+    del radar
+    del sonde
+    del clutter_radar
+    del cmac_radar
 
 if __name__ == '__main__':
     main()

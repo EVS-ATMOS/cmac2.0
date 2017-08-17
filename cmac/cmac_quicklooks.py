@@ -68,8 +68,9 @@ def quicklooks(radar, image_directory=None, sweep=3,
                   'multi_trip': 'red',
                   'no_scatter': 'gray',
                   'snow': 'cyan',
-                  'melting': 'yellow'}
-    lab_colors = ['red', 'cyan', 'grey', 'green', 'yellow']
+                  'melting': 'yellow',
+                  'clutter': 'black'}
+    lab_colors = ['red', 'cyan', 'grey', 'green', 'yellow', 'black']
     lab_colors = [cat_colors[kitty[0]] for kitty in sorted_cats]
     cmap = matplotlib.colors.ListedColormap(lab_colors)
 
@@ -81,7 +82,7 @@ def quicklooks(radar, image_directory=None, sweep=3,
                          max_lat=max_lat, resolution='l', cmap=cmap,
                          vmin=0, vmax=5)
     cbax = plt.gca()
-    tick_locs = np.linspace(0, len(sorted_cats) - 1, len(sorted_cats)) + 0.5
+    tick_locs = np.linspace(0, len(sorted_cats) - 2, len(sorted_cats)) + 0.5
     display.cbs[-1].locator = matplotlib.ticker.FixedLocator(tick_locs)
     catty_list = [sorted_cats[i][0] for i in range(len(sorted_cats))]
     display.cbs[-1].formatter = matplotlib.ticker.FixedFormatter(catty_list)
