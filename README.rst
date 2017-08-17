@@ -23,6 +23,7 @@ To install CMAC 2.0 and the required environment::
         git clone https://github.com/EVS-ATMOS/cmac2.0.git
         cd cmac2.0
         conda env create -f environment.yml
+        source activate cmac_env
         pip install git+https://github.com/jjhelmus/CyLP.git@py3
 
 Using CMAC 2.0
