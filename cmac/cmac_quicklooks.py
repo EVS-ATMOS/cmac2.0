@@ -128,7 +128,7 @@ def quicklooks(radar, image_directory=None, sweep=3,
     display = pyart.graph.RadarMapDisplay(radar)
     fig = plt.figure(figsize=[10, 8])
     display.plot_ppi_map('corrected_reflectivity_attenuation', sweep=sweep,
-                         vmin=0, vmax=60., resolution='l', colorbar_label='',
+                         vmin=0, vmax=60., resolution='l',
                          title='Corrected Reflectivity Attenuation',
                          min_lat=min_lat, min_lon=min_lon,
                          max_lat=max_lat, max_lon=max_lon,
@@ -140,7 +140,7 @@ def quicklooks(radar, image_directory=None, sweep=3,
     display = pyart.graph.RadarMapDisplay(radar)
     fig = plt.figure(figsize=[10, 8])
     display.plot_ppi_map('specific_attenuation', sweep=sweep, vmin=0,
-                         vmax=1.0, colorbar_label='', resolution='l',
+                         vmax=1.0, resolution='l',
                          title='Specific Attenuation',
                          min_lat=min_lat, min_lon=min_lon,
                          max_lat=max_lat, max_lon=max_lon,
@@ -153,7 +153,7 @@ def quicklooks(radar, image_directory=None, sweep=3,
     fig = plt.figure(figsize=[10, 8])
     display.plot_ppi_map('corrected_differential_phase', sweep=sweep,
                          title='Processed Differential Phase',
-                         colorbar_label='', resolution='l', min_lat=min_lat,
+                         resolution='l', min_lat=min_lat,
                          min_lon=min_lon, max_lat=max_lat, max_lon=max_lon,
                          lat_lines=lal, lon_lines=lol)
     plt.savefig(image_directory + '/corrected_differential_phase.png')
@@ -165,9 +165,8 @@ def quicklooks(radar, image_directory=None, sweep=3,
     display.plot_ppi_map('corrected_specific_diff_phase', sweep=sweep,
                          vmin=0, vmax=6, resolution='l',
                          title='Processed Specific Differential Phase',
-                         colorbar_label='', min_lat=min_lat,
-                         min_lon=min_lon, max_lat=max_lat, max_lon=max_lon,
-                         lat_lines=lal, lon_lines=lol)
+                         min_lat=min_lat, min_lon=min_lon, max_lat=max_lat,
+                         max_lon=max_lon, lat_lines=lal, lon_lines=lol)
     plt.savefig(image_directory + '/corrected_specific_diff_phase.png')
     plt.close()
 
