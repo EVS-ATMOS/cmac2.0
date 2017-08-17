@@ -12,7 +12,8 @@ import numpy as np
 from . import processing_code
 
 
-def cmac(radar, sonde, alt=320.0, attenuation_a_coef=None, **kwargs):
+def cmac(radar, sonde, clutter_field, alt=320.0, attenuation_a_coef=None,
+         **kwargs):
     """
     Corrected Moments in Antenna Coordinates
 
@@ -22,6 +23,8 @@ def cmac(radar, sonde, alt=320.0, attenuation_a_coef=None, **kwargs):
         Radar object to use in the CMAC calculation.
     sonde : Object
         Object containing all the sonde data.
+    clutter_field : array
+        Array with xsapr_clutter field data for addition of clutter gate id.
 
     Other Parameters
     ----------------
@@ -64,6 +67,10 @@ def cmac(radar, sonde, alt=320.0, attenuation_a_coef=None, **kwargs):
     my_fuzz, cats = processing_code.do_my_fuzz(radar, **kwargs)
     radar.add_field('gate_id', my_fuzz,
                     replace_existing=True)
+    radar.fields['gate_id']['data'][clutter_field == 1] = 5
+    notes = radar.fields['gate_id']['notes']
+    radar.fields['gate_id']['notes'] = notes + ',5:clutter'
+    radar.fields['gate_id']['valid_max'] = 5
     cat_dict = {}
     for pair_str in radar.fields['gate_id']['notes'].split(','):
         cat_dict.update(
