@@ -32,7 +32,7 @@ def main():
                               recursive=True)
     the_image_files = glob.glob((args.outimage_path + '/**/*.png'),
                                  recursive=True)
-    
+
     radar_times = []
     for file_name in the_radar_files:
         where_xsw = file_name.find('XSW')
@@ -54,13 +54,18 @@ def main():
             image_times.append(datetime.datetime.strptime(
                 image_name[where_cmac-15:where_cmac-1], '%Y%m%d.%H%M%S'))
     
+    indices = [i[0] for i in sorted(enumerate(radar_times), key=lambda x:x[1])]
     radar_times.sort()
+    i = 0
+    out_file_rad = open('failed_files_radar', 'w+')
+    out_file_im = open('failed_files_image', 'w+')
     for the_time in radar_times:
         # Each raw time should have one corresponding time in out_times
         # and three times in image outputs
         nearest_out_time = nearest(out_times, the_time)
         if(abs(nearest_out_time - the_time) > datetime.timedelta(minutes=1)):
             print(("FAIL: " + str(the_time) + " (no radar file!)"))
+            out_file_rad.write((the_radar_files[i] + '\n'))
 
         nearest_image_time = nearest(image_times, the_time)
         if(abs(nearest_image_time - the_time) > datetime.timedelta(minutes=1)):
@@ -68,7 +73,8 @@ def main():
                 print(("FAIL: " + str(nearest_image_time) + " (only " +
                         str(image_times.count(nearest_image_time)) +
                         " images)!"))
-
+                out_file_im.write((the_radar_files[i] + '\n'))
+        i = i + 1
 
 if __name__ == '__main__':
     main()
