@@ -114,4 +114,3 @@ dependencies:
   - git+https://github.com/ARM-DOE/pyart.git
   - git+https://github.com/EVS-ATMOS/cmac2.0.git
   - git+https://github.com/CSU-Radarmet/CSU_RadarTools.git
-  - git+https://github.com/jjhelmus/CyLP.git@py3

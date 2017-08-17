@@ -13,14 +13,18 @@ The processing code was written by Scott Collis and the convolution code
 found within pyart, used in the velocity texture function, was written by
 Robert Jackson.
 
+Robert Jackson has also created parallel code and scripts for cmac2.0.
+
 Install
 -------
 
-To install CMAC 2.0::
+To install CMAC 2.0 and the required environment::
 
         git clone https://github.com/EVS-ATMOS/cmac2.0.git
         cd cmac2.0
-        python setup.py install
+        conda env create -f environment.yml
+        source activate cmac_env
+        pip install git+https://github.com/jjhelmus/CyLP.git@py3
 
 Using CMAC 2.0
 --------------
