@@ -43,8 +43,8 @@ def run_cmac_and_plotting(radar_file_path, sounding_times, args):
     else:
         the_path = (args.out_radar + '/' + year_str +  month_str +
             day_str + '/')
-    file_name = (the_path + '/CMAC.' + year_str + month_str + day_str + '.' +
-        hour_str + minute_str + second_str + '.nc')
+    file_name = (the_path + '/sgpxsaprcmacl5.c1.' + year_str + month_str +
+        day_str + '.' + hour_str + minute_str + second_str + '.nc')
 
     if(not os.path.exists(the_path)):
         os.makedirs(the_path)
@@ -71,8 +71,10 @@ def main():
         description='Create a radar object with applied CMAC2.0.')
     parser.add_argument(
         'radar_path', type=str, help=('Radar path to use for calculations.' +
-                                      'The program will search recursively' + 
-                                      'for files in the directory.'))
+                                      'The program will search recursively' +
+                                      'for files in the directory. If ' +
+                                      'a file is specified, every file ' +
+                                      'in the list will be processed.'))
     parser.add_argument(
         'sonde_path', type=str,
         help='Sonde path to use for CMAC calculation.')
@@ -108,10 +110,17 @@ def main():
         '-sched', '--scheduler_file', type=str, default='~/scheduler.json',
         help='Path to dask scheduler json file')
     args = parser.parse_args()
-
-    radar_files = glob.glob(args.radar_path + '/**/*', recursive=True)
+    if os.path.isdir(args.radar_path):
+        radar_files = glob.glob(args.radar_path + '/**/*', recursive=True)
+    elif os.path.isfile(args.radar_path): 
+        with open(args.radar_path) as f:
+            radar_files = f.readlines()
+        radar_files = [x.strip() for x in radar_files]
+    else:
+        raise IOError('The specified radar path does not exist!')
     sounding_times = get_sounding_times(args.sonde_path)
-    
+       
+
     # Connect to dask client
     client = Client(scheduler_file=args.scheduler_file)
     future_list = []
