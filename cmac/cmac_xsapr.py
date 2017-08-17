@@ -6,7 +6,7 @@ produce a quasi-vertical profile, and more. """
 import netCDF4
 import pyart
 import copy
-import np
+import numpy as np
 
 
 from . import processing_code
