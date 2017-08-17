@@ -98,6 +98,17 @@ def cmac(radar, sonde, alt=320.0, attenuation_a_coef=None, **kwargs):
         phidp_field='corrected_differential_phase',
         a_coef=attenuation_a_coef)
 
+    cat_dict = {}
+    for pair_str in radar.fields['gate_id']['notes'].split(','):
+        print(pair_str)
+        cat_dict.update({pair_str.split(':')[1]: int(pair_str.split(':')[0])})
+
+    rain_gates = pyart.correct.GateFilter(radar)
+    rain_gates.exclude_all()
+    rain_gates.include_equal('gate_id', cat_dict['rain'])
+
+    spec_at['data'][rain_gates.gate_excluded] = 0.0
+
     radar.add_field('specific_attenuation', spec_at)
     print('##    corrected_reflectivity_attenuation')
     radar.add_field('corrected_reflectivity_attenuation', cor_z_atten)
@@ -122,6 +133,7 @@ def cmac(radar, sonde, alt=320.0, attenuation_a_coef=None, **kwargs):
         'comment': ('Rain rate calculated from specific_attenuation,',
                     ' R=51.3*specific_attenuation**0.81, note R=0.0 where',
                     ' norm coherent power < 0.4 or rhohv < 0.8')})
+
 
     print('##')
     print('## All CMAC fields have been added to the radar object.')
