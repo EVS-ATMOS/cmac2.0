@@ -83,8 +83,9 @@ def main():
     print('## CMAC 2.0 Completed')
 
     del radar
-    del clutter_radar
     del sonde
+    del clutter_radar
+    del cmac_radar
 
 if __name__ == '__main__':
     main()
