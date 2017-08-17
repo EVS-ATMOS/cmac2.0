@@ -40,7 +40,7 @@ def quicklooks(radar, image_directory=None, sweep=3,
     if image_directory is None:
         image_directory = os.path.expanduser('~')
 
-    # Plot of reflectivity before CMAC.
+    # Creating a plot of reflectivity before CMAC.
     lal = np.arange(min_lat, max_lat, .2)
     lol = np.arange(min_lon, max_lon, .2)
 
@@ -53,6 +53,7 @@ def quicklooks(radar, image_directory=None, sweep=3,
                          max_lat=max_lat, max_lon=max_lon,
                          lat_lines=lal, lon_lines=lol)
     plt.savefig(image_directory + '/cmac_uncorrected_reflectivity.png')
+    plt.close()
 
     # Four panel plot of gate_id, velocity_texture, reflectivity, and
     # cross_correlation_ratio.
@@ -80,8 +81,6 @@ def quicklooks(radar, image_directory=None, sweep=3,
                          max_lat=max_lat, resolution='l', cmap=cmap,
                          vmin=0, vmax=5)
     cbax = plt.gca()
-    # labels = [item.get_text() for item in cbax.get_xticklabels()]
-    # my_display.cbs[-1].ax.set_yticklabels(cats)
     tick_locs = np.linspace(0, len(sorted_cats) - 1, len(sorted_cats)) + 0.5
     display.cbs[-1].locator = matplotlib.ticker.FixedLocator(tick_locs)
     catty_list = [sorted_cats[i][0] for i in range(len(sorted_cats))]
@@ -89,21 +88,24 @@ def quicklooks(radar, image_directory=None, sweep=3,
     display.cbs[-1].update_ticks()
     plt.subplot(2, 2, 2)
     display.plot_ppi_map('reflectivity', sweep=sweep, vmin=-8, vmax=64,
-                         min_lon=min_lon, max_lon=max_lon, min_lat=min_lat, max_lat=max_lat,
-                         resolution='l', cmap=pyart.graph.cm.NWSRef)
+                         min_lon=min_lon, max_lon=max_lon, min_lat=min_lat,
+                         max_lat=max_lat, resolution='l',
+                         cmap=pyart.graph.cm.NWSRef)
 
     plt.subplot(2, 2, 3)
     display.plot_ppi_map('velocity_texture', sweep=sweep, vmin=0, vmax=14,
-                         min_lon=min_lon, max_lon=max_lon, min_lat=min_lat, max_lat=max_lat,
-                         resolution='l', cmap=pyart.graph.cm.NWSRef)
+                         min_lon=min_lon, max_lon=max_lon, min_lat=min_lat,
+                         max_lat=max_lat, resolution='l',
+                         cmap=pyart.graph.cm.NWSRef)
     plt.subplot(2, 2, 4)
     display.plot_ppi_map('cross_correlation_ratio', sweep=sweep, vmin=.5,
                          vmax=1, min_lon=min_lon, max_lon=max_lon,
                          min_lat=min_lat, max_lat=max_lat, resolution='l',
                          cmap=pyart.graph.cm.Carbone42)
     plt.savefig(image_directory + '/cmac_four_panel_plot.png')
+    plt.close()
 
-    # Plot of reflectivity with applied gates.
+    # Creating a plot with reflectivity corrected with gate ids.
     cmac_gates = pyart.correct.GateFilter(radar)
     cmac_gates.exclude_all()
     cmac_gates.include_equal('gate_id', cat_dict['rain'])
@@ -112,7 +114,7 @@ def quicklooks(radar, image_directory=None, sweep=3,
 
     display = pyart.graph.RadarMapDisplay(radar)
     fig = plt.figure(figsize=[10, 8])
-    display.plot_ppi_map('reflectivity', sweep=sweep, resolution='c',
+    display.plot_ppi_map('reflectivity', sweep=sweep, resolution='l',
                          vmin=-8, vmax=64, mask_outside=False,
                          cmap=pyart.graph.cm.NWSRef,
                          min_lat=min_lat, min_lon=min_lon,
@@ -120,3 +122,73 @@ def quicklooks(radar, image_directory=None, sweep=3,
                          lat_lines=lal, lon_lines=lol,
                          gatefilter=cmac_gates)
     plt.savefig(image_directory + '/cmac_corrected_reflectivity.png')
+    plt.close()
+
+    # Creating a plot with reflectivity corrected with attenuation.
+    display = pyart.graph.RadarMapDisplay(radar)
+    fig = plt.figure(figsize=[10, 8])
+    display.plot_ppi_map('corrected_reflectivity_attenuation', sweep=sweep,
+                         vmin=0, vmax=60., resolution='l', colorbar_label='',
+                         title='Corrected Reflectivity Attenuation',
+                         min_lat=min_lat, min_lon=min_lon,
+                         max_lat=max_lat, max_lon=max_lon,
+                         lat_lines=lal, lon_lines=lol)
+    plt.savefig(image_directory + '/corrected_reflectivity_attenuation.png')
+    plt.close()
+
+    # Creating a plot of specific attenuation.
+    display = pyart.graph.RadarMapDisplay(radar)
+    fig = plt.figure(figsize=[10, 8])
+    display.plot_ppi_map('specific_attenuation', sweep=sweep, vmin=0,
+                         vmax=1.0, colorbar_label='', resolution='l',
+                         title='Specific Attenuation',
+                         min_lat=min_lat, min_lon=min_lon,
+                         max_lat=max_lat, max_lon=max_lon,
+                         lat_lines=lal, lon_lines=lol)
+    plt.savefig(image_directory + '/specific_attenuation.png')
+    plt.close()
+
+    # Creating a plot of corrected differential phase.
+    display = pyart.graph.RadarMapDisplay(radar)
+    fig = plt.figure(figsize=[10, 8])
+    display.plot_ppi_map('corrected_differential_phase', sweep=sweep,
+                         title='Processed Differential Phase',
+                         colorbar_label='', resolution='l', min_lat=min_lat,
+                         min_lon=min_lon, max_lat=max_lat, max_lon=max_lon,
+                         lat_lines=lal, lon_lines=lol)
+    plt.savefig(image_directory + '/corrected_differential_phase.png')
+    plt.close()
+
+    # Creating a plot of corrected specific differential phase.
+    display = pyart.graph.RadarMapDisplay(radar)
+    fig = plt.figure(figsize=[10, 8])
+    display.plot_ppi_map('corrected_specific_diff_phase', sweep=sweep,
+                         vmin=0, vmax=6, resolution='l',
+                         title='Processed Specific Differential Phase',
+                         colorbar_label='', min_lat=min_lat,
+                         min_lon=min_lon, max_lat=max_lat, max_lon=max_lon,
+                         lat_lines=lal, lon_lines=lol)
+    plt.savefig(image_directory + '/corrected_specific_diff_phase.png')
+    plt.close()
+
+    # Creating a plot with region dealias corrected velocity.
+    nyq = radar.instrument_parameters['nyquist_velocity']['data'][0]
+    display = pyart.graph.RadarMapDisplay(radar)
+    fig = plt.figure(figsize=[10, 8])
+    display.plot_ppi_map('corrected_velocity', sweep=sweep, resolution='l',
+                         cmap=pyart.graph.cm.NWSVel, vmin=-1.5*nyq,
+                         vmax=1.5*nyq, min_lat=min_lat, min_lon=min_lon,
+                         max_lat=max_lat, max_lon=max_lon, lat_lines=lal,
+                         lon_lines=lol)
+    plt.savefig(image_directory + '/corrected_velocity.png')
+    plt.close()
+
+    # Creating a plot of rain rate A
+    display = pyart.graph.RadarMapDisplay(radar)
+    fig = plt.figure(figsize=[10, 8])
+    display.plot_ppi_map('rain_rate_A', sweep=sweep, resolution='l',
+                         vmin=0, vmax=120, min_lat=min_lat, min_lon=min_lon,
+                         max_lat=max_lat, max_lon=max_lon, lat_lines=lal,
+                         lon_lines=lol)
+    plt.savefig(image_directory + '/rain_rate_A.png')
+    plt.close()
