@@ -67,7 +67,8 @@ def cmac(radar, sonde, clutter_field, alt=320.0, attenuation_a_coef=None,
     print('##    velocity_texture')
 
     print('##    gate_id')
-    my_fuzz, cats = processing_code.do_my_fuzz(radar, tex_start=2.4, tex_end=2.7)
+    my_fuzz, cats = processing_code.do_my_fuzz(radar, tex_start=2.4,
+                                               tex_end=2.7)
     radar.add_field('gate_id', my_fuzz,
                     replace_existing=True)
     radar.fields['gate_id']['data'][clutter_field == 1] = 5
@@ -131,8 +132,8 @@ def cmac(radar, sonde, clutter_field, alt=320.0, attenuation_a_coef=None,
     spec_at['data'][rain_gates.gate_excluded] = 0.0
 
     radar.add_field('specific_attenuation', spec_at)
-    print('##    corrected_reflectivity_attenuation')
-    radar.add_field('corrected_reflectivity_attenuation', cor_z_atten)
+    print('##    attenuation_corrected_reflectivity')
+    radar.add_field('attenuation_corrected_reflectivity', cor_z_atten)
 
     print('## Rainfall rate as a function of A ##')
     R = 51.3 * (radar.fields['specific_attenuation']['data']) ** 0.81
