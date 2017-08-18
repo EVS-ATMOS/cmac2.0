@@ -7,13 +7,14 @@ import copy
 import netCDF4
 import pyart
 import numpy as np
+import sys
 
 
 from . import processing_code
 
 
 def cmac(radar, sonde, clutter_field, alt=320.0, attenuation_a_coef=None,
-         **kwargs):
+         meta_append=None, **kwargs):
     """
     Corrected Moments in Antenna Coordinates
 
@@ -30,6 +31,8 @@ def cmac(radar, sonde, clutter_field, alt=320.0, attenuation_a_coef=None,
     ----------------
     alt : float
         Value to use as default altitude for the radar object.
+    meta_append : dictonary
+        value key pairs to attend to global attributes
 
     Returns
     -------
@@ -156,6 +159,22 @@ def cmac(radar, sonde, clutter_field, alt=320.0, attenuation_a_coef=None,
     print('##')
     print('## All CMAC fields have been added to the radar object.')
     print('##')
+    print('## Appending metadata')
+    if meta_append is None:
+        command_line = ''
+        for item in sys.argv:
+            command_line = command_line + ' ' + item
+        meta_append = {'site_id' : 'sgp',
+                       'facility_id' : 'i5: Garber, Ok',
+                       'data_level' : 'c1',
+                       'comment' : 'This is highly experimental and initial data. There are many known and unknown issues. Please do not use before contacting the Translator responsible scollis@anl.gov',
+                       'attributions' : 'This data is collected by the ARM Climate Research facility. Radar system is operated by the radar engineering team radar@arm.gov and the data is processed by the precipitation radar products team. LP code courtesy of Scott Giangrande BNL. ',
+                       'version' :'2.0 lite',
+                       'vap_name' : 'cmac',
+                       'known_issues' : 'False phidp jumps in insect regions. Still uses old Giangrande code.',
+                       'command_line' : command_line}
+
+    radar.metadata.update(meta_append)
 
     print('## A quasi-vertical profile is being created.')
     qvp = processing_code.retrieve_qvp(radar, radar.fields['height']['data'])
