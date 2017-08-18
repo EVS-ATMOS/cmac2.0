@@ -173,7 +173,10 @@ def cmac(radar, sonde, clutter_field, alt=320.0, attenuation_a_coef=None,
                        'version' :'2.0 lite',
                        'vap_name' : 'cmac',
                        'known_issues' : 'False phidp jumps in insect regions. Still uses old Giangrande code.',
-                       'command_line' : command_line}
+                       'command_line' : command_line,
+                       'developers' : 'Robert Jackson, ANL. Zachary Sherman, ANL.',
+                       'translator' : 'Scott Collis, ANL.',
+                       'mentors' : 'Nitin Bharadwaj, PNNL. Bradley Isom, PNNL. Joseph Hardin, PNNL. Iosif Lindenmaier, PNNL.'}
 
     radar.metadata.update(meta_append)
 
