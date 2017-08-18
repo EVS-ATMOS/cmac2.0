@@ -49,7 +49,7 @@ def main():
                 file_name[where_nc-15:where_nc-1], '%Y%m%d.%H%M%S'))
 
     for image_name in the_image_files:
-        where_cmac = image_name.rfind('/cmac_')
+        where_cmac = image_name.find('.png')
         if(where_cmac > -1):
             image_times.append(datetime.datetime.strptime(
                 image_name[where_cmac-15:where_cmac-1], '%Y%m%d.%H%M%S'))

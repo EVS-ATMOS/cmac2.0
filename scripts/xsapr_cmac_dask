@@ -13,6 +13,7 @@ import glob
 import datetime
 
 from cmac import cmac, quicklooks, get_sounding_times, get_sounding_file_name
+from cmac import xsapr_clutter
 from distributed import Client, wait
 
 
@@ -21,6 +22,16 @@ def run_cmac_and_plotting(radar_file_path, sounding_times, args):
     radar = pyart.io.read(radar_file_path)
     radar_start_date = netCDF4.num2date(radar.time['data'][0],
             radar.time['units'])
+    
+    # Load clutter files
+    clutter_file_path = (args.out_radar + '/clutter_files/clutter' +
+        datetime.datetime.strftime(radar_start_date, '%Y%m%d') + '.nc')
+    clutter = pyart.io.read(clutter_file_path)
+    clutter_field_dict = clutter.fields['xsapr_clutter']
+    radar.add_field(
+        'xsapr_clutter', clutter_field_dict, replace_existing=True)
+    del clutter
+
     closest_time = min(sounding_times,
                        key=lambda d: abs(d - radar_start_date))
     sonde_file = get_sounding_file_name(args.sonde_path,
@@ -43,7 +54,7 @@ def run_cmac_and_plotting(radar_file_path, sounding_times, args):
     else:
         the_path = (args.out_radar + '/' + year_str +  month_str +
             day_str + '/')
-    file_name = (the_path + '/sgpxsaprcmacl5.c1.' + year_str + month_str +
+    file_name = (the_path + '/sgpxsaprcmacsurl5.c1.' + year_str + month_str +
         day_str + '.' + hour_str + minute_str + second_str + '.nc')
 
     if(not os.path.exists(the_path)):
@@ -111,21 +122,67 @@ def main():
         help='Path to dask scheduler json file')
     args = parser.parse_args()
     if os.path.isdir(args.radar_path):
-        radar_files = glob.glob(args.radar_path + '/**/*', recursive=True)
+        radar_files = glob.glob(args.radar_path + '/**/*XSW*', recursive=True)
     elif os.path.isfile(args.radar_path): 
         with open(args.radar_path) as f:
             radar_files = f.readlines()
         radar_files = [x.strip() for x in radar_files]
     else:
         raise IOError('The specified radar path does not exist!')
+    
     sounding_times = get_sounding_times(args.sonde_path)
-       
+ 
+    # Get dates of radar files from file name
+    radar_times = []
+    for file_name in radar_files:
+        where_xsw = file_name.find('XSW')
+        radar_times.append(
+            datetime.datetime.strptime(file_name[where_xsw+3:where_xsw+15],
+                                                 '%y%m%d%H%M%S'))
 
     # Connect to dask client
     client = Client(scheduler_file=args.scheduler_file)
     future_list = []
     n_cores = sum(client.ncores().values())
     print('## Opened dask cluster with ' + str(n_cores) + ' cores')
+    print('## Generating clutter fields...')
+    if(not os.path.exists(args.out_radar + '/clutter_files')):
+        os.mkdir(args.out_radar + '/clutter_files')
+
+    # Parallelize clutter detection by day
+    cur_date = radar_times[0].date()
+    unique_dates = [cur_date]
+    for x in radar_times:
+        if(not x.date() in unique_dates):
+            unique_dates.append(x.date())
+            cur_date = x.date()
+
+    print("Making clutter files!")
+    future_list = []
+    for the_day in unique_dates:
+        print('Submitting task for ' + the_day.strftime('%Y%m%d'))
+        day_files = []
+        if(len(future_list) > n_cores*2):
+            wait(future_list)
+            del(future_list)
+            future_list = []
+        else:
+            for i in range(0, len(radar_times)):
+                if(radar_times[i].date() == the_day):
+                    day_files.append(radar_files[i])
+            out_file_name = (args.out_radar + '/clutter_files/clutter' +
+                datetime.datetime.strftime(the_day, '%Y%m%d') + '.nc')
+            future_list.append(client.submit(
+                xsapr_clutter,day_files, 
+                write_radar=True, out_file=out_file_name))
+    
+
+    # Need to wait for clutter files to be done generating
+    wait(future_list)
+    print('Clutter files made!')
+
+    future_list = []                     
+    
     for the_file in radar_files:
         # Only run so many at a time to save memory
         # Wait for jobs to finish and clear memory from chunk
