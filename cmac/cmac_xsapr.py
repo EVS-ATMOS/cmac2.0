@@ -61,7 +61,7 @@ def cmac(radar, sonde, alt=320.0, attenuation_a_coef=None, **kwargs):
     print('##    velocity_texture')
 
     print('##    gate_id')
-    my_fuzz, cats = processing_code.do_my_fuzz(radar, **kwargs)
+    my_fuzz, cats = processing_code.do_my_fuzz(radar, tex_start=2.4, tex_end=2.7)
     radar.add_field('gate_id', my_fuzz,
                     replace_existing=True)
     cat_dict = {}
@@ -80,22 +80,33 @@ def cmac(radar, sonde, alt=320.0, attenuation_a_coef=None, **kwargs):
         gatefilter=cmac_gates, centered=True)
     radar.add_field('corrected_velocity', corr_vel, replace_existing=True)
 
+    fzl = processing_code.get_melt(radar)
+
+
     print('##    corrected_differential_phase')
-    phidp, kdp = pyart.correct.phase_proc_lp(radar, 0.0, debug=True)
+    phidp, kdp = pyart.correct.phase_proc_lp(radar, 0.0, debug=True,
+                                        nowrap = 50, fzl=fzl)
+
+    phidp_flt, kdp_filt = processing_code.fix_phase_fields(copy.deepcopy(kdp), copy.deepcopy(phidp),
+                                                 radar.range['data'],
+                                                 cmac_gates)
+
     radar.add_field('corrected_differential_phase', phidp)
+    radar.add_field('filtered_corrected_differential_phase', phidp_flt)
+
     print('##    corrected_specific_diff_phase')
     radar.add_field('corrected_specific_diff_phase', kdp)
+    radar.add_field('filtered_corrected_specific_diff_phase', kdp_filt)
 
     print('##    specific_attenuation')
     if attenuation_a_coef is None:
         attenuation_a_coef = 0.17 #X-Band
 
-
     spec_at, cor_z_atten = pyart.correct.calculate_attenuation(
         radar, 0, refl_field='reflectivity',
         ncp_field='normalized_coherent_power',
         rhv_field='cross_correlation_ratio',
-        phidp_field='corrected_differential_phase',
+        phidp_field='filtered_corrected_differential_phase',
         a_coef=attenuation_a_coef)
 
     cat_dict = {}

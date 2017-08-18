@@ -21,6 +21,7 @@ import netCDF4
 import numpy as np
 import pyart
 import skfuzzy as fuzz
+from scipy import integrate
 
 from csu_radartools import csu_kdp
 from scipy import ndimage, interpolate
@@ -175,38 +176,38 @@ def cum_score_fuzzy_logic(radar, mbfs=None,
     return rv
 
 
-def do_my_fuzz(radar):
+def do_my_fuzz(radar, tex_start=2.0, tex_end=2.1):
     print('##')
     print('## CMAC calculation using fuzzy logic:')
-    second_trip = {'velocity_texture': [[2.0, 2.1, 130., 130.], 4.0],
+    second_trip = {'velocity_texture': [[tex_start, tex_end, 130., 130.], 4.0],
                    'cross_correlation_ratio': [[.5, .7, 1, 1], 0.0],
                    'normalized_coherent_power': [[0, 0, .5, .6], 1.0],
                    'height': [[0, 0, 5000, 8000], 0.0],
                    'sounding_temperature': [[-100, -100, 100, 100], 0.0],
                    'SNR': [[5, 10, 1000, 1000], 1.0]}
 
-    rain = {'velocity_texture': [[0, 0, 2, 2.1], 1.0],
+    rain = {'velocity_texture': [[0, 0, tex_start, tex_end], 1.0],
             'cross_correlation_ratio': [[0.97, 0.98, 1, 1], 1.0],
             'normalized_coherent_power': [[0.4, 0.5, 1, 1], 1.0],
             'height': [[0, 0, 5000, 6000], 0.0],
             'sounding_temperature': [[2., 5., 100, 100], 2.0],
             'SNR': [[8, 10, 1000, 1000], 1.0]}
 
-    snow = {'velocity_texture': [[0, 0, 2, 2.1], 1.0],
+    snow = {'velocity_texture': [[0, 0, tex_start, tex_end], 1.0],
             'cross_correlation_ratio': [[0.65, 0.9, 1, 1], 1.0],
             'normalized_coherent_power': [[0.4, 0.5, 1, 1], 1.0],
             'height': [[0, 0, 25000, 25000], 0.0],
             'sounding_temperature': [[-100, -100, .5, 4.], 2.0],
             'SNR': [[8, 10, 1000, 1000], 1.0]}
 
-    no_scatter = {'velocity_texture': [[2, 2.1, 330., 330.], 2.0],
+    no_scatter = {'velocity_texture': [[tex_start, tex_end, 330., 330.], 2.0],
                   'cross_correlation_ratio': [[0, 0, 0.1, 0.2], 0.0],
                   'normalized_coherent_power': [[0, 0, 0.1, 0.2], 0.0],
                   'height': [[0, 0, 25000, 25000], 0.0],
                   'sounding_temperature': [[-100, -100, 100, 100], 0.0],
                   'SNR': [[-100, -100, 5, 10], 4.0]}
 
-    melting = {'velocity_texture': [[0, 0, 2, 2.1], 0.0],
+    melting = {'velocity_texture': [[0, 0, tex_start, tex_end], 0.0],
                'cross_correlation_ratio': [[0.6, 0.65, .9, .96], 2.0],
                'normalized_coherent_power': [[0.4, 0.5, 1, 1], 0],
                'height': [[0, 0, 25000, 25000], 0.0],
@@ -229,6 +230,41 @@ def do_my_fuzz(radar):
     melt_val = list(cats).index('melting')
     return _fix_rain_above_bb(gid_fld, rain_val, melt_val, snow_val), cats
 
+
+def get_melt(radar, melt_cat=None):
+    if melt_cat is None:
+        cat_dict = {}
+        for pair_str in radar.fields['gate_id']['notes'].split(','):
+            cat_dict.update(
+                {pair_str.split(':')[1]: int(pair_str.split(':')[0])})
+
+        melt_cat = cat_dict['melting']
+
+    melt_locations = np.where(radar.fields['gate_id']['data'] == melt_cat)
+    kinda_cold = np.where(radar.fields['sounding_temperature']['data'] < 0)
+    fzl_sounding = radar.gate_altitude['data'][kinda_cold].min()
+    if len(melt_locations[0] > 1):
+        fzl_pid = radar.gate_altitude['data'][melt_locations].min()
+        fzl = (fzl_pid + fzl_sounding) / 2.0
+    else:
+        fzl = fzl_sounding
+
+    print(fzl)
+    if fzl > 5000:
+        fzl = 3500.0
+
+    return fzl
+
+def fix_phase_fields(orig_kdp, orig_phidp, rrange, happy_kdp,
+                     max_kdp=15.0):
+
+    orig_kdp['data'][happy_kdp.gate_excluded] = 0.0
+    orig_kdp['data'][orig_kdp['data']>max_kdp] = max_kdp
+    interg = integrate.cumtrapz(orig_kdp['data'], rrange, axis=1)
+    print(interg.shape)
+    print(orig_phidp['data'].shape)
+    orig_phidp['data'][:,0:-1] = interg/len(rrange)
+    return orig_phidp, orig_kdp
 
 def return_csu_kdp(radar):
     dzN = _extract_unmasked_data(radar, 'reflectivity')
