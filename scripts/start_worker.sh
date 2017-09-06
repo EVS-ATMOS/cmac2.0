@@ -17,5 +17,6 @@ export LC_ALL=en_US.UTF-8
 export LANG=en_US.UTF-8
 export TMPDIR=$2
 export MPLBACKEND="agg"
-dask-worker --nprocs 16 --nthreads 1 --scheduler-file=$1 --local-directory=$2 --no-nanny
+source activate cmac_env
+dask-worker --nprocs 1 --nthreads 16 --scheduler-file=$1 --local-directory=$2 --no-nanny
 
