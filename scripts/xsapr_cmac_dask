@@ -25,17 +25,17 @@ def run_cmac_and_plotting(radar_file_path, sounding_times,
             radar.time['units'])
     
     # Load clutter files
-    #clutter_file_path = (args.out_radar + '/clutter_files/clutter' +
-    #    datetime.datetime.strftime(radar_start_date.date(), '%Y%m%d')
-    #    + '.nc')
-    #print('## Loading clutter file ' + clutter_file_path)
-    #clutter = pyart.io.read(clutter_file_path)
-    #print('## Reading dictionary...')
-    #clutter_field_dict = clutter.fields['xsapr_clutter']
-    #print('## Adding clutter field..')
-    #radar.add_field(
-    #    'xsapr_clutter', clutter_field_dict, replace_existing=True)
-    #del clutter
+    clutter_file_path = (args.out_radar + '/clutter_files/clutter' +
+        datetime.datetime.strftime(radar_start_date.date(), '%Y%m%d')
+        + '.nc')
+    print('## Loading clutter file ' + clutter_file_path)
+    clutter = pyart.io.read(clutter_file_path)
+    print('## Reading dictionary...')
+    clutter_field_dict = clutter.fields['xsapr_clutter']
+    print('## Adding clutter field..')
+    radar.add_field(
+        'xsapr_clutter', clutter_field_dict, replace_existing=True)
+    del clutter
     closest_time = min(sounding_times,
                        key=lambda d: abs(d - radar_start_date))
     sonde_file = get_sounding_file_name(args.sonde_path,
