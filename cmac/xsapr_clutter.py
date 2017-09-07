@@ -71,7 +71,8 @@ def xsapr_clutter(files, clutter_thresh_min=0.0002,
                             replace_existing=True)
     if write_radar is True:
         pyart.io.write_cfradial(out_file, clutter_radar)
-    return clutter_radar
+    del clutter_radar
+    return
 
 
 # Adapted from http://stackoverflow.com/a/17637351/6392167
