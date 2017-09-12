@@ -4,7 +4,7 @@ import pyart
 
 def xsapr_clutter(files, clutter_thresh_min=0.0002,
                   clutter_thresh_max=1.5, radius=1,
-                  write_radar=False, out_file=None):
+                  write_radar=True, out_file=None):
     """
     X-SAPR Wind Farm Clutter Calculation
 
@@ -28,7 +28,7 @@ def xsapr_clutter(files, clutter_thresh_min=0.0002,
         be also flagged as clutter.
     write_radar : bool
         Whether to or not, to write the clutter radar as a netCDF file.
-        Default is False.
+        Default is True.
     out_file : string
         String of location and filename to write the radar object too,
         if write_radar is True.
@@ -45,13 +45,20 @@ def xsapr_clutter(files, clutter_thresh_min=0.0002,
     run_stats = _RunningStats()
     first_shape = 0
     for file in files:
-        radar = pyart.io.read(file)
-        reflect_array = radar.fields['reflectivity']['data']
-        del radar
-        if(first_shape == 0):
-            first_shape = reflect_array.shape
-        if(reflect_array.shape == first_shape):
-            run_stats.push(reflect_array)
+        try:
+            radar = pyart.io.read(file)
+            reflect_array = radar.fields['reflectivity']['data']
+            if first_shape == 0:
+                first_shape = reflect_array.shape
+                clutter_radar = radar
+                run_stats.push(reflect_array)
+            if reflect_array.shape == first_shape:
+                run_stats.push(reflect_array)
+            del radar
+        except TypeError:
+            print(file + ' is corrupt...skipping!')
+            continue
+
     mean = run_stats.mean()
     stdev = run_stats.standard_deviation()
     # new_means = expit(mean / 1000)
@@ -63,8 +70,6 @@ def xsapr_clutter(files, clutter_thresh_min=0.0002,
         np.logical_and(clutter_values > clutter_thresh_min,
                        clutter_values < clutter_thresh_max))
     clutter_array = _clutter_marker(is_clutters, shape, mask, radius)
-
-    clutter_radar = pyart.io.read(files[0])
     clutter_radar.fields.clear()
     clutter_dict = _clutter_to_dict(clutter_array)
     clutter_radar.add_field('xsapr_clutter', clutter_dict,
