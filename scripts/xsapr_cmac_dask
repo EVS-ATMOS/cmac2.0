@@ -11,6 +11,7 @@ import netCDF4
 import pyart
 import glob
 import datetime
+import stat
 
 from cmac import cmac, quicklooks, get_sounding_times, get_sounding_file_name
 from cmac import xsapr_clutter
@@ -22,7 +23,7 @@ def run_cmac_and_plotting(radar_file_path, sounding_times,
                           args):
     try:
         radar = pyart.io.read(radar_file_path)
-    except (TypeError, RuntimeError) as e:
+    except (TypeError, OSError) as e:
         print(radar_file_path + ' is corrupt!')
         return
     radar_start_date = netCDF4.num2date(radar.time['data'][0],
@@ -69,7 +70,7 @@ def run_cmac_and_plotting(radar_file_path, sounding_times,
 
     if(not os.path.exists(the_path)):
         os.makedirs(the_path)
-        os.chmod(the_path, stat.S_IRGRP | stat.S_IWGRP | stat.S_IXGRP)
+        os.chmod(the_path, stat.S_IRUSR| stat.S_IWUSR| stat.S_IXUSR| stat.S_IRGRP | stat.S_IWGRP | stat.S_IXGRP)
 
     pyart.io.write_cfradial(file_name, cmac_radar)
     print('## A CMAC radar object has been created at ' + file_name)
@@ -77,7 +78,7 @@ def run_cmac_and_plotting(radar_file_path, sounding_times,
         day_str + '.' + hour_str + minute_str + second_str)
     if(not os.path.exists(img_directory)):
         os.makedirs(img_directory)
-        os.chmod(img_directory, stat.S_IRGRP | stat.S_IWGRP | stat.S_IXGRP)
+        os.chmod(img_directory, stat.S_IRUSR| stat.S_IWUSR| stat.S_IXUSR| stat.S_IRGRP | stat.S_IWGRP | stat.S_IXGRP)
     
     quicklooks(cmac_radar, image_directory=img_directory,
                sweep=args.sweep, max_lat=args.max_latitude,
@@ -162,7 +163,7 @@ def main():
         os.mkdir(args.out_radar + '/clutter_files')
         os.chmod(
             args.out_radar + '/clutter_files',
-            stat.S_IRGRP | stat.S_IWGRP | stat.S_IXGRP)
+            stat.S_IRUSR| stat.S_IWUSR| stat.S_IXUSR| stat.S_IRGRP | stat.S_IWGRP | stat.S_IXGRP)
 
     # Parallelize clutter detection by day
     cur_date = radar_times[0].date()
