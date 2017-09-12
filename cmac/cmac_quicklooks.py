@@ -13,6 +13,8 @@ import pyart
 from pyart.graph.common import generate_radar_name
 from pyart.graph.common import generate_radar_time_begin, generate_title
 
+plt.switch_backend('agg')
+
 
 def quicklooks(radar, image_directory=None, sweep=3,
                max_lat=37.0, min_lat=36.0, max_lon=-97.0, min_lon=-98.3):
