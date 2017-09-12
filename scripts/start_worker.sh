@@ -12,11 +12,10 @@ hostIndex=0
 echo "Pulling from schedule node:"
 echo $scheduler_node
 echo $localscratch
-export PATH=/home/rjackson/anaconda3/bin:$PATH
+export PATH=/home/zsherman/anaconda3/envs/cmac_env/bin:$PATH
+source activate cmac_env
 export LC_ALL=en_US.UTF-8
 export LANG=en_US.UTF-8
 export TMPDIR=$2
 export MPLBACKEND="agg"
-source activate cmac_env
 dask-worker --nprocs 1 --nthreads 16 --scheduler-file=$1 --local-directory=$2 --no-nanny
-
