@@ -180,9 +180,9 @@ def cmac(radar, sonde, alt=320.0, attenuation_a_coef=None,
 
     radar.metadata.update(meta_append)
 
-    print('## A quasi-vertical profile is being created.')
-    qvp = processing_code.retrieve_qvp(radar, radar.fields['height']['data'])
-    radar.qvp = qvp
-    print('## The quasi-vertical profile has been created and',
-          'can be accessed with radar.qvp')
+    #print('## A quasi-vertical profile is being created.')
+    #qvp = processing_code.retrieve_qvp(radar, radar.fields['height']['data'])
+    #radar.qvp = qvp
+    #print('## The quasi-vertical profile has been created and',
+    #      'can be accessed with radar.qvp')
     return radar
