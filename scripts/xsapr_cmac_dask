@@ -20,14 +20,19 @@ from distributed import Client, wait
 """ For dask we need the radar plotting routines all in one subroutine """ 
 def run_cmac_and_plotting(radar_file_path, sounding_times, 
                           args):
-    radar = pyart.io.read(radar_file_path)
+    try:
+        radar = pyart.io.read(radar_file_path)
+    except TypeError:
+        print(radar_file_path + ' is corrupt!')
+        return
     radar_start_date = netCDF4.num2date(radar.time['data'][0],
             radar.time['units'])
     
     # Load clutter files
-    clutter_file_path = (args.out_radar + '/clutter_files/clutter' +
-        datetime.datetime.strftime(radar_start_date.date(), '%Y%m%d')
-        + '.nc')
+    #clutter_file_path = (args.out_radar + '/clutter_files/clutter' +
+        #datetime.datetime.strftime(radar_start_date.date(), '%Y%m%d')
+        #+ '.nc')
+    clutter_file_path = '/lustre/or-hydra/cades-arm/proj-shared/sgpxsaprcmacsurI5.c1/clutter_files/clutter20170904.nc'
     print('## Loading clutter file ' + clutter_file_path)
     clutter = pyart.io.read(clutter_file_path)
     print('## Reading dictionary...')
@@ -175,29 +180,29 @@ def main():
             for i in range(0, len(radar_times)):
                 if(radar_times[i].date() == the_day):
                     day_files.append(radar_files[i])
+            print(day_files)
             out_file_name = (args.out_radar + '/clutter_files/clutter' +
                 datetime.datetime.strftime(the_day, '%Y%m%d') + '.nc')
             future_list.append(client.submit(
-                xsapr_clutter,day_files, 
+                xsapr_clutter, day_files, 
                 write_radar=True, out_file=out_file_name))
     
 
-    # Need to wait for clutter files to be done generating
-    clutters = client.gather(future_list)
+    # Need to wait for clutter files to be done generating.
+    wait(future_list)
     print('Clutter files made!')
-    del future_list, clutters
     future_list = []                     
     for the_file in radar_files:
-        # Only run so many at a time to save memory
-        # Wait for jobs to finish and clear memory from chunk
+        # Only run so many at a time to save memory.
+        # Wait for jobs to finish and clear memory from chunk.
         if(len(future_list) > n_cores*2):
             wait(future_list)
             del future_list
             future_list = []
         else:
-            future_list.append(client.submit(run_cmac_and_plotting, the_file,
-                sounding_times, args))
-            
+            future_list.append(client.submit(
+                run_cmac_and_plotting, the_file, sounding_times, args))
+
     ## Do radar object loading on compute nodes. 
     if args.image_directory is None:
         print('## Quicklooks have been saved in your home directory.')
