@@ -55,7 +55,7 @@ def xsapr_clutter(files, clutter_thresh_min=0.0002,
             if reflect_array.shape == first_shape:
                 run_stats.push(reflect_array)
             del radar
-        except TypeError:
+        except (TypeError, RuntimeError) as e:
             print(file + ' is corrupt...skipping!')
             continue
 
