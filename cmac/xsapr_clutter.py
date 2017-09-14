@@ -35,7 +35,9 @@ def xsapr_clutter(files, clutter_thresh_min=0.0002,
     out_file : string
         String of location and filename to write the radar object too,
         if write_radar is True.
-
+    use_dask : bool
+        Use dask instead of running stats for calculation 
+        (good to run in parallel).
     Returns
     -------
     clutter_radar : Radar
