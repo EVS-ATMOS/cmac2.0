@@ -17,4 +17,4 @@ export MPLBACKEND="agg"
 pbsdsh -c 1 -v -- $PBS_O_WORKDIR/start_scheduler.sh /home/zsherman/scheduler.json /home/zsherman/temp_dir &
 pbsdsh -u -v -- $PBS_O_WORKDIR/start_worker.sh /home/zsherman/scheduler.json /home/zsherman/temp_dir &
 
-./xsapr_cmac_dask /lustre/or-hydra/cades-arm/proj-shared/cmac_sgpxsaprppiI5.00/201709/ /lustre/or-hydra/cades-arm/proj-shared/sgpsondewnpn.C1.b1/ --scheduler_file=/home/zsherman/scheduler.json -o /lustre/or-hydra/cades-arm/proj-shared/sgpxsaprcmacsurI5.c1 -id /lustre/or-hydra/cades-arm/proj-shared/sgpxsaprcmacsurI5.c1.png
+./xsapr_cmac_dask /lustre/or-hydra/cades-arm/proj-shared/cmac_sgpxsaprppiI5.00/201709/ /lustre/or-hydra/cades-arm/proj-shared/sgpsondewnpnC1.b1/ --scheduler_file=/home/zsherman/scheduler.json -o /lustre/or-hydra/cades-arm/proj-shared/sgpxsaprcmacsurI5.c1 -id /lustre/or-hydra/cades-arm/proj-shared/sgpxsaprcmacsurI5.c1.png

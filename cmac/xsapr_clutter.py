@@ -50,9 +50,13 @@ def xsapr_clutter(files, clutter_thresh_min=0.0002,
             radar = pyart.io.read(file)
             reflect_array = deepcopy(radar.fields['reflectivity']['data'])
             del radar
+<<<<<<< HEAD
             if(reflect_array.shape == first_shape):
                 return reflect_array.filled(fill_value=np.nan)
         except:
+=======
+        except (TypeError, RuntimeError) as e:
+>>>>>>> 3274aa2a4a67d71144fe6df0078d92e3a075c779
             print(file + ' is corrupt...skipping!')
             
         return np.nan*np.zeros(first_shape)

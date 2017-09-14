@@ -2,15 +2,17 @@
 """ Creates a radar object with applied CMAC 2.0 and quicklooks pertaining
 to CMAC 2.0. """
 
+import argparse
+import datetime
+import gc
+import glob
 import os
+import stat
 
 from matplotlib import use
 use('agg')
-import argparse
 import netCDF4
 import pyart
-import glob
-import datetime
 
 from cmac import cmac, quicklooks, get_sounding_times, get_sounding_file_name
 from cmac import xsapr_clutter
@@ -22,7 +24,7 @@ def run_cmac_and_plotting(radar_file_path, sounding_times,
                           args):
     try:
         radar = pyart.io.read(radar_file_path)
-    except TypeError:
+    except (TypeError):
         print(radar_file_path + ' is corrupt!')
         return
     radar_start_date = netCDF4.num2date(radar.time['data'][0],
@@ -32,7 +34,7 @@ def run_cmac_and_plotting(radar_file_path, sounding_times,
     #clutter_file_path = (args.out_radar + '/clutter_files/clutter' +
         #datetime.datetime.strftime(radar_start_date.date(), '%Y%m%d')
         #+ '.nc')
-    clutter_file_path = '/lustre/or-hydra/cades-arm/proj-shared/sgpxsaprcmacsurI5.c1/clutter_files/clutter20170904.nc'
+    clutter_file_path = '/lustre/or-hydra/cades-arm/proj-shared/sgpxsaprcmacsurI5.c1/clutter_files/clutter20170909.nc'
     print('## Loading clutter file ' + clutter_file_path)
     clutter = pyart.io.read(clutter_file_path)
     print('## Reading dictionary...')
@@ -64,11 +66,14 @@ def run_cmac_and_plotting(radar_file_path, sounding_times,
     else:
         the_path = (args.out_radar + '/' + year_str +  month_str +
             day_str + '/')
-    file_name = (the_path + '/sgpxsaprcmacsurl5.c1.' + year_str + month_str +
+    file_name = (the_path + '/sgpxsaprcmacsurI5.c1.' + year_str + month_str +
         day_str + '.' + hour_str + minute_str + second_str + '.nc')
 
     if(not os.path.exists(the_path)):
         os.makedirs(the_path)
+        os.chmod(
+            the_path,
+            stat.S_IRUSR| stat.S_IWUSR| stat.S_IXUSR| stat.S_IRGRP | stat.S_IWGRP | stat.S_IXGRP)
 
     pyart.io.write_cfradial(file_name, cmac_radar)
     print('## A CMAC radar object has been created at ' + file_name)
@@ -76,6 +81,9 @@ def run_cmac_and_plotting(radar_file_path, sounding_times,
         day_str + '.' + hour_str + minute_str + second_str)
     if(not os.path.exists(img_directory)):
         os.makedirs(img_directory)
+        os.chmod(
+            img_directory,
+            stat.S_IRUSR| stat.S_IWUSR| stat.S_IXUSR| stat.S_IRGRP | stat.S_IWGRP | stat.S_IXGRP)
     
     quicklooks(cmac_radar, image_directory=img_directory,
                sweep=args.sweep, max_lat=args.max_latitude,
@@ -84,6 +92,7 @@ def run_cmac_and_plotting(radar_file_path, sounding_times,
     print('## Quicklooks have been saved at ' + img_directory)
     print('##')
     del cmac_radar
+
 
 def main():
     """ The main function utilizes the cmac function and quicklooks function
@@ -158,6 +167,9 @@ def main():
     print('## Generating clutter fields...')
     if(not os.path.exists(args.out_radar + '/clutter_files')):
         os.mkdir(args.out_radar + '/clutter_files')
+        os.chmod(
+            args.out_radar + '/clutter_files',
+            stat.S_IRUSR| stat.S_IWUSR| stat.S_IXUSR| stat.S_IRGRP | stat.S_IWGRP | stat.S_IXGRP)
 
     # Parallelize clutter detection by day
     cur_date = radar_times[0].date()
