@@ -1,10 +1,13 @@
 import numpy as np
 import pyart
-
+import dask.array as da
+from copy import deepcopy
+from dask import delayed
 
 def xsapr_clutter(files, clutter_thresh_min=0.0002,
                   clutter_thresh_max=1.5, radius=1,
-                  write_radar=True, out_file=None):
+                  write_radar=True, out_file=None,
+                  use_dask=False):
     """
     X-SAPR Wind Farm Clutter Calculation
 
@@ -42,28 +45,65 @@ def xsapr_clutter(files, clutter_thresh_min=0.0002,
 
     """
 
-    run_stats = _RunningStats()
-    first_shape = 0
-    for file in files:
+    def get_reflect_array(file, first_shape):
         try:
             radar = pyart.io.read(file)
-            reflect_array = radar.fields['reflectivity']['data']
-            if first_shape == 0:
+            reflect_array = deepcopy(radar.fields['reflectivity']['data'])
+            del radar
+            if(reflect_array.shape == first_shape):
+                return reflect_array.filled(fill_value=np.nan)
+        except:
+            print(file + ' is corrupt...skipping!')
+            
+        return np.nan*np.zeros(first_shape)
+       
+    if(use_dask == False):
+        run_stats = _RunningStats()
+        first_shape = 0
+        for file in files:
+            try:
+                radar = pyart.io.read(file)
+                reflect_array = radar.fields['reflectivity']['data']
+                if first_shape == 0:
+                    first_shape = reflect_array.shape
+                    clutter_radar = radar
+                    run_stats.push(reflect_array)
+                if reflect_array.shape == first_shape:
+                    run_stats.push(reflect_array)
+                del radar
+            except TypeError:
+                print(file + ' is corrupt...skipping!')
+                continue
+        mean = run_stats.mean()
+        stdev = run_stats.standard_deviation()
+        clutter_values = stdev / mean
+    else:
+        first_shape = 0
+        i = 0
+        while(first_shape == 0):
+            try:
+                radar = pyart.io.read(files[i])
+                reflect_array = radar.fields['reflectivity']['data']
                 first_shape = reflect_array.shape
                 clutter_radar = radar
-                run_stats.push(reflect_array)
-            if reflect_array.shape == first_shape:
-                run_stats.push(reflect_array)
-            del radar
-        except TypeError:
-            print(file + ' is corrupt...skipping!')
-            continue
+            except TypeError:
+                i = i + 1
+                print(file + ' is corrupt...skipping!')
+                continue
+        arrays = [delayed(get_reflect_array)(file, first_shape)
+                  for file in files]
+        array = [da.from_delayed(a, shape=first_shape, dtype=float)
+                 for a in arrays]
+        array = da.stack(array, axis=0)
+        print('## Calculating mean in parallel...')
+        mean = np.array(da.nanmean(array, axis=0))
+        print('## Caluclating standard deviation...')
+        stdev = np.array(da.nanstd(array, axis=0))
+        clutter_values = stdev / mean
+        clutter_values = np.ma.masked_invalid(clutter_values)
 
-    mean = run_stats.mean()
-    stdev = run_stats.standard_deviation()
     # new_means = expit(mean / 1000)
-    clutter_values = stdev / mean
-
+   
     shape = clutter_values.shape
     mask = np.ma.getmask(clutter_values)
     is_clutters = np.argwhere(
