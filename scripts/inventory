@@ -43,16 +43,14 @@ def main():
     out_times = []
     image_times = []
     for file_name in the_out_files:
-        where_nc = file_name.find('.nc')
-        if(where_nc > -1):
-            out_times.append(datetime.datetime.strptime(
-                file_name[where_nc-15:where_nc-1], '%Y%m%d.%H%M%S'))
-
+           try:
+               out_times.append(datetime.datetime.strptime(
+                   file_name[-18:-3], '%Y%m%d.%H%M%S'))
+           except ValueError:
+               continue
     for image_name in the_image_files:
-        where_cmac = image_name.find('.png')
-        if(where_cmac > -1):
-            image_times.append(datetime.datetime.strptime(
-                image_name[where_cmac-15:where_cmac-1], '%Y%m%d.%H%M%S'))
+        image_times.append(datetime.datetime.strptime(
+            image_name[-19:-4], '%Y%m%d.%H%M%S'))
     
     indices = [i[0] for i in sorted(enumerate(radar_times), key=lambda x:x[1])]
     radar_times.sort()
