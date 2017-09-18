@@ -7,6 +7,7 @@ import datetime
 import gc
 import glob
 import os
+import shutil
 import stat
 
 from matplotlib import use
@@ -24,8 +25,15 @@ def run_cmac_and_plotting(radar_file_path, sounding_times,
                           args):
     try:
         radar = pyart.io.read(radar_file_path)
-    except (TypeError):
-        print(radar_file_path + ' is corrupt!')
+    except TypeError:
+        path = '/lustre/or-hydra/cades-arm/proj-shared/cmac_sgpxsaprppiI5.00/type_error_radars/'
+        print(radar_file_path + ' has encountered TypeError!')
+        if not os.path.exists(path):
+            os.makedirs(path)
+            os.chmod(
+                path
+                stat.S_IRUSR| stat.S_IWUSR| stat.S_IXUSR| stat.S_IRGRP | stat.S_IWGRP | stat.S_IXGRP)
+        shutil.move(radar_file_path, path)
         return
     radar_start_date = netCDF4.num2date(radar.time['data'][0],
             radar.time['units'])
