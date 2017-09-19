@@ -229,7 +229,7 @@ def main():
     if args.image_directory is None:
         print('## Quicklooks have been saved in your home directory.')
     else:
-        print('## Quicklooks have been save to ' + args.image_directory)
+        print('## Quicklooks have been saved to ' + args.image_directory)
     print('##')
     print('## CMAC 2.0 Completed in ' + str(time.time() - bt) + ' s')
     client.shutdown()
