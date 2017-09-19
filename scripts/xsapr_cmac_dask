@@ -7,6 +7,7 @@ import datetime
 import gc
 import glob
 import os
+import shutil
 import stat
 import time
 
@@ -25,8 +26,18 @@ def run_cmac_and_plotting(radar_file_path, sounding_times,
                           args):
     try:
         radar = pyart.io.read(radar_file_path)
-    except (TypeError):
-        print(radar_file_path + ' is corrupt!')
+    except TypeError:
+        if args.bad_directory is None:
+            path = (os.path.expanduser('~') + '/' + 'type_error_radars/')
+        else:
+            path = args.bad_directory
+        print(radar_file_path + ' has encountered TypeError!')
+        if not os.path.exists(path):
+            os.makedirs(path)
+            os.chmod(
+                path
+                stat.S_IRUSR| stat.S_IWUSR| stat.S_IXUSR| stat.S_IRGRP | stat.S_IWGRP | stat.S_IXGRP)
+        shutil.move(radar_file_path, path)
         return
     radar_start_date = netCDF4.num2date(radar.time['data'][0],
             radar.time['units'])
@@ -141,6 +152,10 @@ def main():
     parser.add_argument(
         '-sched', '--scheduler_file', type=str, default='~/scheduler.json',
         help='Path to dask scheduler json file')
+    parser.add_argument(
+        '-bd', '--bad_directory', type=str, default=None,
+        help=('Path to directory to place radar input files that'
+              + ' can not be read by Py-ART due to TypeError'))
     args = parser.parse_args()
     if os.path.isdir(args.radar_path):
         radar_files = glob.glob(args.radar_path + '/**/*XSW*', recursive=True)
@@ -221,7 +236,7 @@ def main():
     if args.image_directory is None:
         print('## Quicklooks have been saved in your home directory.')
     else:
-        print('## Quicklooks have been save to ' + args.image_directory)
+        print('## Quicklooks have been saved to ' + args.image_directory)
     print('##')
     print('## CMAC 2.0 Completed in ' + str(time.time() - bt) + ' s')
     client.shutdown()
