@@ -28,9 +28,9 @@ def run_cmac_and_plotting(radar_file_path, sounding_times,
         radar = pyart.io.read(radar_file_path)
     except TypeError:
         if args.bad_directory is None:
-            path = (os.path.expanduser('~') + '/'+ 'type_error_radars/')
+            path = (os.path.expanduser('~') + '/' + 'type_error_radars/')
         else:
-            path = args.bad_directory)
+            path = args.bad_directory
         print(radar_file_path + ' has encountered TypeError!')
         if not os.path.exists(path):
             os.makedirs(path)
