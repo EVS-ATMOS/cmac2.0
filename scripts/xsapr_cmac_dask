@@ -26,7 +26,10 @@ def run_cmac_and_plotting(radar_file_path, sounding_times,
     try:
         radar = pyart.io.read(radar_file_path)
     except TypeError:
-        path = '/lustre/or-hydra/cades-arm/proj-shared/cmac_sgpxsaprppiI5.00/type_error_radars/'
+        if args.bad_directory is None:
+            path = (os.path.expanduser('~') + '/'+ 'type_error_radars/')
+        else:
+            path = args.bad_directory)
         print(radar_file_path + ' has encountered TypeError!')
         if not os.path.exists(path):
             os.makedirs(path)
@@ -147,6 +150,10 @@ def main():
     parser.add_argument(
         '-sched', '--scheduler_file', type=str, default='~/scheduler.json',
         help='Path to dask scheduler json file')
+    parser.add_argument(
+        '-bd', '--bad_directory', type=str, default=None,
+        help=('Path to directory to place radar input files that'
+              + ' can not be read by Py-ART due to TypeError'))
     args = parser.parse_args()
     if os.path.isdir(args.radar_path):
         radar_files = glob.glob(args.radar_path + '/**/*XSW*', recursive=True)
