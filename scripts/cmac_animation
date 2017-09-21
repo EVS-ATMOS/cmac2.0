@@ -20,7 +20,7 @@ def main():
         type=str,
         help="End date string to do gif creation. Example:'20170928'")
     parser.add_argument(
-        '-fr', '--frame_rate', type=float,
+        '-fr', '--frame_rate', type=float, default=1.0,
         help='Frame rate to create gif with. Example: 2.0')
     args = parser.parse_args()
 
@@ -60,7 +60,7 @@ def main():
                   + " 'scale=trunc(iw/2)*2:trunc(ih/2)*2' -y "
                   + date_path + "cmac_four_panel_plot.sgpxsaprcmacsurI5.c1."
                   + str_i + ".mp4")
-        shutil.rmtree(path + 'temp_images/')
+        os.remove(path + 'temp_images/')
 
 if __name__ == '__main__':
     main()
