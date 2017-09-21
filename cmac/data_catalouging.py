@@ -1,21 +1,25 @@
-import glob
-import datetime
+""" Determines the closest sounding file by datetime to a radar file. """
 
-"""This function parses the time periods from a list of SGP sonde files."""
+import datetime
+import glob
+
+
 def get_sounding_times(sonde_path):
+    """ This function parses the time periods from a list of SGP
+    sonde files. """
     file_list = glob.glob(sonde_path + '/*.cdf')
     time_list = []
     for file_name in file_list:
-        time_list.append(datetime.datetime.strptime(file_name,
-                                                    (sonde_path +
-                                                     'sgpsondewnpnC1.b1.' +
-                                                     '%Y%m%d.%H%M%S.cdf')))
+        time_list.append(
+            datetime.datetime.strptime(
+                file_name, (sonde_path + 'sgpsondewnpnC1.b1.'
+                            + '%Y%m%d.%H%M%S.cdf')))
     return time_list
 
 
-""" This function will give a filename of a sounding corresponding to 
-    a given time """
 def get_sounding_file_name(sonde_path, time):
+    """ This function will give a filename of a sounding corresponding
+    to given time. """
     year_str = "%04d" % time.year
     month_str = "%02d" % time.month
     day_str = "%02d" % time.day
