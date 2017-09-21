@@ -8,8 +8,9 @@ import stat
 
 
 def main():
-    """ Script that takes month and day input from the user to then
-    create a gif for that day for the cmac_four_panel plot. """
+    """ Script that takes a start date and an end date and creates
+    mp4 for each day, between and including the start and end date, for
+    the cmac_four_panel plot. Also an option to change frame rate. """
     parser = argparse.ArgumentParser(
         description='Create a gif of cmac_four_panel plot for a given day.')
     parser.add_argument(
@@ -30,7 +31,7 @@ def main():
     if not os.path.exists(path):
         os.makedirs(path)
         os.chmod(path,
-                 stat.S_IRUSR| stat.S_IWUSR| stat.S_IXUSR|
+                 stat.S_IRUSR | stat.S_IWUSR | stat.S_IXUSR |
                  stat.S_IRGRP | stat.S_IWGRP | stat.S_IXGRP)
     for i in range(int(args.start_date), int(args.end_date)):
         str_i = str(i)
@@ -45,12 +46,12 @@ def main():
         if not os.path.exists(date_path):
             os.makedirs(date_path)
             os.chmod(date_path,
-                     stat.S_IRUSR| stat.S_IWUSR| stat.S_IXUSR|
+                     stat.S_IRUSR | stat.S_IWUSR | stat.S_IXUSR |
                      stat.S_IRGRP | stat.S_IWGRP | stat.S_IXGRP)
 
         os.makedirs(path + 'temp_images/')
         os.chmod(path + 'temp_images/',
-                 stat.S_IRUSR| stat.S_IWUSR| stat.S_IXUSR|
+                 stat.S_IRUSR | stat.S_IWUSR | stat.S_IXUSR |
                  stat.S_IRGRP | stat.S_IWGRP | stat.S_IXGRP)
         for file in files:
             shutil.copy(file, path + 'temp_images/')
