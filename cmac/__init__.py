@@ -19,6 +19,7 @@ Functions
     do_my_fuzz
     return_csu_kdp
     retrieve_qvp
+    xsapr_clutter
 
 """
 
@@ -29,5 +30,5 @@ from .processing_code import get_texture, cum_score_fuzzy_logic
 from .processing_code import return_csu_kdp, retrieve_qvp
 from .data_catalouging import get_sounding_times, get_sounding_file_name
 from .xsapr_clutter import xsapr_clutter
- 
+
 __all__ = [s for s in dir() if not s.startswith('_')]
