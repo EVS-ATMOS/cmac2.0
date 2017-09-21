@@ -1,35 +1,29 @@
 #!/usr/bin/env python
-""" Creates a radar object with applied CMAC 2.0 and quicklooks pertaining
-to CMAC 2.0. """
+""" Generates clutter radar with the option to use dask. """
 
+import argparse
+import glob
 import os
+from time import time
 
 from matplotlib import use
 use('agg')
-import argparse
-import netCDF4
-import pyart
-import glob
-import datetime
 
-from cmac import cmac, quicklooks, get_sounding_times, get_sounding_file_name
 from cmac import xsapr_clutter
-from time import time
 
 
 def main():
-    """ The main function utilizes the cmac function and quicklooks function
-    to produce a CMAC radar and images pertaining to CMAC. """
+    """ The main function use calculates xsapr clutter for CMAC 2.0. """
     parser = argparse.ArgumentParser(
         description='Create a radar object with applied CMAC2.0.')
     parser.add_argument(
-        'radar_path', type=str, help=('Radar path to use for calculations.' +
-                                      'The program will search recursively' +
-                                      'for files in the directory. If ' +
-                                      'a file is specified, every file ' +
+        'radar_path', type=str, help=('Radar path to use for calculations.',
+                                      'The program will search recursively',
+                                      'for files in the directory. If',
+                                      'a file is specified, every file',
                                       'in the list will be processed.'))
     parser.add_argument(
-         'out_file_name', type=str, help=('Output Cf/Radial file'))
+        'out_file_name', type=str, help=('Output Cf/Radial file'))
     args = parser.parse_args()
     if os.path.isdir(args.radar_path):
         radar_files = glob.glob(args.radar_path + '/**/*XSW*', recursive=True)
@@ -40,8 +34,8 @@ def main():
     else:
         raise IOError('The specified radar path does not exist!')
     bt = time()
-    xsapr_clutter(radar_files, write_radar=True, 
-                  out_file=args.out_file_name, use_dask=True)    
+    xsapr_clutter(radar_files, write_radar=True,
+                  out_file=args.out_file_name, use_dask=True)
     print('Time to make clutter file: ' + str(time() - bt))
 
 if __name__ == '__main__':
