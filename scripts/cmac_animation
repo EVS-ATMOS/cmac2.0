@@ -24,16 +24,20 @@ def main():
         help='Frame rate to create gif with. Example: 2.0')
     args = parser.parse_args()
 
-    path = '/lustre/or-hydra/cades-arm/proj-shared/sgpxsaprcmacsurI5.c1.png/mp4s/'
+    path = ('/lustre/or-hydra/cades-arm/proj-shared/'
+            +'sgpxsaprcmacsurI5.c1.png/mp4s/')
 
     if not os.path.exists(path):
         os.makedirs(path)
         os.chmod(path,
-                 stat.S_IRUSR| stat.S_IWUSR| stat.S_IXUSR| stat.S_IRGRP | stat.S_IWGRP | stat.S_IXGRP)
+                 stat.S_IRUSR| stat.S_IWUSR| stat.S_IXUSR|
+                 stat.S_IRGRP | stat.S_IWGRP | stat.S_IXGRP)
     for i in range(int(args.start_date), int(args.end_date)):
         str_i = str(i)
         files = glob.glob(
-                    '/lustre/or-hydra/cades-arm/proj-shared/sgpxsaprcmacsurI5.c1.png/' + str_i + '**/cmac*', recursive=True)
+                    '/lustre/or-hydra/cades-arm/proj-shared/'
+                    + 'sgpxsaprcmacsurI5.c1.png/' + str_i + '**/cmac*',
+                    recursive=True)
         if len(files) == 0:
             print(str_i + ' has no image files. Moving to the next date.')
             continue
@@ -41,24 +45,22 @@ def main():
         if not os.path.exists(date_path):
             os.makedirs(date_path)
             os.chmod(date_path,
-                     stat.S_IRUSR| stat.S_IWUSR| stat.S_IXUSR| stat.S_IRGRP | stat.S_IWGRP | stat.S_IXGRP)
+                     stat.S_IRUSR| stat.S_IWUSR| stat.S_IXUSR|
+                     stat.S_IRGRP | stat.S_IWGRP | stat.S_IXGRP)
 
         os.makedirs(path + 'temp_images/')
         os.chmod(path + 'temp_images/',
-                 stat.S_IRUSR| stat.S_IWUSR| stat.S_IXUSR| stat.S_IRGRP | stat.S_IWGRP | stat.S_IXGRP)
+                 stat.S_IRUSR| stat.S_IWUSR| stat.S_IXUSR|
+                 stat.S_IRGRP | stat.S_IWGRP | stat.S_IXGRP)
         for file in files:
-            print('hello')
-            print(file)
             shutil.copy(file, path + 'temp_images/')
         os.system("cat " + path + "temp_images/*.png |"
                   + " ffmpeg -f image2pipe -r " + str(args.frame_rate)
-                  + " -i -"
-                  + " -movflags faststart -pix_fmt yuv420p -vf"
+                  + " -i - -movflags faststart -pix_fmt yuv420p -vf"
                   + " 'scale=trunc(iw/2)*2:trunc(ih/2)*2' -y "
                   + date_path + "cmac_four_panel_plot.sgpxsaprcmacsurI5.c1."
                   + str_i + ".mp4")
         shutil.rmtree(path + 'temp_images/')
-
 
 if __name__ == '__main__':
     main()
