@@ -1,0 +1,64 @@
+#!/usr/bin/env python
+
+import argparse
+import glob
+import os
+import shutil
+import stat
+
+
+def main():
+    """ Script that takes month and day input from the user to then
+    create a gif for that day for the cmac_four_panel plot. """
+    parser = argparse.ArgumentParser(
+        description='Create a gif of cmac_four_panel plot for a given day.')
+    parser.add_argument(
+        'start_date', type=str,
+        help="Start date string to do gif creation. Example:'20170909'")
+    parser.add_argument(
+        'end_date',
+        type=str,
+        help="End date string to do gif creation. Example:'20170928'")
+    parser.add_argument(
+        '-fr', '--frame_rate', type=float,
+        help='Frame rate to create gif with. Example: 2.0')
+    args = parser.parse_args()
+
+    path = '/lustre/or-hydra/cades-arm/proj-shared/sgpxsaprcmacsurI5.c1.png/mp4s/'
+
+    if not os.path.exists(path):
+        os.makedirs(path)
+        os.chmod(path,
+                 stat.S_IRUSR| stat.S_IWUSR| stat.S_IXUSR| stat.S_IRGRP | stat.S_IWGRP | stat.S_IXGRP)
+    for i in range(int(args.start_date), int(args.end_date)):
+        str_i = str(i)
+        files = glob.glob(
+                    '/lustre/or-hydra/cades-arm/proj-shared/sgpxsaprcmacsurI5.c1.png/' + str_i + '**/cmac*', recursive=True)
+        if len(files) == 0:
+            print(str_i + ' has no image files. Moving to the next date.')
+            continue
+        date_path = path + str_i + '/'
+        if not os.path.exists(date_path):
+            os.makedirs(date_path)
+            os.chmod(date_path,
+                     stat.S_IRUSR| stat.S_IWUSR| stat.S_IXUSR| stat.S_IRGRP | stat.S_IWGRP | stat.S_IXGRP)
+
+        os.makedirs(path + 'temp_images/')
+        os.chmod(path + 'temp_images/',
+                 stat.S_IRUSR| stat.S_IWUSR| stat.S_IXUSR| stat.S_IRGRP | stat.S_IWGRP | stat.S_IXGRP)
+        for file in files:
+            print('hello')
+            print(file)
+            shutil.copy(file, path + 'temp_images/')
+        os.system("cat " + path + "temp_images/*.png |"
+                  + " ffmpeg -f image2pipe -r " + str(args.frame_rate)
+                  + " -i -"
+                  + " -movflags faststart -pix_fmt yuv420p -vf"
+                  + " 'scale=trunc(iw/2)*2:trunc(ih/2)*2' -y "
+                  + date_path + "cmac_four_panel_plot.sgpxsaprcmacsurI5.c1."
+                  + str_i + ".mp4")
+        shutil.rmtree(path + 'temp_images/')
+
+
+if __name__ == '__main__':
+    main()
