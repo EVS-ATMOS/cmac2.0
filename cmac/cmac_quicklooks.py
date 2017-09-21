@@ -11,7 +11,7 @@ import matplotlib.pyplot as plt
 import pyart
 
 from pyart.graph.common import generate_radar_name
-from pyart.graph.common import generate_radar_time_begin, generate_title
+from pyart.graph.common import generate_radar_time_begin
 
 plt.switch_backend('agg')
 
@@ -48,7 +48,7 @@ def quicklooks(radar, image_directory=None, sweep=3,
         image_directory = os.path.expanduser('~')
 
     radar_start_date = netCDF4.num2date(
-    radar.time['data'][0], radar.time['units'])
+        radar.time['data'][0], radar.time['units'])
 
     date_string = datetime.strftime(radar_start_date, '%Y%m%d.%H%M%S')
     arm_name = '.sgpxsaprcmacsurI5.c1.'
@@ -273,9 +273,9 @@ def _generate_title(radar, field, sweep):
     """ Generates a title for each plot. """
     time_str = generate_radar_time_begin(radar).isoformat() + 'Z'
     fixed_angle = radar.fixed_angle['data'][sweep]
-    l1 = "%s %.1f Deg. %s " % (generate_radar_name(radar), fixed_angle,
-                           time_str)
+    line_one = "%s %.1f Deg. %s " % (generate_radar_name(radar), fixed_angle,
+                                     time_str)
     field_name = str(field)
     field_name = field_name.replace('_', ' ')
     field_name = field_name[0].upper() + field_name[1:]
-    return l1 + '\n' + field_name
+    return line_one + '\n' + field_name
