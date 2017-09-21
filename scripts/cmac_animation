@@ -60,7 +60,7 @@ def main():
                   + " 'scale=trunc(iw/2)*2:trunc(ih/2)*2' -y "
                   + date_path + "cmac_four_panel_plot.sgpxsaprcmacsurI5.c1."
                   + str_i + ".mp4")
-        os.remove(path + 'temp_images/')
+        shutil.rmtree(path + 'temp_images/')
 
 if __name__ == '__main__':
     main()
