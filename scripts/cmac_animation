@@ -27,7 +27,7 @@ def main():
     args = parser.parse_args()
 
     path = ('/lustre/or-hydra/cades-arm/proj-shared/'
-            +'sgpxsaprcmacsurI5.c1.png/mp4s/')
+            + 'sgpxsaprcmacsurI5.c1.png/mp4s/')
 
     # Creates an mp4s directory if it does not exist.
     if not os.path.exists(path):
@@ -64,6 +64,7 @@ def main():
         # Copies the files found with glob and places in the temp directory.
         for file in files:
             shutil.copy(file, path + 'temp_images/')
+
         # Runs ffmpeg and creates an mp4 from all the image files in the
         # temporary image directory.
         os.system("cat " + path + "temp_images/*.png |"

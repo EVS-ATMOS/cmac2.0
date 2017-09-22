@@ -60,6 +60,9 @@ def main():
     clutter_field = clutter_radar.fields['xsapr_clutter']['data']
 
     cmac_radar = cmac(radar, sonde, clutter_field, alt=args.altitude)
+    sonde.close()
+    del radar
+    del clutter_radar
     if args.out_radar is None:
         pyart.io.write_cfradial(
             os.path.expanduser('~')+'/cmac_radar.nc', cmac_radar)
@@ -74,6 +77,7 @@ def main():
                sweep=args.sweep, max_lat=args.max_latitude,
                min_lat=args.min_latitude, max_lon=args.max_longitude,
                min_lon=args.min_longitude)
+    del cmac_radar
     print('##')
     if args.image_directory is None:
         print('## Quicklooks have been saved in your home directory.')
@@ -81,11 +85,6 @@ def main():
         print('## Quicklooks have been save to ' + args.image_directory)
     print('##')
     print('## CMAC 2.0 Completed')
-
-    del radar
-    del sonde
-    del clutter_radar
-    del cmac_radar
 
 if __name__ == '__main__':
     main()

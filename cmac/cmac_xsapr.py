@@ -3,18 +3,17 @@ Code that uses CMAC to remove and correct second trip returns, correct velocity,
 produce a quasi-vertical profile, and more. """
 
 import copy
+import sys
 
 import netCDF4
 import pyart
 import numpy as np
-import sys
-
 
 from . import processing_code
 
 
 def cmac(radar, sonde, alt=320.0, attenuation_a_coef=None,
-         meta_append=None, **kwargs):
+         meta_append=None):
     """
     Corrected Moments in Antenna Coordinates
 
@@ -29,6 +28,8 @@ def cmac(radar, sonde, alt=320.0, attenuation_a_coef=None,
     ----------------
     alt : float
         Value to use as default altitude for the radar object.
+    attenuation_a_coef : float
+        A coefficient in attenuation calculation.
     meta_append : dictonary
         value key pairs to attend to global attributes
 
@@ -39,14 +40,12 @@ def cmac(radar, sonde, alt=320.0, attenuation_a_coef=None,
 
     """
 
+    # Obtaining variables needed for fuzzy logic.
     radar.altitude['data'][0] = alt
 
     radar_start_date = netCDF4.num2date(
         radar.time['data'][0], radar.time['units'])
     print('##', str(radar_start_date))
-    # ymd_string = datetime.strftime(radar_start_date, '%Y%m%d')
-    # hms_string = datetime.strftime(radar_start_date, '%H%M%S')
-    # print('##', ymd_string, hms_string)
 
     z_dict, temp_dict = pyart.retrieve.map_profile_to_gates(
         sonde.variables['tdry'][:], sonde.variables['alt'][:], radar)
@@ -64,12 +63,14 @@ def cmac(radar, sonde, alt=320.0, attenuation_a_coef=None,
     radar.add_field('velocity_texture', texture, replace_existing=True)
     print('##    velocity_texture')
 
+    # Performing fuzzy logic to obtain the gate ids.
     print('##    gate_id')
-    my_fuzz, cats = processing_code.do_my_fuzz(radar, tex_start=2.4,
-                                               tex_end=2.7)
+    my_fuzz, _ = processing_code.do_my_fuzz(radar, tex_start=2.4,
+                                            tex_end=2.7)
     radar.add_field('gate_id', my_fuzz,
                     replace_existing=True)
 
+    # Adding fifth gate id, clutter.
     clutter_data = radar.fields['xsapr_clutter']['data']
     radar.fields['gate_id']['data'][clutter_data == 1] = 5
     notes = radar.fields['gate_id']['notes']
@@ -80,6 +81,7 @@ def cmac(radar, sonde, alt=320.0, attenuation_a_coef=None,
         cat_dict.update(
             {pair_str.split(':')[1]:int(pair_str.split(':')[0])})
 
+    # Corrected velocity using pyart's region dealiaser.
     print('##    corrected_velocity')
     cmac_gates = pyart.correct.GateFilter(radar)
     cmac_gates.exclude_all()
@@ -93,14 +95,14 @@ def cmac(radar, sonde, alt=320.0, attenuation_a_coef=None,
 
     fzl = processing_code.get_melt(radar)
 
-
+    # Calculating differential phase fields.
     print('##    corrected_differential_phase')
     phidp, kdp = pyart.correct.phase_proc_lp(radar, 0.0, debug=True,
-                                        nowrap = 50, fzl=fzl)
+                                             nowrap=50, fzl=fzl)
 
-    phidp_flt, kdp_filt = processing_code.fix_phase_fields(copy.deepcopy(kdp), copy.deepcopy(phidp),
-                                                 radar.range['data'],
-                                                 cmac_gates)
+    phidp_flt, kdp_filt = processing_code.fix_phase_fields(
+        copy.deepcopy(kdp), copy.deepcopy(phidp), radar.range['data'],
+        cmac_gates)
 
     radar.add_field('corrected_differential_phase', phidp)
     radar.add_field('filtered_corrected_differential_phase', phidp_flt)
@@ -113,6 +115,7 @@ def cmac(radar, sonde, alt=320.0, attenuation_a_coef=None,
     if attenuation_a_coef is None:
         attenuation_a_coef = 0.17 #X-Band
 
+    # Calculating attenuation by using pyart.
     spec_at, cor_z_atten = pyart.correct.calculate_attenuation(
         radar, 0, refl_field='reflectivity',
         ncp_field='normalized_coherent_power',
@@ -135,6 +138,7 @@ def cmac(radar, sonde, alt=320.0, attenuation_a_coef=None,
     print('##    attenuation_corrected_reflectivity')
     radar.add_field('attenuation_corrected_reflectivity', cor_z_atten)
 
+    # Calculating rain rate.
     print('## Rainfall rate as a function of A ##')
     R = 51.3 * (radar.fields['specific_attenuation']['data']) ** 0.81
     rainrate = copy.deepcopy(radar.fields['specific_attenuation'])
@@ -147,7 +151,7 @@ def cmac(radar, sonde, alt=320.0, attenuation_a_coef=None,
     rainrate['units'] = 'mm/hr'
     radar.fields.update({'rain_rate_A': rainrate})
 
-    #This needs to be updated to a gatefilter
+    # This needs to be updated to a gatefilter.
     mask = radar.fields['reflectivity']['data'].mask
 
     radar.fields['rain_rate_A']['data'][np.where(mask)] = 0.0
@@ -160,25 +164,40 @@ def cmac(radar, sonde, alt=320.0, attenuation_a_coef=None,
     print('##')
     print('## All CMAC fields have been added to the radar object.')
     print('##')
+
+    # Adding the metadate to the cmac radar object.
     print('## Appending metadata')
     if meta_append is None:
         command_line = ''
         for item in sys.argv:
             command_line = command_line + ' ' + item
-        meta_append = {'site_id' : 'sgp',
-                       'facility_id' : 'i5: Garber, Ok',
-                       'data_level' : 'c1',
-                       'comment' : 'This is highly experimental and initial data. There are many known and unknown issues. Please do not use before contacting the Translator responsible scollis@anl.gov',
-                       'attributions' : 'This data is collected by the ARM Climate Research facility. Radar system is operated by the radar engineering team radar@arm.gov and the data is processed by the precipitation radar products team. LP code courtesy of Scott Giangrande BNL. ',
-                       'version' :'2.0 lite',
-                       'vap_name' : 'cmac',
-                       'known_issues' : 'False phidp jumps in insect regions. Still uses old Giangrande code.',
-                       'command_line' : command_line,
-                       'developers' : 'Robert Jackson, ANL. Zachary Sherman, ANL.',
-                       'translator' : 'Scott Collis, ANL.',
-                       'mentors' : 'Nitin Bharadwaj, PNNL. Bradley Isom, PNNL. Joseph Hardin, PNNL. Iosif Lindenmaier, PNNL.'}
-
+        meta_append = {
+            'site_id': 'sgp',
+            'facility_id': 'i5: Garber, Ok',
+            'data_level': 'c1',
+            'comment': (
+                'This is highly experimental and initial data. There are many',
+                'known and unknown issues. Please do not use before',
+                'contacting the Translator responsible scollis@anl.gov'),
+            'attributions': (
+                'This data is collected by the ARM Climate Research facility.',
+                'Radar system is operated by the radar engineering team',
+                'radar@arm.gov and the data is processed by the precipitation',
+                'radar products team. LP code courtesy of Scott Giangrande',
+                'BNL.'),
+            'version': '2.0 lite',
+            'vap_name': 'cmac',
+            'known_issues': (
+                'False phidp jumps in insect regions. Still uses old',
+                'Giangrande code.'),
+            'command_line': command_line,
+            'developers': 'Robert Jackson, ANL. Zachary Sherman, ANL.',
+            'translator': 'Scott Collis, ANL.',
+            'mentors': ('Nitin Bharadwaj, PNNL. Bradley Isom, PNNL.',
+                        'Joseph Hardin, PNNL. Iosif Lindenmaier, PNNL.')}
     radar.metadata.update(meta_append)
+
+    # The qvp below will be added soon, need to do it correctly.
 
     #print('## A quasi-vertical profile is being created.')
     #qvp = processing_code.retrieve_qvp(radar, radar.fields['height']['data'])

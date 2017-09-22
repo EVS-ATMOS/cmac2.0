@@ -1,3 +1,6 @@
+""" Sonde check attempts to read each sonde file with netCDF4, error
+files are sent to a new directory. """
+
 import glob
 import os
 import shutil
@@ -12,12 +15,14 @@ for file in files:
     try:
         sonde = netCDF4.Dataset(file)
         sonde.close()
-    except (OSError):
+    except OSError:
         print(file + ' is corrupt!')
-        path = '/lustre/or-hydra/cades-arm/proj-shared/sgpsondewnpnC1.b1/corrupt_soundings/'
+        path = ('/lustre/or-hydra/cades-arm/proj-shared/'
+                + 'sgpsondewnpnC1.b1/corrupt_soundings/')
         if not os.path.exists(path):
             os.makedirs(path)
             os.chmod(
                 path,
-                stat.S_IRUSR| stat.S_IWUSR| stat.S_IXUSR| stat.S_IRGRP | stat.S_IWGRP | stat.S_IXGRP)
+                stat.S_IRUSR | stat.S_IWUSR | stat.S_IXUSR |
+                stat.S_IRGRP | stat.S_IWGRP | stat.S_IXGRP)
         shutil.move(file, path)
