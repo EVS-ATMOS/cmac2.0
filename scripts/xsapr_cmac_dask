@@ -4,7 +4,6 @@ to CMAC 2.0. """
 
 import argparse
 import datetime
-import gc
 import glob
 import os
 import shutil
@@ -21,9 +20,8 @@ from cmac import xsapr_clutter
 from distributed import Client, wait
 
 
-""" For dask we need the radar plotting routines all in one subroutine """ 
-def run_cmac_and_plotting(radar_file_path, sounding_times, 
-                          args):
+def run_cmac_and_plotting(radar_file_path, sounding_times, args):
+    """ For dask we need the radar plotting routines all in one subroutine. """
     try:
         radar = pyart.io.read(radar_file_path)
     except TypeError:
@@ -35,18 +33,20 @@ def run_cmac_and_plotting(radar_file_path, sounding_times,
         if not os.path.exists(path):
             os.makedirs(path)
             os.chmod(
-                path
-                stat.S_IRUSR| stat.S_IWUSR| stat.S_IXUSR| stat.S_IRGRP | stat.S_IWGRP | stat.S_IXGRP)
+                path,
+                stat.S_IRUSR | stat.S_IWUSR | stat.S_IXUSR |
+                stat.S_IRGRP | stat.S_IWGRP | stat.S_IXGRP)
         shutil.move(radar_file_path, path)
         return
     radar_start_date = netCDF4.num2date(radar.time['data'][0],
-            radar.time['units'])
-    
-    # Load clutter files
+                                        radar.time['units'])
+
+    # Load clutter files.
     #clutter_file_path = (args.out_radar + '/clutter_files/clutter' +
         #datetime.datetime.strftime(radar_start_date.date(), '%Y%m%d')
         #+ '.nc')
-    clutter_file_path = '/lcrc/group/earthscience/xsaprcmac2.0/out_files/clutter_files/clutter20170806.nc'
+    clutter_file_path = ('/lcrc/group/earthscience/xsaprcmac2.0/out_files/'
+                         + 'clutter_files/clutter20170806.nc')
     print('## Loading clutter file ' + clutter_file_path)
     clutter = pyart.io.read(clutter_file_path)
     print('## Reading dictionary...')
@@ -73,30 +73,32 @@ def run_cmac_and_plotting(radar_file_path, sounding_times,
     second_str = "%02d" % radar_start_date.second
 
     if args.out_radar is None:
-        the_path = (os.path.expanduser('~') + '/'+ year_str + month_str +
-            second_str + '/')
+        the_path = (os.path.expanduser('~') + '/'+ year_str + month_str
+                    + second_str + '/')
     else:
-        the_path = (args.out_radar + '/' + year_str +  month_str +
-            day_str + '/')
-    file_name = (the_path + '/sgpxsaprcmacsurI5.c1.' + year_str + month_str +
-        day_str + '.' + hour_str + minute_str + second_str + '.nc')
+        the_path = (args.out_radar + '/' + year_str +  month_str
+                    + day_str + '/')
+    file_name = (the_path + '/sgpxsaprcmacsurI5.c1.' + year_str + month_str
+                 + day_str + '.' + hour_str + minute_str + second_str + '.nc')
 
-    if(not os.path.exists(the_path)):
+    if not os.path.exists(the_path):
         os.makedirs(the_path)
         os.chmod(
             the_path,
-            stat.S_IRUSR| stat.S_IWUSR| stat.S_IXUSR| stat.S_IRGRP | stat.S_IWGRP | stat.S_IXGRP)
+            stat.S_IRUSR | stat.S_IWUSR | stat.S_IXUSR |
+            stat.S_IRGRP | stat.S_IWGRP | stat.S_IXGRP)
 
     pyart.io.write_cfradial(file_name, cmac_radar)
     print('## A CMAC radar object has been created at ' + file_name)
-    img_directory = (args.image_directory + '/' + year_str + month_str +
-        day_str + '.' + hour_str + minute_str + second_str)
-    if(not os.path.exists(img_directory)):
+    img_directory = (args.image_directory + '/' + year_str + month_str
+                     + day_str + '.' + hour_str + minute_str + second_str)
+    if not os.path.exists(img_directory):
         os.makedirs(img_directory)
         os.chmod(
             img_directory,
-            stat.S_IRUSR| stat.S_IWUSR| stat.S_IXUSR| stat.S_IRGRP | stat.S_IWGRP | stat.S_IXGRP)
-    
+            stat.S_IRUSR | stat.S_IWUSR | stat.S_IXUSR |
+            stat.S_IRGRP | stat.S_IWGRP | stat.S_IXGRP)
+
     quicklooks(cmac_radar, image_directory=img_directory,
                sweep=args.sweep, max_lat=args.max_latitude,
                min_lat=args.min_latitude, max_lon=args.max_longitude,
@@ -113,24 +115,24 @@ def main():
     parser = argparse.ArgumentParser(
         description='Create a radar object with applied CMAC2.0.')
     parser.add_argument(
-        'radar_path', type=str, help=('Radar path to use for calculations.' +
-                                      'The program will search recursively' +
-                                      'for files in the directory. If ' +
-                                      'a file is specified, every file ' +
+        'radar_path', type=str, help=('Radar path to use for calculations.',
+                                      'The program will search recursively',
+                                      'for files in the directory. If',
+                                      'a file is specified, every file',
                                       'in the list will be processed.'))
     parser.add_argument(
         'sonde_path', type=str,
         help='Sonde path to use for CMAC calculation.')
     parser.add_argument(
         '-o', '--out_radar', type=str, default=None,
-        help=('Out file path and name to use for the CMAC radar.'
-              + ' If not provided, radar is written to users home'
-              + ' directory.'))
+        help=('Out file path and name to use for the CMAC radar.',
+              'If not provided, radar is written to users home',
+              'directory.'))
     parser.add_argument(
         '-id', '--image_directory', type=str, default=None,
-        help=('Path to image directory to save CMAC radar images.'
-              + ' If not provided, images are written to users home'
-              + ' directory.'))
+        help=('Path to image directory to save CMAC radar images.',
+              'If not provided, images are written to users home',
+              'directory.'))
     parser.add_argument(
         '-alt', '--altitude', type=float, default=320.0,
         help='Value to use as default altitude for the radar object')
@@ -159,40 +161,41 @@ def main():
     args = parser.parse_args()
     if os.path.isdir(args.radar_path):
         radar_files = glob.glob(args.radar_path + '/**/*XSW*', recursive=True)
-    elif os.path.isfile(args.radar_path): 
+    elif os.path.isfile(args.radar_path):
         with open(args.radar_path) as f:
             radar_files = f.readlines()
         radar_files = [x.strip() for x in radar_files]
     else:
         raise IOError('The specified radar path does not exist!')
-    
+
     sounding_times = get_sounding_times(args.sonde_path)
- 
-    # Get dates of radar files from file name
+
+    # Get dates of radar files from the file name.
     radar_times = []
     for file_name in radar_files:
         where_xsw = file_name.find('XSW')
         radar_times.append(
             datetime.datetime.strptime(file_name[where_xsw+3:where_xsw+15],
-                                                 '%y%m%d%H%M%S'))
+                                       '%y%m%d%H%M%S'))
 
-    # Connect to dask client
+    # Connect to dask client.
     client = Client(scheduler_file=args.scheduler_file)
     future_list = []
     n_cores = sum(client.ncores().values())
     print('## Opened dask cluster with ' + str(n_cores) + ' cores')
     print('## Generating clutter fields...')
-    if(not os.path.exists(args.out_radar + '/clutter_files')):
+    if not os.path.exists(args.out_radar + '/clutter_files'):
         os.mkdir(args.out_radar + '/clutter_files')
         os.chmod(
             args.out_radar + '/clutter_files',
-            stat.S_IRUSR| stat.S_IWUSR| stat.S_IXUSR| stat.S_IRGRP | stat.S_IWGRP | stat.S_IXGRP)
+            stat.S_IRUSR | stat.S_IWUSR | stat.S_IXUSR |
+            stat.S_IRGRP | stat.S_IWGRP | stat.S_IXGRP)
 
     # Parallelize clutter detection by day
     cur_date = radar_times[0].date()
     unique_dates = [cur_date]
     for x in radar_times:
-        if(not x.date() in unique_dates):
+        if not x.date() in unique_dates:
             unique_dates.append(x.date())
             cur_date = x.date()
 
@@ -201,38 +204,39 @@ def main():
     for the_day in unique_dates:
         print('Submitting task for ' + the_day.strftime('%Y%m%d'))
         day_files = []
-        if(len(future_list) > n_cores*2):
-            wait(future_list)
-            del(future_list)
-            future_list = []
-        else:
-            for i in range(0, len(radar_times)):
-                if(radar_times[i].date() == the_day):
-                    day_files.append(radar_files[i])
-            print(day_files)
-            out_file_name = (args.out_radar + '/clutter_files/clutter' +
-                datetime.datetime.strftime(the_day, '%Y%m%d') + '.nc')
-            future_list.append(client.submit(
-                xsapr_clutter, day_files, 
-                write_radar=True, out_file=out_file_name))
-    
-
-    # Need to wait for clutter files to be done generating.
-    wait(future_list)
-    print('Clutter files made!')
-    future_list = []                     
-    for the_file in radar_files:
-        # Only run so many at a time to save memory.
-        # Wait for jobs to finish and clear memory from chunk.
-        if(len(future_list) > n_cores*2):
+        if len(future_list) > n_cores*2:
             wait(future_list)
             del future_list
             future_list = []
         else:
+            for i in range(0, len(radar_times)):
+                if radar_times[i].date() == the_day:
+                    day_files.append(radar_files[i])
+            print(day_files)
+            out_file_name = (
+                args.out_radar + '/clutter_files/clutter'
+                + datetime.datetime.strftime(the_day, '%Y%m%d') + '.nc')
             future_list.append(client.submit(
-                run_cmac_and_plotting, the_file, sounding_times, args))
+                xsapr_clutter, day_files,
+                write_radar=True, out_file=out_file_name))
 
-    ## Do radar object loading on compute nodes. 
+    # Need to wait for clutter files to be done generating.
+    wait(future_list)
+    print('Clutter files made!')
+    future_list = []
+    for the_file in radar_files:
+        # Only run so many at a time to save memory.
+        # Wait for jobs to finish and clear memory from chunk.
+        if len(future_list) > n_cores*2:
+            wait(future_list)
+            del future_list
+            future_list = []
+        else:
+            future_list.append(
+                client.submit(run_cmac_and_plotting, the_file,
+                              sounding_times, args))
+
+    ## Do radar object loading on compute nodes.
     if args.image_directory is None:
         print('## Quicklooks have been saved in your home directory.')
     else:
@@ -240,7 +244,6 @@ def main():
     print('##')
     print('## CMAC 2.0 Completed in ' + str(time.time() - bt) + ' s')
     client.shutdown()
-
 
 if __name__ == '__main__':
     main()
