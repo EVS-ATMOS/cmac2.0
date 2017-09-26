@@ -1,5 +1,5 @@
-#PBS -l nodes=16:ppn=16
-#PBS -l walltime=16:00:00
+#PBS -l nodes=32:ppn=16
+#PBS -l walltime=10:00:00
 #PBS -q batch
 #PBS -l qos=std
 #PBS -W group_list=cades-arm
@@ -17,4 +17,6 @@ export MPLBACKEND="agg"
 pbsdsh -c 1 -v -- $PBS_O_WORKDIR/start_scheduler.sh /home/zsherman/scheduler.json /home/zsherman/temp_dir &
 pbsdsh -u -v -- $PBS_O_WORKDIR/start_worker.sh /home/zsherman/scheduler.json /home/zsherman/temp_dir &
 
-./xsapr_cmac_dask /lustre/or-hydra/cades-arm/proj-shared/cmac_sgpxsaprppiI5.00/201709/ /lustre/or-hydra/cades-arm/proj-shared/sgpsondewnpnC1.b1/ --scheduler_file=/home/zsherman/scheduler.json -o /lustre/or-hydra/cades-arm/proj-shared/sgpxsaprcmacsurI5.c1 -id /lustre/or-hydra/cades-arm/proj-shared/sgpxsaprcmacsurI5.c1.png
+sleep 60 
+
+./xsapr_cmac_dask /lustre/or-hydra/cades-arm/proj-shared/cmac_sgpxsaprppiI5.00/201708/ /lustre/or-hydra/cades-arm/proj-shared/sgpsondewnpnC1.b1/ --scheduler_file=/home/zsherman/scheduler.json -o /lustre/or-hydra/cades-arm/proj-shared/sgpxsaprcmacsurI5.c1 -id /lustre/or-hydra/cades-arm/proj-shared/sgpxsaprcmacsurI5.c1.png
