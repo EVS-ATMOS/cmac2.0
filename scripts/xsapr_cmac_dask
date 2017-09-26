@@ -42,11 +42,7 @@ def run_cmac_and_plotting(radar_file_path, sounding_times, args):
                                         radar.time['units'])
 
     # Load clutter files.
-    #clutter_file_path = (args.out_radar + '/clutter_files/clutter' +
-        #datetime.datetime.strftime(radar_start_date.date(), '%Y%m%d')
-        #+ '.nc')
-    clutter_file_path = ('/lcrc/group/earthscience/xsaprcmac2.0/out_files/'
-                         + 'clutter_files/clutter20170806.nc')
+    clutter_file_path = args.clutter_file
     print('## Loading clutter file ' + clutter_file_path)
     clutter = pyart.io.read(clutter_file_path)
     print('## Reading dictionary...')
@@ -124,6 +120,9 @@ def main():
         'sonde_path', type=str,
         help='Sonde path to use for CMAC calculation.')
     parser.add_argument(
+        'clutter_file', type=str,
+        help='Path to clutter file')
+    parser.add_argument(
         '-o', '--out_radar', type=str, default=None,
         help=('Out file path and name to use for the CMAC radar.',
               'If not provided, radar is written to users home',
@@ -184,45 +183,8 @@ def main():
     n_cores = sum(client.ncores().values())
     print('## Opened dask cluster with ' + str(n_cores) + ' cores')
     print('## Generating clutter fields...')
-    if not os.path.exists(args.out_radar + '/clutter_files'):
-        os.mkdir(args.out_radar + '/clutter_files')
-        os.chmod(
-            args.out_radar + '/clutter_files',
-            stat.S_IRUSR | stat.S_IWUSR | stat.S_IXUSR |
-            stat.S_IRGRP | stat.S_IWGRP | stat.S_IXGRP)
-
-    # Parallelize clutter detection by day
-    cur_date = radar_times[0].date()
-    unique_dates = [cur_date]
-    for x in radar_times:
-        if not x.date() in unique_dates:
-            unique_dates.append(x.date())
-            cur_date = x.date()
-
-    print("Making clutter files!")
-    future_list = []
-    for the_day in unique_dates:
-        print('Submitting task for ' + the_day.strftime('%Y%m%d'))
-        day_files = []
-        if len(future_list) > n_cores*2:
-            wait(future_list)
-            del future_list
-            future_list = []
-        else:
-            for i in range(0, len(radar_times)):
-                if radar_times[i].date() == the_day:
-                    day_files.append(radar_files[i])
-            print(day_files)
-            out_file_name = (
-                args.out_radar + '/clutter_files/clutter'
-                + datetime.datetime.strftime(the_day, '%Y%m%d') + '.nc')
-            future_list.append(client.submit(
-                xsapr_clutter, day_files,
-                write_radar=True, out_file=out_file_name))
 
     # Need to wait for clutter files to be done generating.
-    wait(future_list)
-    print('Clutter files made!')
     future_list = []
     for the_file in radar_files:
         # Only run so many at a time to save memory.
