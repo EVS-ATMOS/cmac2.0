@@ -2,10 +2,19 @@
 """ CMAC 2.0 animation generator. """
 
 import argparse
+import datetime
 import glob
 import os
 import shutil
 import stat
+
+
+def datespan(start_date, end_date, delta=datetime.timedelta(days=1)):
+    """ Retrieves all dates between the start and end date. """
+    current_date = start_date
+    while current_date < end_date:
+        yield current_date
+        current_date += delta
 
 
 def main():
@@ -37,19 +46,21 @@ def main():
                  stat.S_IRGRP | stat.S_IWGRP | stat.S_IXGRP)
 
     # Loops through each day between the start and end date.
-    for i in range(int(args.start_date), int(args.end_date)):
-        str_i = str(i)
+    start = datetime.datetime.strptime(args.start_date, "%Y%m%d")
+    stop = datetime.datetime.strptime(args.end_date, "%Y%m%d")
+    for date_time in datespan(start, stop, delta=datetime.timedelta(days=1)):
+        date = datetime.datetime.strftime(date_time, '%Y%m%d')
         files = glob.glob(
             '/lustre/or-hydra/cades-arm/proj-shared/'
-            + 'sgpxsaprcmacsurI5.c1.png/' + str_i + '**/cmac*',
+            + 'sgpxsaprcmacsurI5.c1.png/' + date + '**/cmac*',
             recursive=True)
         # If a date has no image files, loop goes to the next date.
         if not files:
-            print(str_i + ' has no image files. Moving to the next date.')
+            print(date + ' has no image files. Moving to the next date.')
             continue
 
         # Creates a directory with corresponding date for each mp4.
-        date_path = path + str_i + '/'
+        date_path = path + date + '/'
         if not os.path.exists(date_path):
             os.makedirs(date_path)
             os.chmod(date_path,
@@ -72,7 +83,7 @@ def main():
                   + " -i - -movflags faststart -pix_fmt yuv420p -vf"
                   + " 'scale=trunc(iw/2)*2:trunc(ih/2)*2' -y "
                   + date_path + "cmac_four_panel_plot.sgpxsaprcmacsurI5.c1."
-                  + str_i + ".mp4")
+                  + date + ".mp4")
 
         # Removes temp_images directory to start fresh with each day.
         shutil.rmtree(path + 'temp_images/')
