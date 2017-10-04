@@ -12,7 +12,7 @@ import numpy as np
 from . import processing_code
 
 
-def cmac(radar, sonde, alt=320.0, attenuation_a_coef=None,
+def cmac(radar, sonde, clutter_file, alt=320.0, attenuation_a_coef=None,
          meta_append=None):
     """
     Corrected Moments in Antenna Coordinates
@@ -42,7 +42,12 @@ def cmac(radar, sonde, alt=320.0, attenuation_a_coef=None,
 
     # Obtaining variables needed for fuzzy logic.
     radar.altitude['data'][0] = alt
-
+    
+    clutter_radar = pyart.io.read(clutter_file)
+    radar.add_field('xsapr_clutter', clutter_radar.fields['xsapr_clutter'],
+                    replace_existing=True)
+    del clutter_radar
+    
     radar_start_date = netCDF4.num2date(
         radar.time['data'][0], radar.time['units'])
     print('##', str(radar_start_date))

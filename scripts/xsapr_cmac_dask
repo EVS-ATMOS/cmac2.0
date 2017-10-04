@@ -98,7 +98,7 @@ def run_cmac_and_plotting(radar_file_path, sounding_times, args):
     quicklooks(cmac_radar, image_directory=img_directory,
                sweep=args.sweep, max_lat=args.max_latitude,
                min_lat=args.min_latitude, max_lon=args.max_longitude,
-               min_lon=args.min_longitude)
+               min_lon=args.min_longitude, dd_lobes=args.dd_lobes)
     print('## Quicklooks have been saved at ' + img_directory)
     print('##')
     del cmac_radar
@@ -157,6 +157,12 @@ def main():
         '-bd', '--bad_directory', type=str, default=None,
         help=('Path to directory to place radar input files that'
               + ' can not be read by Py-ART due to TypeError'))
+    parser.add_argument('--dd-lobes', dest='dd_lobes', action='store_true',
+                        help='Plot Dual Doppler lobes between i4 and i5.')
+    parser.add_argument('--no-dd-lobes', dest='dd_lobes', action='store_false',
+                        help=('Do not plot Dual Doppler lobes' + 
+                             ' between i4 and i5.'))   
+    parser.set_defaults(dd_lobes=False)
     args = parser.parse_args()
     if os.path.isdir(args.radar_path):
         radar_files = glob.glob(args.radar_path + '/**/*XSW*', recursive=True)
@@ -196,7 +202,7 @@ def main():
         else:
             future_list.append(
                 client.submit(run_cmac_and_plotting, the_file,
-                              sounding_times, args))
+                              args.clutter_file, sounding_times, args))
 
     ## Do radar object loading on compute nodes.
     if args.image_directory is None:
