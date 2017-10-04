@@ -202,7 +202,7 @@ def main():
         else:
             future_list.append(
                 client.submit(run_cmac_and_plotting, the_file,
-                              args.clutter_file, sounding_times, args))
+                              sounding_times, args))
 
     ## Do radar object loading on compute nodes.
     if args.image_directory is None:
