@@ -113,7 +113,8 @@ def quicklooks(radar, image_directory=None, sweep=3,
     plt.subplot(2, 2, 1, projection=ccrs.PlateCarree())
     display.plot_ppi_map('gate_id', sweep=sweep, min_lon=min_lon,
                          max_lon=max_lon, min_lat=min_lat,
-                         max_lat=max_lat, resolution='50m', cmap=cmap,
+                         max_lat=max_lat, resolution='50m',
+                         lat_lines=lal, lon_lines=lol, cmap=cmap,
                          vmin=0, vmax=5, projection=ccrs.PlateCarree())
 
     if(dd_lobes == True):
@@ -131,8 +132,8 @@ def quicklooks(radar, image_directory=None, sweep=3,
     plt.subplot(2, 2, 2, projection=ccrs.PlateCarree())
     display.plot_ppi_map('reflectivity', sweep=sweep, vmin=-8, vmax=64,
                          min_lon=min_lon, max_lon=max_lon, min_lat=min_lat,
-                         max_lat=max_lat, resolution='50m',
-                         cmap=pyart.graph.cm.NWSRef, 
+                         max_lat=max_lat, lat_lines=lal, lon_lines=lol,
+                         resolution='50m', cmap=pyart.graph.cm.NWSRef, 
                          projection=ccrs.PlateCarree())
     if(dd_lobes == True):
         plt.contour(grid_lon, grid_lat, bca,  
@@ -142,7 +143,8 @@ def quicklooks(radar, image_directory=None, sweep=3,
     plt.subplot(2, 2, 3, projection=ccrs.PlateCarree())
     display.plot_ppi_map('velocity_texture', sweep=sweep, vmin=0, vmax=14,
                          min_lon=min_lon, max_lon=max_lon, min_lat=min_lat,
-                         max_lat=max_lat, resolution='50m',
+                         max_lat=max_lat, lat_lines=lal, lon_lines=lol,
+                         resolution='50m',
                          title=_generate_title(
                              radar, 'velocity_texture', sweep),
                          cmap=pyart.graph.cm.NWSRef, 
@@ -154,7 +156,8 @@ def quicklooks(radar, image_directory=None, sweep=3,
     plt.subplot(2, 2, 4, projection=ccrs.PlateCarree())
     display.plot_ppi_map('cross_correlation_ratio', sweep=sweep, vmin=.5,
                          vmax=1, min_lon=min_lon, max_lon=max_lon,
-                         min_lat=min_lat, max_lat=max_lat, resolution='50m',
+                         min_lat=min_lat, max_lat=max_lat, lat_lines=lal,
+                         lon_lines=lol, resolution='50m',
                          cmap=pyart.graph.cm.Carbone42,
                          projection=ccrs.PlateCarree())
     if(dd_lobes == True):
