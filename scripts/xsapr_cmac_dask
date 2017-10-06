@@ -209,8 +209,7 @@ def main():
     else:
         print('## Quicklooks have been saved to ' + args.image_directory)
     perm_image = 'chmod -R g+rw ' + args.image_directory
-    perm_radar = ('chmod -R g+rw /lustre/or-hydra/cades-arm/proj-shared/'
-                  + 'sgpxsaprcmacsurI5.c1/')
+    perm_radar = 'chmod -R g+rw ' + args.out_radar
     subprocess.call(perm_image, shell=True)
     subprocess.call(perm_radar, shell=True)
     print('##')
