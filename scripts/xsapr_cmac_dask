@@ -8,6 +8,7 @@ import glob
 import os
 import shutil
 import stat
+import subprocess
 import time
 
 from matplotlib import use
@@ -188,9 +189,7 @@ def main():
     future_list = []
     n_cores = sum(client.ncores().values())
     print('## Opened dask cluster with ' + str(n_cores) + ' cores')
-    print('## Generating clutter fields...')
 
-    # Need to wait for clutter files to be done generating.
     future_list = []
     for the_file in radar_files:
         # Only run so many at a time to save memory.
@@ -209,6 +208,11 @@ def main():
         print('## Quicklooks have been saved in your home directory.')
     else:
         print('## Quicklooks have been saved to ' + args.image_directory)
+    perm_image = 'chmod -R g+rw ' + args.image_directory
+    perm_radar = ('chmod -R g+rw /lustre/or-hydra/cades-arm/proj-shared/'
+                  + 'sgpxsaprcmacsurI5.c1/')
+    subprocess.call(perm_image, shell=True)
+    subprocess.call(perm_radar, shell=True)
     print('##')
     print('## CMAC 2.0 Completed in ' + str(time.time() - bt) + ' s')
     client.shutdown()
