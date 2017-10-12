@@ -58,10 +58,6 @@ def quicklooks(radar, image_directory=None, sweep=3,
     arm_name = '.sgpxsaprcmacsurI5.c1.'
     combined_name = arm_name + date_string
 
-    if dd_lobes is True:
-        image_directory = image_directory + '/dd_lobes_'
-    else:
-        image directory = image_directory + '/'
     # Creating a plot of reflectivity before CMAC.
     lal = np.arange(min_lat, max_lat+.2, .2)
     lol = np.arange(min_lon, max_lon+.2, .2)
@@ -88,7 +84,7 @@ def quicklooks(radar, image_directory=None, sweep=3,
 
     plt.savefig(
         image_directory
-        + 'reflectivity' + combined_name + '.png')
+        + '/reflectivity' + combined_name + '.png')
     plt.close()
 
     # Four panel plot of gate_id, velocity_texture, reflectivity, and
@@ -167,7 +163,7 @@ def quicklooks(radar, image_directory=None, sweep=3,
                     colors='k')
     plt.savefig(
         image_directory
-        + 'cmac_four_panel_plot' + combined_name + '.png')
+        + '/cmac_four_panel_plot' + combined_name + '.png')
     plt.close()
 
     # Creating a plot with reflectivity corrected with gate ids.
@@ -197,7 +193,7 @@ def quicklooks(radar, image_directory=None, sweep=3,
                     colors='k')
     plt.savefig(
         image_directory
-        + 'masked_corrected_reflectivity' + combined_name + '.png')
+        + '/masked_corrected_reflectivity' + combined_name + '.png')
     plt.close()
 
     # Creating a plot with reflectivity corrected with attenuation.
@@ -218,7 +214,7 @@ def quicklooks(radar, image_directory=None, sweep=3,
                     colors='k')
     plt.savefig(
         image_directory
-        + 'attenuation_corrected_reflectivity' + combined_name + '.png')
+        + '/attenuation_corrected_reflectivity' + combined_name + '.png')
     plt.close()
 
     # Creating a plot of specific attenuation.
@@ -236,7 +232,7 @@ def quicklooks(radar, image_directory=None, sweep=3,
                     colors='k')
     plt.savefig(
         image_directory
-        + 'specific_attenuation' + combined_name + '.png')
+        + '/specific_attenuation' + combined_name + '.png')
     plt.close()
 
     # Creating a plot of corrected differential phase.
@@ -256,7 +252,7 @@ def quicklooks(radar, image_directory=None, sweep=3,
                     colors='k')
     plt.savefig(
         image_directory
-        + 'corrected_differential_phase' + combined_name + '.png')
+        + '/corrected_differential_phase' + combined_name + '.png')
     plt.close()
 
     # Creating a plot of corrected specific differential phase.
@@ -276,7 +272,7 @@ def quicklooks(radar, image_directory=None, sweep=3,
                     colors='k')
     plt.savefig(
         image_directory
-        + 'corrected_specific_diff_phase' + combined_name + '.png')
+        + '/corrected_specific_diff_phase' + combined_name + '.png')
     plt.close()
 
     # Creating a plot with region dealias corrected velocity.
@@ -294,7 +290,7 @@ def quicklooks(radar, image_directory=None, sweep=3,
                     colors='k')
     plt.savefig(
         image_directory
-        + 'corrected_velocity' + combined_name + '.png')
+        + '/corrected_velocity' + combined_name + '.png')
     plt.close()
 
     # Creating a plot of rain rate A
@@ -310,7 +306,7 @@ def quicklooks(radar, image_directory=None, sweep=3,
                     colors='k')
     plt.savefig(
         image_directory
-        + 'rain_rate_A' + combined_name + '.png')
+        + '/rain_rate_A' + combined_name + '.png')
     plt.close()
 
     # Creating a plot of filtered corrected differential phase.
@@ -331,7 +327,7 @@ def quicklooks(radar, image_directory=None, sweep=3,
                     colors='k')
     plt.savefig(
         image_directory
-        + 'filtered_corrected_differential_phase' + combined_name + '.png')
+        + '/filtered_corrected_differential_phase' + combined_name + '.png')
     plt.close()
 
     # Creating a plot of filtered corrected specific differential phase.
@@ -352,7 +348,7 @@ def quicklooks(radar, image_directory=None, sweep=3,
                     colors='k')
     plt.savefig(
         image_directory
-        + 'filtered_corrected_specific_diff_phase' + combined_name + '.png')
+        + '/filtered_corrected_specific_diff_phase' + combined_name + '.png')
     plt.close()
 
 
