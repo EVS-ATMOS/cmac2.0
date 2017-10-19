@@ -52,20 +52,37 @@ def main():
     parser.add_argument(
         '-minlon', '--min_longitude', type=float, default=-98.3,
         help='Value to use as min longitude for the bounds of the plots.')
+    parser.add_argument('--dd-lobes', dest='dd_lobes', action='store_true',
+                        help='Plot Dual Doppler lobes between i4 and i5.')
+    parser.add_argument('--no-dd-lobes', dest='dd_lobes', action='store_false',
+                        help=('Do not plot Dual Doppler lobes' + 
+                             ' between i4 and i5.'))
+   
+    parser.set_defaults(dd_lobes=False)
     args = parser.parse_args()
-
+    
+    
     radar = pyart.io.read(args.radar_file)
     clutter_radar = pyart.io.read(args.clutter_file)
     sonde = netCDF4.Dataset(args.sonde_file)
-    clutter_field = clutter_radar.fields['xsapr_clutter']['data']
-
-    cmac_radar = cmac(radar, sonde, clutter_field, alt=args.altitude)
+    
+    # Load clutter files.
+    clutter_file_path = args.clutter_file
+    print('## Loading clutter file ' + clutter_file_path)
+    clutter = pyart.io.read(clutter_file_path)
+    print('## Reading dictionary...')
+    clutter_field_dict = clutter.fields['xsapr_clutter']
+    print('## Adding clutter field..')
+    radar.add_field(
+        'xsapr_clutter', clutter_field_dict, replace_existing=True)
+    del clutter
+    cmac_radar = cmac(radar, sonde,  alt=args.altitude)
     sonde.close()
     del radar
     del clutter_radar
     if args.out_radar is None:
         pyart.io.write_cfradial(
-            os.path.expanduser('~')+'/cmac_radar.nc', cmac_radar)
+            os.path.expanduser('~') + '/cmac_radar.nc', cmac_radar)
         print('## A CMAC radar object has been created at '
               + os.path.expanduser('~') + '/cmac_radar.nc')
     else:
@@ -76,7 +93,7 @@ def main():
     quicklooks(cmac_radar, image_directory=args.image_directory,
                sweep=args.sweep, max_lat=args.max_latitude,
                min_lat=args.min_latitude, max_lon=args.max_longitude,
-               min_lon=args.min_longitude)
+               min_lon=args.min_longitude, dd_lobes=args.dd_lobes)
     del cmac_radar
     print('##')
     if args.image_directory is None:

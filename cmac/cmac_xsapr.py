@@ -42,7 +42,7 @@ def cmac(radar, sonde, alt=320.0, attenuation_a_coef=None,
 
     # Obtaining variables needed for fuzzy logic.
     radar.altitude['data'][0] = alt
-
+    
     radar_start_date = netCDF4.num2date(
         radar.time['data'][0], radar.time['units'])
     print('##', str(radar_start_date))

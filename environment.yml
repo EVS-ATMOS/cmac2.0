@@ -105,6 +105,7 @@ dependencies:
 - zict=0.1.2=py36_0
 - coincbc=2.9.9
 - ffmpeg=3.1.3
+- cartopy=0.15.1
 - pip:
   - ipython-genutils==0.2.0
   - jupyter-client==5.1.0
@@ -113,6 +114,7 @@ dependencies:
   - decorator==4.1.1
   - networkx==1.11
   - scikit-fuzzy==0.3
+  - pyshp
   - git+https://github.com/zssherman/xsapr_clutter_project.git
   - git+https://github.com/ARM-DOE/pyart.git
   - git+https://github.com/EVS-ATMOS/cmac2.0.git
