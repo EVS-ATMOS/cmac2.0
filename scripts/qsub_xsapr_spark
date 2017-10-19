@@ -1,0 +1,8 @@
+#PBS -l nodes=24:ppn=32
+#PBS -l walltime=1:30:00
+#PBS -q batch
+#PBS -l qos=std
+#PBS -W group_list=cades-arm
+#PBS -j oe
+#PBS -N IPythonMPI0
+

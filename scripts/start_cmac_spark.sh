@@ -1,0 +1,2 @@
+$SPARK_HOME/bin/spark-submit --master=$1 ./xsapr_cmac_pyspark.py /lustre/or-hydra/cades-arm/proj-shared/cmac_sgpxsaprppiI5.00/201708/ /lustre/or-hydra/cades-arm/proj-shared/sgpsondewnpnC1.b1/ /home/rjackson/cmac2.0/scripts/clutter201709.nc --scheduler_file=/home/rjackson/scheduler.json -o /lustre/or-hydra/cades-arm/proj-shared/sgpxsaprcmacsurI5.c1/scaling_test_spark -id /lustre/or-hydra/cades-arm/proj-shared/sgpxsaprcmacsurI5.c1/scaling_test_images
+
