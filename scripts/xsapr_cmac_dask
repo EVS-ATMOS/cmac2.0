@@ -42,26 +42,6 @@ def run_cmac_and_plotting(radar_file_path, sounding_times, args):
     radar_start_date = netCDF4.num2date(radar.time['data'][0],
                                         radar.time['units'])
 
-    # Load clutter files.
-    clutter_file_path = args.clutter_file
-    print('## Loading clutter file ' + clutter_file_path)
-    clutter = pyart.io.read(clutter_file_path)
-    print('## Reading dictionary...')
-    clutter_field_dict = clutter.fields['xsapr_clutter']
-    print('## Adding clutter field..')
-    radar.add_field(
-        'xsapr_clutter', clutter_field_dict, replace_existing=True)
-    del clutter
-    closest_time = min(sounding_times,
-                       key=lambda d: abs(d - radar_start_date))
-    sonde_file = get_sounding_file_name(args.sonde_path,
-                                        closest_time)
-    sonde = netCDF4.Dataset(sonde_file)
-    cmac_radar = cmac(radar, sonde, alt=args.altitude)
-
-    ## Free up some memory
-    del radar
-    sonde.close()
     year_str = "%04d" % radar_start_date.year
     month_str = "%02d" % radar_start_date.month
     day_str = "%02d" % radar_start_date.day
@@ -84,6 +64,31 @@ def run_cmac_and_plotting(radar_file_path, sounding_times, args):
             the_path,
             stat.S_IRUSR | stat.S_IWUSR | stat.S_IXUSR |
             stat.S_IRGRP | stat.S_IWGRP | stat.S_IXGRP)
+
+    if args.overwrite is False:
+        if os.path.exists(file_name) is True:
+            return
+
+    # Load clutter files.
+    clutter_file_path = args.clutter_file
+    print('## Loading clutter file ' + clutter_file_path)
+    clutter = pyart.io.read(clutter_file_path)
+    print('## Reading dictionary...')
+    clutter_field_dict = clutter.fields['xsapr_clutter']
+    print('## Adding clutter field..')
+    radar.add_field(
+        'xsapr_clutter', clutter_field_dict, replace_existing=True)
+    del clutter
+    closest_time = min(sounding_times,
+                       key=lambda d: abs(d - radar_start_date))
+    sonde_file = get_sounding_file_name(args.sonde_path,
+                                        closest_time)
+    sonde = netCDF4.Dataset(sonde_file)
+    cmac_radar = cmac(radar, sonde, alt=args.altitude)
+
+    ## Free up some memory
+    del radar
+    sonde.close()
 
     pyart.io.write_cfradial(file_name, cmac_radar)
     print('## A CMAC radar object has been created at ' + file_name)
@@ -162,8 +167,15 @@ def main():
                         help='Plot Dual Doppler lobes between i4 and i5.')
     parser.add_argument('--no-dd-lobes', dest='dd_lobes', action='store_false',
                         help=('Do not plot Dual Doppler lobes' + 
-                             ' between i4 and i5.'))   
+                             ' between i4 and i5.'))
+    parser.add_argument('--overwrite', dest='overwrite', action='store_true',
+                        help='Option to overwrite prexisting cmac files.')
+    parser.add_argument('--no-overwrite', dest='overwrite',
+                        action='store_false',
+                        help=('Do not overwrite prexisting cmac files.'))
     parser.set_defaults(dd_lobes=False)
+    parser.set_defaults(overwrite=False)
+
     args = parser.parse_args()
     if os.path.isdir(args.radar_path):
         radar_files = glob.glob(args.radar_path + '/**/*XSW*', recursive=True)
