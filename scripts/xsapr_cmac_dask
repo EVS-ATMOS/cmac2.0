@@ -7,10 +7,10 @@ import datetime
 import glob
 import os
 import shutil
-import stat
 import subprocess
 import time
 
+from distributed import Client, wait
 from matplotlib import use
 use('agg')
 import netCDF4
@@ -18,7 +18,6 @@ import pyart
 
 from cmac import cmac, quicklooks, get_sounding_times, get_sounding_file_name
 from cmac import xsapr_clutter
-from distributed import Client, wait
 
 
 def run_cmac_and_plotting(radar_file_path, sounding_times, args):
@@ -27,18 +26,16 @@ def run_cmac_and_plotting(radar_file_path, sounding_times, args):
         radar = pyart.io.read(radar_file_path)
     except TypeError:
         if args.bad_directory is None:
-            path = (os.path.expanduser('~') + '/' + 'type_error_radars/')
+            path = os.path.expanduser('~') + '/' + 'type_error_radars/'
         else:
             path = args.bad_directory
         print(radar_file_path + ' has encountered TypeError!')
         if not os.path.exists(path):
             os.makedirs(path)
-            os.chmod(
-                path,
-                stat.S_IRUSR | stat.S_IWUSR | stat.S_IXUSR |
-                stat.S_IRGRP | stat.S_IWGRP | stat.S_IXGRP)
+            subprocess.call('chmod -R g+rw ' + path, shell=True)
         shutil.move(radar_file_path, path)
         return
+
     radar_start_date = netCDF4.num2date(radar.time['data'][0],
                                         radar.time['units'])
 
@@ -58,16 +55,14 @@ def run_cmac_and_plotting(radar_file_path, sounding_times, args):
     file_name = (the_path + '/sgpxsaprcmacsurI5.c1.' + year_str + month_str
                  + day_str + '.' + hour_str + minute_str + second_str + '.nc')
 
-    if not os.path.exists(the_path):
-        os.makedirs(the_path)
-        os.chmod(
-            the_path,
-            stat.S_IRUSR | stat.S_IWUSR | stat.S_IXUSR |
-            stat.S_IRGRP | stat.S_IWGRP | stat.S_IXGRP)
-
     if args.overwrite is False:
         if os.path.exists(file_name) is True:
+            print(file_name + ' already exists.')
             return
+
+    if not os.path.exists(the_path):
+        os.makedirs(the_path)
+        subprocess.call('chmod -R g+rw ' + the_path, shell=True)
 
     # Load clutter files.
     clutter_file_path = args.clutter_file
@@ -96,17 +91,12 @@ def run_cmac_and_plotting(radar_file_path, sounding_times, args):
                      + day_str + '.' + hour_str + minute_str + second_str)
     if not os.path.exists(img_directory):
         os.makedirs(img_directory)
-        os.chmod(
-            img_directory,
-            stat.S_IRUSR | stat.S_IWUSR | stat.S_IXUSR |
-            stat.S_IRGRP | stat.S_IWGRP | stat.S_IXGRP)
+        subprocess.call('chmod -R g+rw ' + img_directory, shell=True)
 
     quicklooks(cmac_radar, image_directory=img_directory,
                sweep=args.sweep, max_lat=args.max_latitude,
                min_lat=args.min_latitude, max_lon=args.max_longitude,
                min_lon=args.min_longitude, dd_lobes=args.dd_lobes)
-    print('## Quicklooks have been saved at ' + img_directory)
-    print('##')
     del cmac_radar
 
 
@@ -177,6 +167,7 @@ def main():
     parser.set_defaults(overwrite=False)
 
     args = parser.parse_args()
+
     if os.path.isdir(args.radar_path):
         radar_files = glob.glob(args.radar_path + '/**/*XSW*', recursive=True)
     elif os.path.isfile(args.radar_path):
@@ -220,10 +211,9 @@ def main():
         print('## Quicklooks have been saved in your home directory.')
     else:
         print('## Quicklooks have been saved to ' + args.image_directory)
-    perm_image = 'chmod -R g+rw ' + args.image_directory
-    perm_radar = 'chmod -R g+rw ' + args.out_radar
-    subprocess.call(perm_image, shell=True)
-    subprocess.call(perm_radar, shell=True)
+
+    subprocess.call('chmod -R g+rw ' + args.image_directory, shell=True)
+    subprocess.call('chmod -R g+rw ' + args.out_radar, shell=True)
     print('##')
     print('## CMAC 2.0 Completed in ' + str(time.time() - bt) + ' s')
     client.shutdown()
