@@ -51,7 +51,7 @@ def run_cmac_and_plotting(radar_file_path, sounding_times, args):
                     + second_str + '/')
     else:
         the_path = (args.out_radar + '/' + year_str +  month_str
-                    + day_str + '/')
+                    + day_str)
     file_name = (the_path + '/sgpxsaprcmacsurI5.c1.' + year_str + month_str
                  + day_str + '.' + hour_str + minute_str + second_str + '.nc')
 
@@ -98,6 +98,7 @@ def run_cmac_and_plotting(radar_file_path, sounding_times, args):
                min_lat=args.min_latitude, max_lon=args.max_longitude,
                min_lon=args.min_longitude, dd_lobes=args.dd_lobes)
     del cmac_radar
+    return
 
 
 def main():
