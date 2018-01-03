@@ -6,7 +6,7 @@ import datetime
 import glob
 import os
 import shutil
-import stat
+import subprocess
 
 
 def datespan(start_date, end_date, delta=datetime.timedelta(days=1)):
@@ -24,6 +24,9 @@ def main():
     parser = argparse.ArgumentParser(
         description='Create a mp4 of cmac_four_panel plot for a each day.')
     parser.add_argument(
+        'xsapr_site', type=str, choices=['I4','I5','I6'],
+        help='X-SAPR site location, example: I4, I5 or I6.')
+    parser.add_argument(
         'start_date', type=str,
         help="Start date string to do mp4 creation. Example:'20170909'")
     parser.add_argument(
@@ -35,15 +38,15 @@ def main():
         help='Frame rate to create mp4 with. Example: 2.0')
     args = parser.parse_args()
 
+    site = args.xsapr_site
+
     path = ('/lustre/or-hydra/cades-arm/proj-shared/'
-            + 'sgpxsaprcmacsurI5.c1.png/mp4s/')
+            + 'sgpxsaprcmacsur' + site + '.c1.mp4/')
 
     # Creates an mp4s directory if it does not exist.
     if not os.path.exists(path):
         os.makedirs(path)
-        os.chmod(path,
-                 stat.S_IRUSR | stat.S_IWUSR | stat.S_IXUSR |
-                 stat.S_IRGRP | stat.S_IWGRP | stat.S_IXGRP)
+        subprocess.call('chmod -R g+rw ' + path, shell=True)
 
     # Loops through each day between the start and end date.
     start = datetime.datetime.strptime(args.start_date, "%Y%m%d")
@@ -52,8 +55,8 @@ def main():
         date = datetime.datetime.strftime(date_time, '%Y%m%d')
         files = glob.glob(
             '/lustre/or-hydra/cades-arm/proj-shared/'
-            + 'sgpxsaprcmacsurI5.c1.png/' + date + '**/cmac*',
-            recursive=True)
+            + 'sgpxsaprcmacsur' + site + '.c1.png/' + date
+            + '**/cmac*', recursive=True)
         # If a date has no image files, loop goes to the next date.
         if not files:
             print(date + ' has no image files. Moving to the next date.')
@@ -63,15 +66,12 @@ def main():
         date_path = path + date + '/'
         if not os.path.exists(date_path):
             os.makedirs(date_path)
-            os.chmod(date_path,
-                     stat.S_IRUSR | stat.S_IWUSR | stat.S_IXUSR |
-                     stat.S_IRGRP | stat.S_IWGRP | stat.S_IXGRP)
+            subprocess.call('chmod -R g+rw ' + date_path, shell=True)
 
         # Creates a temporary image folder to store a day at a time.
         os.makedirs(path + 'temp_images/')
-        os.chmod(path + 'temp_images/',
-                 stat.S_IRUSR | stat.S_IWUSR | stat.S_IXUSR |
-                 stat.S_IRGRP | stat.S_IWGRP | stat.S_IXGRP)
+        subprocess.call('chmod -R g+rw ' + path + 'temp_images/',
+                        shell=True)
         # Copies the files found with glob and places in the temp directory.
         for file in files:
             shutil.copy(file, path + 'temp_images/')
@@ -82,8 +82,8 @@ def main():
                   + " ffmpeg -f image2pipe -r " + str(args.frame_rate)
                   + " -i - -movflags faststart -pix_fmt yuv420p -vf"
                   + " 'scale=trunc(iw/2)*2:trunc(ih/2)*2' -y "
-                  + date_path + "cmac_four_panel_plot.sgpxsaprcmacsurI5.c1."
-                  + date + ".mp4")
+                  + date_path + "cmac_four_panel_plot.sgpxsaprcmacsur"
+                  + site + ".c1." + date + ".mp4")
 
         # Removes temp_images directory to start fresh with each day.
         shutil.rmtree(path + 'temp_images/')
