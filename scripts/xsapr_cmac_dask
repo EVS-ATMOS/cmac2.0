@@ -120,6 +120,9 @@ def main():
         'clutter_file', type=str,
         help='Path to clutter file')
     parser.add_argument(
+        'site', type=str, help=('Site ID, for example I4, for which X-SAPR',
+                                'data CMAC2.0 will run on.')) 
+    parser.add_argument(
         '-o', '--out_radar', type=str, default=None,
         help=('Out file path and name to use for the CMAC radar.',
               'If not provided, radar is written to users home',
@@ -130,23 +133,8 @@ def main():
               'If not provided, images are written to users home',
               'directory.'))
     parser.add_argument(
-        '-alt', '--altitude', type=float, default=320.0,
-        help='Value to use as default altitude for the radar object')
-    parser.add_argument(
         '-sw', '--sweep', type=int, default=3,
         help='Value for the sweep to plot.')
-    parser.add_argument(
-        '-maxlat', '--max_latitude', type=float, default=37.0,
-        help='Value to use as max latitude for the bounds of the plots.')
-    parser.add_argument(
-        '-minlat', '--min_latitude', type=float, default=36.0,
-        help='Value to use as min latitude for the bounds of the plots.')
-    parser.add_argument(
-        '-maxlon', '--max_longitude', type=float, default=-97.0,
-        help='Value to use as max longitude for the bounds of the plots.')
-    parser.add_argument(
-        '-minlon', '--min_longitude', type=float, default=-98.3,
-        help='Value to use as min longitude for the bounds of the plots.')
     parser.add_argument(
         '-sched', '--scheduler_file', type=str, default='~/scheduler.json',
         help='Path to dask scheduler json file')
@@ -169,8 +157,33 @@ def main():
 
     args = parser.parse_args()
 
+    if args.site == 'I4':
+        from cmac import CONFIG_XSAPR_I4 as radar_config
+    elif args.site == 'I5':
+        from cmac import CONFIG_XSAPR_I5 as radar_config
+    elif args.site == 'I6':
+        from cmac import CONFIG_XSAPR_I6 as radar_config
+    
+
+    site_id = radar_config['site']
+    town = radar_config['town']
+    x_compass = radar_config['x_compass']
+    site_alt = radar_config['site_alt']
+    field_shape = radar_config['field_shape']
+    max_lat = radar_config['max_lat']
+    min_lat = radar_config['min_lat']
+    max_lon = radar_config['max_lon']
+    min_lon = radar_config['min_lon']
+    site_i6_dms_lat = radar_config['site_i6_dms_lat'] 
+    site_i6_dms_lon = radar_config['site_i6_dms_lon']
+    site_i5_dms_lat = radar_config['site_i5_dms_lat']
+    site_i5_dms_lon = radar_config['site_i5_dms_lon']
+    site_i4_dms_lat = radar_config['site_i4_dms_lat']
+    site_i4_dms_lon = radar_config['site_i4_dms_lon']
+
     if os.path.isdir(args.radar_path):
-        radar_files = glob.glob(args.radar_path + '/**/*XSW*', recursive=True)
+        radar_files = glob.glob(args.radar_path + '/**/*' + x_compass
+                                + '*', recursive=True)
     elif os.path.isfile(args.radar_path):
         with open(args.radar_path) as f:
             radar_files = f.readlines()
@@ -183,9 +196,9 @@ def main():
     # Get dates of radar files from the file name.
     radar_times = []
     for file_name in radar_files:
-        where_xsw = file_name.find('XSW')
+        where_x = file_name.find(x_compass)
         radar_times.append(
-            datetime.datetime.strptime(file_name[where_xsw+3:where_xsw+15],
+            datetime.datetime.strptime(file_name[where_x+3:where_x+15],
                                        '%y%m%d%H%M%S'))
 
     # Connect to dask client.
