@@ -24,9 +24,13 @@ def main():
                                       'in the list will be processed.'))
     parser.add_argument(
         'out_file_name', type=str, help=('Output Cf/Radial file'))
+    parser.add_argument(
+        'facility', type=str, help=('Facility ID such as I4, to show which',
+                                    'X-SAPR data is being used.')) 
     args = parser.parse_args()
     if os.path.isdir(args.radar_path):
-        radar_files = glob.glob(args.radar_path + '/**/*XSW*', recursive=True)
+        radar_files = glob.glob(args.radar_path + '/**/*' + args.facility
+                                + '*', recursive=True)
     elif os.path.isfile(args.radar_path):
         with open(args.radar_path) as f:
             radar_files = f.readlines()
