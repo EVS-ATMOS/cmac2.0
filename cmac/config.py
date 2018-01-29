@@ -10,7 +10,7 @@ have to also be changed.
 
 
 config_xsapr_i6 = {
-    'site': 'I6',
+    'facility': 'I6',
     'town': 'Deer Creek, OK',
     'x_compass': 'XNW',
     'site_alt': 341,
@@ -27,7 +27,7 @@ config_xsapr_i6 = {
     'site_i4_dms_lon': (-97, 21, 49.32)}
 
 config_xsapr_i5 = {
-    'site': 'I5',
+    'facility': 'I5',
     'town': 'Garber, OK',
     'x_compass': 'XSW',
     'site_alt': 328,
@@ -44,7 +44,7 @@ config_xsapr_i5 = {
     'site_i4_dms_lon': (-97, 21, 49.32)}
 
 config_xsapr_i4 = {
-    'site': 'I4',
+    'facility': 'I4',
     'town': 'Billings, OK',
     'x_compass': 'XSE',
     'site_alt': 330,
