@@ -9,7 +9,7 @@ have to also be changed.
 """
 
 
-CONFIG_XSAPR_I6 = {
+config_xsapr_i6 = {
     'site': 'I6',
     'town': 'Deer Creek, OK',
     'x_compass': 'XNW',
@@ -26,7 +26,7 @@ CONFIG_XSAPR_I6 = {
     'site_i4_dms_lat': (36, 34, 44.4),
     'site_i4_dms_lon': (-97, 21, 49.32)}
 
-CONFIG_XSAPR_I5 = {
+config_xsapr_i5 = {
     'site': 'I5',
     'town': 'Garber, OK',
     'x_compass': 'XSW',
@@ -43,7 +43,7 @@ CONFIG_XSAPR_I5 = {
     'site_i4_dms_lat': (36, 34, 44.4),
     'site_i4_dms_lon': (-97, 21, 49.32)}
 
-CONFIG_XSAPR_I4 = {
+config_xsapr_i4 = {
     'site': 'I4',
     'town': 'Billings, OK',
     'x_compass': 'XSE',
