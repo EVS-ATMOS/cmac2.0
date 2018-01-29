@@ -46,20 +46,20 @@ def run_cmac_and_plotting(radar_file_path, radar_config,
     max_lon = radar_config['max_lon']
     min_lon = radar_config['min_lon']
     if facility_id == 'I4':
-        radar1_dms_lon = radar_config['site_i4_dms_lon']
-        radar1_dms_lat = radar_config['site_i4_dms_lat']
-        radar2_dms_lon = radar_config['site_i5_dms_lon']
-        radar2_dms_lat = radar_config['site_i5_dms_lat']
+        dms_radar1_coords = [radar_config['site_i4_dms_lon'],
+                             radar_config['site_i4_dms_lat']]
+        dms_radar2_coords = [radar_config['site_i5_dms_lon'],
+                             radar_config['site_i5_dms_lat']]
     if facility_id == 'I5':
-        radar1_dms_lon = radar_config['site_i5_dms_lon']
-        radar1_dms_lat = radar_config['site_i5_dms_lat']
-        radar2_dms_lon = radar_config['site_i4_dms_lon']
-        radar2_dms_lat = radar_config['site_i4_dms_lat']
+        dms_radar1_coords = [radar_config['site_i5_dms_lon'],
+                             radar_config['site_i5_dms_lat']]
+        dms_radar2_coords = [radar_config['site_i4_dms_lon'],
+                             radar_config['site_i4_dms_lat']]
     if facility_id == 'I6':
-        radar1_dms_lon = radar_config['site_i6_dms_lon']
-        radar1_dms_lat = radar_config['site_i6_dms_lat']
-        radar2_dms_lon = radar_config['site_i4_dms_lon']
-        radar2_dms_lat = radar_config['site_i4_dms_lat']
+        dms_radar1_coords = [radar_config['site_i6_dms_lon'],
+                             radar_config['site_i6_dms_lat']]
+        dms_radar2_coords = [radar_config['site_i4_dms_lon'],
+                             radar_config['site_i4_dms_lat']]
 
     radar_start_date = netCDF4.num2date(radar.time['data'][0],
                                         radar.time['units'])
@@ -133,10 +133,8 @@ def run_cmac_and_plotting(radar_file_path, radar_config,
                sweep=args.sweep, max_lat=max_lat,
                min_lat=min_lat, max_lon=max_lon,
                min_lon=min_lon, dd_lobes=args.dd_lobes,
-               dd_lobes_radar1_lon=radar1_dms_lon,
-               dd_lobes_radar1_lat=radar1_dms_lat,
-               dd_lobes_radar2_lon=radar2_dms_lon,
-               dd_lobes_radar2_lat=radar2_dms_lat)
+               dms_radar1_coords=dms_radar1_coords,
+               dms_radar2_coords=dms_radar2_coords)
 
     # Delete the cmac_radar object and move on to the next radar file.
     del cmac_radar
