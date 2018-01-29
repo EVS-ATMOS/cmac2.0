@@ -85,10 +85,17 @@ def quicklooks(radar, facility_id, image_directory=None, sweep=3,
     if dd_lobes is True:
         grid_lat = np.arange(min_lat, max_lat, 0.01)
         grid_lon = np.arange(min_lon, max_lon, 0.01)
-        dms_radar1 = [_dms_to_decimal(dd_lobes_radar1_lon),
-                      _dms_to_decimal(dd_lobes_radar1_lat)]
-        dms_radar2 = [_dms_to_decimal(dd_lobes_radar2_lon),
-                      _dms_to_decimal(dd_lobes_radar2_lat)]
+        dms_radar1 = [_dms_to_decimal(
+            dd_lobes_radar1_lon[0], dd_lobes_radar1_lon[1],
+            dd_lobes_radar1_lon[2]), _dms_to_decimal(
+                dd_lobes_radar1_lat[0], dd_lobes_radar1_lat[1],
+                dd_lobes_radar1_lat[2])]
+        dms_radar2 = [_dms_to_decimal(
+            dd_lobes_radar2_lon[0], dd_lobes_radar2_lon[1],
+            dd_lobes_radar2_lon[2]), _dms_to_decimal(
+                dd_lobes_radar2_lat[0], dd_lobes_radar2_lat[1],
+                dd_lobes_radar2_lat[2])]
+
 
         bca = _get_bca(dms_radar2[0], dms_radar2[1], dms_radar1[0],
                        dms_radar1[1], grid_lon, grid_lat)
