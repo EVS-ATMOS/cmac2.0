@@ -53,6 +53,6 @@ or the code will continue to increase in automation.
 Lead Developers
 ---------------
 
-Scott Collis
-Robert Jackson
-Zach Sherman
+ - Scott Collis
+ - Robert Jackson
+ - Zach Sherman
