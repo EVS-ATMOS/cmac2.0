@@ -17,9 +17,10 @@ from pyart.graph.common import generate_radar_time_begin
 plt.switch_backend('agg')
 
 
-def quicklooks(radar, image_directory=None, sweep=3,
+def quicklooks(radar, facility_id, image_directory=None, sweep=3,
                max_lat=37.0, min_lat=36.0, max_lon=-97.0, min_lon=-98.3,
-               dd_lobes=True):
+               dd_lobes=True, dms_radar1_coords=None,
+               dms_radar2_coords=None):
     """
     Quicklooks, images produced with regards to CMAC
 
@@ -27,6 +28,8 @@ def quicklooks(radar, image_directory=None, sweep=3,
     ---------
     radar : Radar
         Radar object that has CMAC applied to it.
+    facility_id : String
+        String stating the id of the radar. For example: 'I5'.
 
     Optional Parameters
     -------------------
@@ -44,7 +47,15 @@ def quicklooks(radar, image_directory=None, sweep=3,
     min_lon : float
         Minimum longitude for plot bounds. Default is -98.3.
     dd_lobes : bool
-        Plot DD lobes between i4 and i5 if = True.
+        Plot DD lobes between radars if dd_lobes is True.
+    dms_radar1_coords : List
+        Values in degrees of the longitude and latitude coordinates for the
+        main radar being plotted for the dd_lobes_calculation. If dd_lobes
+        argument is False, dms_radar1_coords is not used.
+    dms_radar2_coords : List
+        Values in degrees of the longitude and latitude coordinates for the
+        secondary radar within the plot for the dd_lobes_calculation. If
+        dd_lobes argument is False, dms_radar2_coords is not used.
 
     """
 
@@ -55,18 +66,30 @@ def quicklooks(radar, image_directory=None, sweep=3,
         radar.time['data'][0], radar.time['units'])
 
     date_string = datetime.strftime(radar_start_date, '%Y%m%d.%H%M%S')
-    arm_name = '.sgpxsaprcmacsurI5.c1.'
+    arm_name = '.sgpxsaprcmacsur' + facility_id + '.c1.'
     combined_name = arm_name + date_string
 
     # Creating a plot of reflectivity before CMAC.
     lal = np.arange(min_lat, max_lat+.2, .2)
     lol = np.arange(min_lon, max_lon+.2, .2)
-    grid_lat = np.arange(min_lat, max_lat, 0.01)
-    grid_lon = np.arange(min_lon, max_lon, 0.01)
-    i5 = [_dms_to_decimal(-97, 35, 37.68), _dms_to_decimal(36, 29, 29.4)]
-    i4 = [_dms_to_decimal(-97, 21, 49.32), _dms_to_decimal(36, 34, 44.4)]
-    bca = _get_bca(i4[0], i4[1], i5[0], i5[1], grid_lon, grid_lat)
-    grid_lon, grid_lat = np.meshgrid(grid_lon, grid_lat)
+
+    if dd_lobes is True:
+        grid_lat = np.arange(min_lat, max_lat, 0.01)
+        grid_lon = np.arange(min_lon, max_lon, 0.01)
+        dec_radar1 = [_dms_to_decimal(
+            dms_radar1_coords[0][0], dms_radar1_coords[0][1],
+            dms_radar1_coords[0][2]), _dms_to_decimal(
+                dms_radar1_coords[1][0], dms_radar1_coords[1][1],
+                dms_radar1_coords[1][2])]
+        dec_radar2 = [_dms_to_decimal(
+            dms_radar2_coords[0][0], dms_radar2_coords[0][1],
+            dms_radar2_coords[0][2]), _dms_to_decimal(
+                dms_radar2_coords[1][0], dms_radar2_coords[1][1],
+                dms_radar2_coords[1][2])]
+
+        bca = _get_bca(dec_radar2[0], dec_radar2[1], dec_radar1[0],
+                       dec_radar1[1], grid_lon, grid_lat)
+        grid_lon, grid_lat = np.meshgrid(grid_lon, grid_lat)
 
     display = pyart.graph.RadarMapDisplayCartopy(radar)
     fig = plt.figure(figsize=[12, 8])

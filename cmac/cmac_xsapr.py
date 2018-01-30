@@ -12,8 +12,8 @@ import numpy as np
 from . import processing_code
 
 
-def cmac(radar, sonde, alt=320.0, attenuation_a_coef=None,
-         meta_append=None):
+def cmac(radar, sonde, facility_id, town, alt,
+         attenuation_a_coef=None, meta_append=None):
     """
     Corrected Moments in Antenna Coordinates
 
@@ -23,11 +23,15 @@ def cmac(radar, sonde, alt=320.0, attenuation_a_coef=None,
         Radar object to use in the CMAC calculation.
     sonde : Object
         Object containing all the sonde data.
+    facility_id : String
+        String stating the id of the radar. For example: 'I5'.
+    town : String
+        String stating the town of the radar. For example: 'Garber, OK'.
+    alt : Float
+        Value to use as default altitude for the radar object.
 
     Other Parameters
     ----------------
-    alt : float
-        Value to use as default altitude for the radar object.
     attenuation_a_coef : float
         A coefficient in attenuation calculation.
     meta_append : dictonary
@@ -42,7 +46,7 @@ def cmac(radar, sonde, alt=320.0, attenuation_a_coef=None,
 
     # Obtaining variables needed for fuzzy logic.
     radar.altitude['data'][0] = alt
-    
+ 
     radar_start_date = netCDF4.num2date(
         radar.time['data'][0], radar.time['units'])
     print('##', str(radar_start_date))
@@ -171,9 +175,10 @@ def cmac(radar, sonde, alt=320.0, attenuation_a_coef=None,
         command_line = ''
         for item in sys.argv:
             command_line = command_line + ' ' + item
+
         meta_append = {
             'site_id': 'sgp',
-            'facility_id': 'i5: Garber, Ok',
+            'facility_id': facility_id + ': ' + town,
             'data_level': 'c1',
             'comment': (
                 'This is highly experimental and initial data. There are many',

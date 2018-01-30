@@ -11,6 +11,9 @@ Functions
 .. autosummary::
     :toctree: generated/
 
+    config_xsapr_i4
+    config_xsapr_i5
+    config_xsapr_i6
     cmac
     quicklooks
     snr_and_sounding
@@ -23,6 +26,7 @@ Functions
 
 """
 
+from .config import config_xsapr_i4, config_xsapr_i5, config_xsapr_i6
 from .cmac_xsapr import cmac
 from .cmac_quicklooks import quicklooks
 from .processing_code import snr_and_sounding, do_my_fuzz

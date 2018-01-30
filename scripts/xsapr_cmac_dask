@@ -17,10 +17,10 @@ import netCDF4
 import pyart
 
 from cmac import cmac, quicklooks, get_sounding_times, get_sounding_file_name
-from cmac import xsapr_clutter
 
 
-def run_cmac_and_plotting(radar_file_path, sounding_times, args):
+def run_cmac_and_plotting(radar_file_path, radar_config,
+                          sounding_times, args):
     """ For dask we need the radar plotting routines all in one subroutine. """
     try:
         radar = pyart.io.read(radar_file_path)
@@ -35,6 +35,31 @@ def run_cmac_and_plotting(radar_file_path, sounding_times, args):
             subprocess.call('chmod -R g+rw ' + path, shell=True)
         shutil.move(radar_file_path, path)
         return
+
+    # Defining variables based on the argument args.facility.
+    facility_id = radar_config['facility']
+    town = radar_config['town']
+    alt = radar_config['site_alt']
+    field_shape = radar_config['field_shape']
+    max_lat = radar_config['max_lat']
+    min_lat = radar_config['min_lat']
+    max_lon = radar_config['max_lon']
+    min_lon = radar_config['min_lon']
+    if facility_id == 'I4':
+        dms_radar1_coords = [radar_config['site_i4_dms_lon'],
+                             radar_config['site_i4_dms_lat']]
+        dms_radar2_coords = [radar_config['site_i5_dms_lon'],
+                             radar_config['site_i5_dms_lat']]
+    if facility_id == 'I5':
+        dms_radar1_coords = [radar_config['site_i5_dms_lon'],
+                             radar_config['site_i5_dms_lat']]
+        dms_radar2_coords = [radar_config['site_i4_dms_lon'],
+                             radar_config['site_i4_dms_lat']]
+    if facility_id == 'I6':
+        dms_radar1_coords = [radar_config['site_i6_dms_lon'],
+                             radar_config['site_i6_dms_lat']]
+        dms_radar2_coords = [radar_config['site_i4_dms_lon'],
+                             radar_config['site_i4_dms_lat']]
 
     radar_start_date = netCDF4.num2date(radar.time['data'][0],
                                         radar.time['units'])
@@ -52,13 +77,15 @@ def run_cmac_and_plotting(radar_file_path, sounding_times, args):
     else:
         the_path = (args.out_radar + '/' + year_str +  month_str
                     + day_str)
-    file_name = (the_path + '/sgpxsaprcmacsurI5.c1.' + year_str + month_str
-                 + day_str + '.' + hour_str + minute_str + second_str + '.nc')
+    file_name = (the_path + '/sgpxsaprcmacsur' + facility_id + '.c1.'
+                 + year_str + month_str + day_str + '.' + hour_str
+                 + minute_str + second_str + '.nc')
 
-    if args.overwrite is False:
-        if os.path.exists(file_name) is True:
-            print(file_name + ' already exists.')
-            return
+    # If overwrite is False, checks to see if the cmac_radar file
+    # already exists. If so, CMAC 2.0 is not used on the original radar file.
+    if args.overwrite is False and os.path.exists(file_name) is True:
+        print(file_name + ' already exists.')
+        return
 
     if not os.path.exists(the_path):
         os.makedirs(the_path)
@@ -74,29 +101,42 @@ def run_cmac_and_plotting(radar_file_path, sounding_times, args):
     radar.add_field(
         'xsapr_clutter', clutter_field_dict, replace_existing=True)
     del clutter
+
+    # Retrieve closest sonde in time to the time of the radar file.
     closest_time = min(sounding_times,
                        key=lambda d: abs(d - radar_start_date))
     sonde_file = get_sounding_file_name(args.sonde_path,
                                         closest_time)
     sonde = netCDF4.Dataset(sonde_file)
-    cmac_radar = cmac(radar, sonde, alt=args.altitude)
 
-    ## Free up some memory
+    # Running the cmac code to produce a cmac_radar object.
+    cmac_radar = cmac(radar, sonde, facility_id, town, alt)
+
+    # Free up some memory.
     del radar
     sonde.close()
 
+    # Produce the cmac_radar file from the cmac_radar object.
     pyart.io.write_cfradial(file_name, cmac_radar)
     print('## A CMAC radar object has been created at ' + file_name)
+
+    # Providing the image_directory and checking if it already exists.
     img_directory = (args.image_directory + '/' + year_str + month_str
                      + day_str + '.' + hour_str + minute_str + second_str)
     if not os.path.exists(img_directory):
         os.makedirs(img_directory)
         subprocess.call('chmod -R g+rw ' + img_directory, shell=True)
 
-    quicklooks(cmac_radar, image_directory=img_directory,
-               sweep=args.sweep, max_lat=args.max_latitude,
-               min_lat=args.min_latitude, max_lon=args.max_longitude,
-               min_lon=args.min_longitude, dd_lobes=args.dd_lobes)
+    # Producing all the cmac_radar quicklooks.
+    quicklooks(cmac_radar, facility_id,
+               image_directory=img_directory,
+               sweep=args.sweep, max_lat=max_lat,
+               min_lat=min_lat, max_lon=max_lon,
+               min_lon=min_lon, dd_lobes=args.dd_lobes,
+               dms_radar1_coords=dms_radar1_coords,
+               dms_radar2_coords=dms_radar2_coords)
+
+    # Delete the cmac_radar object and move on to the next radar file.
     del cmac_radar
     return
 
@@ -120,6 +160,9 @@ def main():
         'clutter_file', type=str,
         help='Path to clutter file')
     parser.add_argument(
+        'facility', type=str, help=('Facility ID, for example I4, for which',
+                                    'X-SAPR data CMAC2.0 will run on.'))
+    parser.add_argument(
         '-o', '--out_radar', type=str, default=None,
         help=('Out file path and name to use for the CMAC radar.',
               'If not provided, radar is written to users home',
@@ -130,23 +173,8 @@ def main():
               'If not provided, images are written to users home',
               'directory.'))
     parser.add_argument(
-        '-alt', '--altitude', type=float, default=320.0,
-        help='Value to use as default altitude for the radar object')
-    parser.add_argument(
         '-sw', '--sweep', type=int, default=3,
         help='Value for the sweep to plot.')
-    parser.add_argument(
-        '-maxlat', '--max_latitude', type=float, default=37.0,
-        help='Value to use as max latitude for the bounds of the plots.')
-    parser.add_argument(
-        '-minlat', '--min_latitude', type=float, default=36.0,
-        help='Value to use as min latitude for the bounds of the plots.')
-    parser.add_argument(
-        '-maxlon', '--max_longitude', type=float, default=-97.0,
-        help='Value to use as max longitude for the bounds of the plots.')
-    parser.add_argument(
-        '-minlon', '--min_longitude', type=float, default=-98.3,
-        help='Value to use as min longitude for the bounds of the plots.')
     parser.add_argument(
         '-sched', '--scheduler_file', type=str, default='~/scheduler.json',
         help='Path to dask scheduler json file')
@@ -157,8 +185,8 @@ def main():
     parser.add_argument('--dd-lobes', dest='dd_lobes', action='store_true',
                         help='Plot Dual Doppler lobes between i4 and i5.')
     parser.add_argument('--no-dd-lobes', dest='dd_lobes', action='store_false',
-                        help=('Do not plot Dual Doppler lobes' + 
-                             ' between i4 and i5.'))
+                        help=('Do not plot Dual Doppler lobes'
+                              + ' between i4 and i5.'))
     parser.add_argument('--overwrite', dest='overwrite', action='store_true',
                         help='Option to overwrite prexisting cmac files.')
     parser.add_argument('--no-overwrite', dest='overwrite',
@@ -169,8 +197,18 @@ def main():
 
     args = parser.parse_args()
 
+    # Importing radar config data depending on facilty_id
+    if args.facility == 'I4':
+        from cmac import config_xsapr_i4 as radar_config
+    elif args.facility == 'I5':
+        from cmac import config_xsapr_i5 as radar_config
+    elif args.facility == 'I6':
+        from cmac import config_xsapr_i6 as radar_config
+
+    x_compass = radar_config['x_compass']
     if os.path.isdir(args.radar_path):
-        radar_files = glob.glob(args.radar_path + '/**/*XSW*', recursive=True)
+        radar_files = glob.glob(args.radar_path + '/**/*' + x_compass
+                                + '*', recursive=True)
     elif os.path.isfile(args.radar_path):
         with open(args.radar_path) as f:
             radar_files = f.readlines()
@@ -183,9 +221,9 @@ def main():
     # Get dates of radar files from the file name.
     radar_times = []
     for file_name in radar_files:
-        where_xsw = file_name.find('XSW')
+        where_x = file_name.find(x_compass)
         radar_times.append(
-            datetime.datetime.strptime(file_name[where_xsw+3:where_xsw+15],
+            datetime.datetime.strptime(file_name[where_x+3:where_x+15],
                                        '%y%m%d%H%M%S'))
 
     # Connect to dask client.
@@ -205,7 +243,7 @@ def main():
         else:
             future_list.append(
                 client.submit(run_cmac_and_plotting, the_file,
-                              sounding_times, args))
+                              radar_config, sounding_times, args))
 
     ## Do radar object loading on compute nodes.
     if args.image_directory is None:
