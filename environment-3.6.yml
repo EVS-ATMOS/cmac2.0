@@ -1,0 +1,17 @@
+name: cmac_env
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.6
+  - arm_pyart
+  - basemap
+  - wradlib
+  - cartopy
+  - coincbc
+  - cython
+  - pip:
+    - scikit-fuzzy
+    - git+https://github.com/zssherman/xsapr_clutter_project.git
+    - git+https://github.com/CSU-Radarmet/CSU_RadarTools.git
+    - git+https://github.com/EVS-ATMOS/cmac2.0.git

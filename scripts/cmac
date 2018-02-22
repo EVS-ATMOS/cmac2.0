@@ -1,0 +1,146 @@
+#!/usr/bin/env python
+""" Creates a radar object with applied CMAC 2.0 and quicklooks pertaining
+to CMAC 2.0. """
+
+import argparse
+import os
+import importlib
+
+import netCDF4
+import pyart
+
+from cmac import cmac, quicklooks
+
+
+def main():
+    """ The main function utilizes the cmac function and quicklooks function
+    to produce a CMAC radar and images pertaining to CMAC. """
+    parser = argparse.ArgumentParser(
+        description='Create a radar object with applied CMAC2.0.')
+    parser.add_argument(
+        'radar_file', type=str, help='Radar file to use for calculations.')
+    parser.add_argument(
+        'sonde_file', type=str,
+        help='Sonde file to use for CMAC calculation.')
+    parser.add_argument(
+        'clutter_file', type=str,
+        help='clutter file to use for addition of clutter gate id.')
+    parser.add_argument(
+        'config_dict', type=str, help=('Configuration dictionary for the',
+                                       'specific radar being used.'))
+    parser.add_argument(
+        '-o', '--out_radar_directory', type=str, default=None,
+        help=('Out file path and name to use for the CMAC radar.',
+              'If not provided, radar is written to users home',
+              'directory.'))
+    parser.add_argument(
+        '-id', '--image_directory', type=str, default=None,
+        help=('Path to image directory to save CMAC radar images.',
+              'If not provided, images are written to users home',
+              'directory.'))
+    parser.add_argument(
+        '-sw', '--sweep', type=int, default=3,
+        help='Value for the sweep to plot.')
+    parser.add_argument('--dd-lobes', dest='dd_lobes', action='store_true',
+                        help='Plot Dual Doppler lobes between i4 and i5.')
+    parser.add_argument('--no-dd-lobes', dest='dd_lobes', action='store_false',
+                        help=('Do not plot Dual Doppler lobes',
+                              'between i4 and i5.'))
+
+    parser.set_defaults(dd_lobes=False)
+    args = parser.parse_args()
+
+    config_module = importlib.import_module('cmac.config')
+    radar_config = getattr(config_module, args.config_dict)
+
+    facility = radar_config['facility']
+    if facility == 'I4':
+        dms_radar1_coords = [radar_config['site_i4_dms_lon'],
+                             radar_config['site_i4_dms_lat']]
+        dms_radar2_coords = [radar_config['site_i5_dms_lon'],
+                             radar_config['site_i5_dms_lat']]
+    elif facility == 'I5':
+        dms_radar1_coords = [radar_config['site_i5_dms_lon'],
+                             radar_config['site_i5_dms_lat']]
+        dms_radar2_coords = [radar_config['site_i4_dms_lon'],
+                             radar_config['site_i4_dms_lat']]
+    elif facility == 'I6':
+        dms_radar1_coords = [radar_config['site_i6_dms_lon'],
+                             radar_config['site_i6_dms_lat']]
+        dms_radar2_coords = [radar_config['site_i4_dms_lon'],
+                             radar_config['site_i4_dms_lat']]
+
+    save_name = radar_config['save_name']
+    town = radar_config['town']
+    alt = radar_config['site_alt']
+    max_lat = radar_config['max_lat']
+    min_lat = radar_config['min_lat']
+    max_lon = radar_config['max_lon']
+    min_lon = radar_config['min_lon']
+
+
+    radar = pyart.io.read(args.radar_file)
+    clutter_radar = pyart.io.read(args.clutter_file)
+    sonde = netCDF4.Dataset(args.sonde_file)
+
+    # Load clutter files.
+    print('## Loading clutter file ' + args.clutter_file)
+    print('## Reading dictionary...')
+    clutter_field_dict = clutter_radar.fields['xsapr_clutter']
+    print('## Adding clutter field..')
+    radar.add_field(
+        'xsapr_clutter', clutter_field_dict, replace_existing=True)
+    del clutter_radar
+
+    cmac_radar = cmac(radar, sonde, facility, town, alt)
+    sonde.close()
+
+    radar_start_date = netCDF4.num2date(radar.time['data'][0],
+                                        radar.time['units'])
+    year_str = "%04d" % radar_start_date.year
+    month_str = "%02d" % radar_start_date.month
+    day_str = "%02d" % radar_start_date.day
+    hour_str = "%02d" % radar_start_date.hour
+    minute_str = "%02d" % radar_start_date.minute
+    second_str = "%02d" % radar_start_date.second
+
+    del radar
+
+    if args.out_radar_directory is None:
+        pyart.io.write_cfradial(
+            (os.path.expanduser('~') + '/' + save_name + '.'
+             + year_str + month_str + day_str + '.' + hour_str
+             + minute_str + second_str + '.nc'), cmac_radar)
+        print('## A CMAC radar object has been created at '
+              + os.path.expanduser('~') + '/' + save_name + '.'
+              + year_str + month_str + day_str + '.' + hour_str
+              + minute_str + second_str + '.nc')
+    else:
+        pyart.io.write_cfradial(
+            (args.out_radar_directory + '/' + save_name + '.'
+             + year_str + month_str + day_str + '.' + hour_str
+             + minute_str + second_str + '.nc'), cmac_radar)
+        print('## A CMAC radar object has been created at '
+              + args.out_radar_directory + '/' + save_name + '.'
+              + year_str + month_str + day_str + '.' + hour_str
+              + minute_str + second_str + '.nc')
+
+    quicklooks(cmac_radar, save_name,
+               image_directory=args.image_directory,
+               sweep=args.sweep, max_lat=max_lat,
+               min_lat=min_lat, max_lon=max_lon,
+               min_lon=min_lon, dd_lobes=args.dd_lobes,
+               dms_radar1_coords=dms_radar1_coords,
+               dms_radar2_coords=dms_radar2_coords)
+
+    del cmac_radar
+    print('##')
+    if args.image_directory is None:
+        print('## Quicklooks have been saved in your home directory.')
+    else:
+        print('## Quicklooks have been save to ' + args.image_directory)
+    print('##')
+    print('## CMAC 2.0 Completed')
+
+if __name__ == '__main__':
+    main()

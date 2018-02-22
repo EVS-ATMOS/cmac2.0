@@ -1,30 +1,19 @@
-"""
-cmac.processing_code
-======================
-Common core processing code across the AGU poster.
-
-.. autosummary::
-    :toctree: generated/
-
-"""
-
-""" This code was written by Scott Collis. I did some pep8 changes,
-name changes and updated the velocity texture function."""
-
+""" Module that does various CMAC 2.0 calculations. This code was written by
+Scott Collis and Robert Jackson. """
 
 import copy
+import datetime
 import os
 import time
-import datetime
+
+from csu_radartools import csu_kdp
 import fnmatch
 import netCDF4
 import numpy as np
 import pyart
-import skfuzzy as fuzz
 from scipy import integrate
-
-from csu_radartools import csu_kdp
 from scipy import ndimage, interpolate
+import skfuzzy as fuzz
 
 
 def snr_and_sounding(radar, soundings_dir, override_file=None):
@@ -259,11 +248,11 @@ def fix_phase_fields(orig_kdp, orig_phidp, rrange, happy_kdp,
                      max_kdp=15.0):
 
     orig_kdp['data'][happy_kdp.gate_excluded] = 0.0
-    orig_kdp['data'][orig_kdp['data']>max_kdp] = max_kdp
+    orig_kdp['data'][orig_kdp['data'] > max_kdp] = max_kdp
     interg = integrate.cumtrapz(orig_kdp['data'], rrange, axis=1)
     print(interg.shape)
     print(orig_phidp['data'].shape)
-    orig_phidp['data'][:,0:-1] = interg/len(rrange)
+    orig_phidp['data'][:, 0:-1] = interg/len(rrange)
     return orig_phidp, orig_kdp
 
 def return_csu_kdp(radar):
@@ -330,7 +319,7 @@ def _extract_unmasked_data(radar, field, bad=-32768):
 
 
 def _csu_to_field(field, radar, units='unitless', long_name='Hydrometeor ID',
-                 standard_name='Hydrometeor ID', dz_field='ZC'):
+                  standard_name='Hydrometeor ID', dz_field='ZC'):
     """ Adds a newly created field to the Py-ART radar object. If reflectivity
     is a masked array, make the new field masked the same as reflectivity. """
     fill_value = -32768

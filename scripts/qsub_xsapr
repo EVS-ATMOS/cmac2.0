@@ -19,4 +19,4 @@ pbsdsh -u -v -- $PBS_O_WORKDIR/start_worker.sh /home/zsherman/scheduler.json /ho
 
 sleep 60 
 
-./xsapr_cmac_dask /lustre/or-hydra/cades-arm/proj-shared/cmac_sgpxsaprppiI5.00/201708/ /lustre/or-hydra/cades-arm/proj-shared/sgpsondewnpnC1.b1/ --scheduler_file=/home/zsherman/scheduler.json -o /lustre/or-hydra/cades-arm/proj-shared/sgpxsaprcmacsurI5.c1 -id /lustre/or-hydra/cades-arm/proj-shared/sgpxsaprcmacsurI5.c1.png
+./cmac_dask /lustre/or-hydra/cades-arm/proj-shared/cmac_sgpxsaprppiI5.00/201708/ /lustre/or-hydra/cades-arm/proj-shared/sgpsondewnpnC1.b1/ config_xsapr_i5 --scheduler_file=/home/zsherman/scheduler.json -o /lustre/or-hydra/cades-arm/proj-shared/sgpxsaprcmacsurI5.c1 -id /lustre/or-hydra/cades-arm/proj-shared/sgpxsaprcmacsurI5.c1.png
