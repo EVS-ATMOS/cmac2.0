@@ -17,38 +17,46 @@ More information can be found at https://www.arm.gov/capabilities/vaps/xsapr-cma
 Install
 -------
 
-CMAC 2.0 and the required environment can be installed on Linux by using the
+CMAC 2.0 and the required environment can be installed by using the
 instructions below::
 
         git clone https://github.com/EVS-ATMOS/cmac2.0.git
         cd cmac2.0
-        conda env create -f environment.yml
+        conda env create -f environment-3.6.yml
         source activate cmac_env
+        export COIN_INSTALL_DIR= /Users/yourusername/youranacondadir/envs/cmac_env
         pip install git+https://github.com/jjhelmus/CyLP.git@py3
 
-Note: Environments for Mac and Windows are being worked on and a simplified
-environment for Linux is also in the works.
+Scripts such as cmac_animation and cmac_dask require additional dependencies::
+
+        source activate cmac_env
+        conda install -c menpo ffmpeg=version
+        conda install dask ipyparallel
+
+Note: For ffmpeg, depending on the user's operating system, the version will
+need to be replaced with corresponding version number found here:
+
+https://anaconda.org/menpo/ffmpeg
 
 Using CMAC 2.0
 --------------
 
 Once downloaded, CMAC 2.0 can be used in the terminal. The required arguments
-are radar_file, sonde_file, clutter_file and facility. There are optional
+are radar_file, sonde_file, clutter_file and config_dict. There are optional
 arguments such as out_radar, image_directory and sweep for the quicklooks.
 
 An example::
 
-        xsapr_cmac /home/user/cmac2.0/data/radar_file.nc /home/user/cmac2.0/data/sonde_file.cdf /home/user/cmac2.0/data/clutter_file.nc I5
+        cmac /home/user/cmac2.0/data/radar_file.nc /home/user/cmac2.0/data/sonde
+        _file.cdf /home/user/cmac2.0/data/clutter_file.nc config_xsapr_i5
 
 Optional arguments can be called by using::
 
         -o -id -sw
 
-Facility is the location at the ARM SGP site where the three X-SAPR radars are
-located, such as facility I4, I5 and I6. There is currently a config.py file
-with dictionaries for each radar. Down the road, radars such as C-SAPR can be
-added to config.py and facility will most likely change to include more options
-or the code will continue to increase in automation.
+There is currently a config.py file with dictionaries for radars. Down the road,
+radars such as C-SAPR can be added to config.py which then can be called with
+the config_dict argument.
 
 Lead Developers
 ---------------

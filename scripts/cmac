@@ -2,9 +2,10 @@
 """ Creates a radar object with applied CMAC 2.0 and quicklooks pertaining
 to CMAC 2.0. """
 
-import os
-
 import argparse
+import os
+import importlib
+
 import netCDF4
 import pyart
 
@@ -25,8 +26,8 @@ def main():
         'clutter_file', type=str,
         help='clutter file to use for addition of clutter gate id.')
     parser.add_argument(
-        'facility', type=str, help=('Facility ID of where the radar that is',
-                                    'being used for CMAC2.0 is located.'))
+        'config_dict', type=str, help=('Configuration dictionary for the',
+                                       'specific radar being used.'))
     parser.add_argument(
         '-o', '--out_radar_directory', type=str, default=None,
         help=('Out file path and name to use for the CMAC radar.',
@@ -49,31 +50,34 @@ def main():
     parser.set_defaults(dd_lobes=False)
     args = parser.parse_args()
 
-    if args.facility == 'I4':
-        from cmac import config_xsapr_i4 as radar_config
+    config_module = importlib.import_module('cmac.config')
+    radar_config = getattr(config_module, args.config_dict)
+
+    facility = radar_config['facility']
+    if facility == 'I4':
         dms_radar1_coords = [radar_config['site_i4_dms_lon'],
                              radar_config['site_i4_dms_lat']]
         dms_radar2_coords = [radar_config['site_i5_dms_lon'],
                              radar_config['site_i5_dms_lat']]
-    elif args.facility == 'I5':
-        from cmac import config_xsapr_i5 as radar_config
+    elif facility == 'I5':
         dms_radar1_coords = [radar_config['site_i5_dms_lon'],
                              radar_config['site_i5_dms_lat']]
         dms_radar2_coords = [radar_config['site_i4_dms_lon'],
                              radar_config['site_i4_dms_lat']]
-    elif args.facility == 'I6':
-        from cmac import config_xsapr_i6 as radar_config
+    elif facility == 'I6':
         dms_radar1_coords = [radar_config['site_i6_dms_lon'],
                              radar_config['site_i6_dms_lat']]
         dms_radar2_coords = [radar_config['site_i4_dms_lon'],
                              radar_config['site_i4_dms_lat']]
 
+    save_name = radar_config['save_name']
     town = radar_config['town']
     alt = radar_config['site_alt']
     max_lat = radar_config['max_lat']
     min_lat = radar_config['min_lat']
     max_lon = radar_config['max_lon']
     min_lon = radar_config['min_lon']
+
 
     radar = pyart.io.read(args.radar_file)
     clutter_radar = pyart.io.read(args.clutter_file)
@@ -88,7 +92,7 @@ def main():
         'xsapr_clutter', clutter_field_dict, replace_existing=True)
     del clutter_radar
 
-    cmac_radar = cmac(radar, sonde, args.facility, town, alt)
+    cmac_radar = cmac(radar, sonde, facility, town, alt)
     sonde.close()
 
     radar_start_date = netCDF4.num2date(radar.time['data'][0],
@@ -104,24 +108,24 @@ def main():
 
     if args.out_radar_directory is None:
         pyart.io.write_cfradial(
-            (os.path.expanduser('~') + '/sgpxsaprcmacsur' + args.facility
-             + '.c1.' + year_str + month_str + day_str + '.' + hour_str
+            (os.path.expanduser('~') + '/' + save_name + '.'
+             + year_str + month_str + day_str + '.' + hour_str
              + minute_str + second_str + '.nc'), cmac_radar)
         print('## A CMAC radar object has been created at '
-              + os.path.expanduser('~') + '/sgpxsaprcmacsur' + args.facility
-              + '.c1.' + year_str + month_str + day_str + '.' + hour_str
+              + os.path.expanduser('~') + '/' + save_name + '.'
+              + year_str + month_str + day_str + '.' + hour_str
               + minute_str + second_str + '.nc')
     else:
         pyart.io.write_cfradial(
-            (args.out_radar_directory + '/sgpxsaprcmacsur' + args.facility
-             + '.c1.' + year_str + month_str + day_str + '.' + hour_str
+            (args.out_radar_directory + '/' + save_name + '.'
+             + year_str + month_str + day_str + '.' + hour_str
              + minute_str + second_str + '.nc'), cmac_radar)
         print('## A CMAC radar object has been created at '
-              + args.out_radar_directory + '/sgpxsaprcmacsur' + args.facility
-              + '.c1.' + year_str + month_str + day_str + '.' + hour_str
+              + args.out_radar_directory + '/' + save_name + '.'
+              + year_str + month_str + day_str + '.' + hour_str
               + minute_str + second_str + '.nc')
 
-    quicklooks(cmac_radar, args.facility,
+    quicklooks(cmac_radar, save_name,
                image_directory=args.image_directory,
                sweep=args.sweep, max_lat=max_lat,
                min_lat=min_lat, max_lon=max_lon,

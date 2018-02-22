@@ -1,6 +1,6 @@
-"""
-Code that uses CMAC to remove and correct second trip returns, correct velocity,
-produce a quasi-vertical profile, and more. """
+""" Module that uses CMAC 2.0 to remove and correct second trip returns,
+correct velocity and more. A new radar object is then created with all CMAC
+2.0 products. """
 
 import copy
 import sys
@@ -9,10 +9,10 @@ import netCDF4
 import pyart
 import numpy as np
 
-from . import processing_code
+from . import cmac_processing
 
 
-def cmac(radar, sonde, facility_id, town, alt,
+def cmac(radar, sonde, facility, town, alt,
          attenuation_a_coef=None, meta_append=None):
     """
     Corrected Moments in Antenna Coordinates
@@ -23,7 +23,7 @@ def cmac(radar, sonde, facility_id, town, alt,
         Radar object to use in the CMAC calculation.
     sonde : Object
         Object containing all the sonde data.
-    facility_id : String
+    facility : String
         String stating the id of the radar. For example: 'I5'.
     town : String
         String stating the town of the radar. For example: 'Garber, OK'.
@@ -35,7 +35,7 @@ def cmac(radar, sonde, facility_id, town, alt,
     attenuation_a_coef : float
         A coefficient in attenuation calculation.
     meta_append : dictonary
-        value key pairs to attend to global attributes
+        Value key pairs to attend to global attributes.
 
     Returns
     -------
@@ -43,17 +43,16 @@ def cmac(radar, sonde, facility_id, town, alt,
         Radar object with new CMAC added fields.
 
     """
-
     # Obtaining variables needed for fuzzy logic.
     radar.altitude['data'][0] = alt
- 
+
     radar_start_date = netCDF4.num2date(
         radar.time['data'][0], radar.time['units'])
     print('##', str(radar_start_date))
 
     z_dict, temp_dict = pyart.retrieve.map_profile_to_gates(
         sonde.variables['tdry'][:], sonde.variables['alt'][:], radar)
-    texture = processing_code.get_texture(radar)
+    texture = cmac_processing.get_texture(radar)
 
     snr = pyart.retrieve.calculate_snr_from_reflectivity(radar)
     print('##')
@@ -69,7 +68,7 @@ def cmac(radar, sonde, facility_id, town, alt,
 
     # Performing fuzzy logic to obtain the gate ids.
     print('##    gate_id')
-    my_fuzz, _ = processing_code.do_my_fuzz(radar, tex_start=2.4,
+    my_fuzz, _ = cmac_processing.do_my_fuzz(radar, tex_start=2.4,
                                             tex_end=2.7)
     radar.add_field('gate_id', my_fuzz,
                     replace_existing=True)
@@ -97,14 +96,14 @@ def cmac(radar, sonde, facility_id, town, alt,
         gatefilter=cmac_gates, centered=True)
     radar.add_field('corrected_velocity', corr_vel, replace_existing=True)
 
-    fzl = processing_code.get_melt(radar)
+    fzl = cmac_processing.get_melt(radar)
 
     # Calculating differential phase fields.
     print('##    corrected_differential_phase')
     phidp, kdp = pyart.correct.phase_proc_lp(radar, 0.0, debug=True,
                                              nowrap=50, fzl=fzl)
 
-    phidp_flt, kdp_filt = processing_code.fix_phase_fields(
+    phidp_flt, kdp_filt = cmac_processing.fix_phase_fields(
         copy.deepcopy(kdp), copy.deepcopy(phidp), radar.range['data'],
         cmac_gates)
 
@@ -164,7 +163,6 @@ def cmac(radar, sonde, facility_id, town, alt,
                     ' R=51.3*specific_attenuation**0.81, note R=0.0 where',
                     ' norm coherent power < 0.4 or rhohv < 0.8')})
 
-
     print('##')
     print('## All CMAC fields have been added to the radar object.')
     print('##')
@@ -178,7 +176,7 @@ def cmac(radar, sonde, facility_id, town, alt,
 
         meta_append = {
             'site_id': 'sgp',
-            'facility_id': facility_id + ': ' + town,
+            'facility_id': facility + ': ' + town,
             'data_level': 'c1',
             'comment': (
                 'This is highly experimental and initial data. There are many',
@@ -201,12 +199,4 @@ def cmac(radar, sonde, facility_id, town, alt,
             'mentors': ('Nitin Bharadwaj, PNNL. Bradley Isom, PNNL.',
                         'Joseph Hardin, PNNL. Iosif Lindenmaier, PNNL.')}
     radar.metadata.update(meta_append)
-
-    # The qvp below will be added soon, need to do it correctly.
-
-    #print('## A quasi-vertical profile is being created.')
-    #qvp = processing_code.retrieve_qvp(radar, radar.fields['height']['data'])
-    #radar.qvp = qvp
-    #print('## The quasi-vertical profile has been created and',
-    #      'can be accessed with radar.qvp')
     return radar

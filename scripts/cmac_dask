@@ -5,6 +5,7 @@ to CMAC 2.0. """
 import argparse
 import datetime
 import glob
+import importlib
 import os
 import shutil
 import subprocess
@@ -36,8 +37,9 @@ def run_cmac_and_plotting(radar_file_path, radar_config,
         shutil.move(radar_file_path, path)
         return
 
-    # Defining variables based on the argument args.facility.
-    facility_id = radar_config['facility']
+    # Defining variables based on the argument args.config_dict.
+    save_name = radar_config['save_name']
+    facility = radar_config['facility']
     town = radar_config['town']
     alt = radar_config['site_alt']
     field_shape = radar_config['field_shape']
@@ -45,17 +47,17 @@ def run_cmac_and_plotting(radar_file_path, radar_config,
     min_lat = radar_config['min_lat']
     max_lon = radar_config['max_lon']
     min_lon = radar_config['min_lon']
-    if facility_id == 'I4':
+    if facility == 'I4':
         dms_radar1_coords = [radar_config['site_i4_dms_lon'],
                              radar_config['site_i4_dms_lat']]
         dms_radar2_coords = [radar_config['site_i5_dms_lon'],
                              radar_config['site_i5_dms_lat']]
-    if facility_id == 'I5':
+    if facility == 'I5':
         dms_radar1_coords = [radar_config['site_i5_dms_lon'],
                              radar_config['site_i5_dms_lat']]
         dms_radar2_coords = [radar_config['site_i4_dms_lon'],
                              radar_config['site_i4_dms_lat']]
-    if facility_id == 'I6':
+    if facility == 'I6':
         dms_radar1_coords = [radar_config['site_i6_dms_lon'],
                              radar_config['site_i6_dms_lat']]
         dms_radar2_coords = [radar_config['site_i4_dms_lon'],
@@ -77,7 +79,7 @@ def run_cmac_and_plotting(radar_file_path, radar_config,
     else:
         the_path = (args.out_radar + '/' + year_str +  month_str
                     + day_str)
-    file_name = (the_path + '/sgpxsaprcmacsur' + facility_id + '.c1.'
+    file_name = (the_path + '/' + save_name + '.'
                  + year_str + month_str + day_str + '.' + hour_str
                  + minute_str + second_str + '.nc')
 
@@ -110,7 +112,7 @@ def run_cmac_and_plotting(radar_file_path, radar_config,
     sonde = netCDF4.Dataset(sonde_file)
 
     # Running the cmac code to produce a cmac_radar object.
-    cmac_radar = cmac(radar, sonde, facility_id, town, alt)
+    cmac_radar = cmac(radar, sonde, facility, town, alt)
 
     # Free up some memory.
     del radar
@@ -128,7 +130,7 @@ def run_cmac_and_plotting(radar_file_path, radar_config,
         subprocess.call('chmod -R g+rw ' + img_directory, shell=True)
 
     # Producing all the cmac_radar quicklooks.
-    quicklooks(cmac_radar, facility_id,
+    quicklooks(cmac_radar, save_name,
                image_directory=img_directory,
                sweep=args.sweep, max_lat=max_lat,
                min_lat=min_lat, max_lon=max_lon,
@@ -160,8 +162,8 @@ def main():
         'clutter_file', type=str,
         help='Path to clutter file')
     parser.add_argument(
-        'facility', type=str, help=('Facility ID, for example I4, for which',
-                                    'X-SAPR data CMAC2.0 will run on.'))
+        'config_dict', type=str, help=('Configuration dictionary for the',
+                                       'specific radar being used.'))
     parser.add_argument(
         '-o', '--out_radar', type=str, default=None,
         help=('Out file path and name to use for the CMAC radar.',
@@ -197,13 +199,9 @@ def main():
 
     args = parser.parse_args()
 
-    # Importing radar config data depending on facilty_id
-    if args.facility == 'I4':
-        from cmac import config_xsapr_i4 as radar_config
-    elif args.facility == 'I5':
-        from cmac import config_xsapr_i5 as radar_config
-    elif args.facility == 'I6':
-        from cmac import config_xsapr_i6 as radar_config
+    # Importing radar config data depending on user chosen config dictionary.
+    config_module = importlib.import_module('cmac.config')
+    radar_config = getattr(config_module, args.config_dict)
 
     x_compass = radar_config['x_compass']
     if os.path.isdir(args.radar_path):
