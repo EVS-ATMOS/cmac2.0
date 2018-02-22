@@ -8,8 +8,8 @@ have to also be changed.
 
 """
 
-
 config_xsapr_i6 = {
+    'save_name': 'sgpxsaprcmacsurI6.c1',
     'facility': 'I6',
     'town': 'Deer Creek, OK',
     'x_compass': 'XNW',
@@ -27,6 +27,7 @@ config_xsapr_i6 = {
     'site_i4_dms_lon': (-97, 21, 49.32)}
 
 config_xsapr_i5 = {
+    'save_name': 'sgpxsaprcmacsurI5.c1',
     'facility': 'I5',
     'town': 'Garber, OK',
     'x_compass': 'XSW',
@@ -44,6 +45,7 @@ config_xsapr_i5 = {
     'site_i4_dms_lon': (-97, 21, 49.32)}
 
 config_xsapr_i4 = {
+    'save_name': 'sgpxsaprcmacsurI4.c1',
     'facility': 'I4',
     'town': 'Billings, OK',
     'x_compass': 'XSE',
