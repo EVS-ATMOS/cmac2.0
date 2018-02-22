@@ -8,17 +8,17 @@ import numpy as np
 import pyart
 
 
-def xsapr_clutter(files, clutter_thresh_min=0.0002,
-                  clutter_thresh_max=1.5, radius=1,
-                  write_radar=True, out_file=None,
-                  use_dask=False):
+def tall_clutter(files, clutter_thresh_min=0.0002,
+                 clutter_thresh_max=1.5, radius=1,
+                 write_radar=True, out_file=None,
+                 use_dask=False):
     """
-    X-SAPR Wind Farm Clutter Calculation
+    Wind Farm Clutter Calculation
 
     Parameters
     ----------
     files : list
-        List of radar files used for X-SAPR clutter calculation.
+        List of radar files used for the clutter calculation.
 
     Other Parameters
     ----------------
@@ -40,8 +40,9 @@ def xsapr_clutter(files, clutter_thresh_min=0.0002,
         String of location and filename to write the radar object too,
         if write_radar is True.
     use_dask : bool
-        Use dask instead of running stats for calculation
-        (good to run in parallel).
+        Use dask instead of running stats for calculation. The will reduce
+        run time.
+
     Returns
     -------
     clutter_radar : Radar
@@ -50,6 +51,7 @@ def xsapr_clutter(files, clutter_thresh_min=0.0002,
         other radar specifications.
 
     """
+
 
     def get_reflect_array(file, first_shape):
         """ Retrieves a reflectivity array for a radar volume. """
