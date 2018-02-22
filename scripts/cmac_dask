@@ -220,7 +220,7 @@ def main():
         raise IOError('The specified radar path does not exist!')
 
     sounding_times = get_sounding_times(args.sonde_path)
-
+    print(sounding_times)
     # Get dates of radar files from the file name.
     radar_times = []
     for file_name in radar_files:
@@ -234,10 +234,12 @@ def main():
     n_cores = sum(client.ncores().values())
     print('## Opened dask cluster with ' + str(n_cores) + ' cores')
 
-    the_bag = db.from_sequence(radar_files)
+    #he_bag = db.from_sequence(radar_files, n_partitions=n_cores)
     the_function = lambda x: run_cmac_and_plotting(
         x, radar_config, sounding_times, args)
-    result = the_bag.map(the_function).compute()
+    result = client.map(the_function, radar_files)
+    wait(result)
+    #esult = the_bag.map(the_function).compute()
     
     ## Do radar object loading on compute nodes.
     if args.image_directory is None:
