@@ -9,11 +9,11 @@ from time import time
 from matplotlib import use
 use('agg')
 
-from cmac import xsapr_clutter
+from cmac import tall_clutter
 
 
 def main():
-    """ The main function use calculates xsapr clutter for CMAC 2.0. """
+    """ The main function use calculates clutter for CMAC 2.0. """
     parser = argparse.ArgumentParser(
         description='Create a radar object with applied CMAC2.0.')
     parser.add_argument(
@@ -38,8 +38,8 @@ def main():
     else:
         raise IOError('The specified radar path does not exist!')
     bt = time()
-    xsapr_clutter(radar_files, write_radar=True,
-                  out_file=args.out_file_name, use_dask=True)
+    tall_clutter(radar_files, write_radar=True,
+                 out_file=args.out_file_name, use_dask=True)
     print('Time to make clutter file: ' + str(time() - bt))
 
 if __name__ == '__main__':
