@@ -17,7 +17,7 @@ from pyart.graph.common import generate_radar_time_begin
 plt.switch_backend('agg')
 
 
-def quicklooks(radar, facility_id, image_directory=None, sweep=3,
+def quicklooks(radar, save_name, image_directory=None, sweep=3,
                max_lat=37.0, min_lat=36.0, max_lon=-97.0, min_lon=-98.3,
                dd_lobes=True, dms_radar1_coords=None,
                dms_radar2_coords=None):
@@ -28,8 +28,10 @@ def quicklooks(radar, facility_id, image_directory=None, sweep=3,
     ---------
     radar : Radar
         Radar object that has CMAC applied to it.
-    facility_id : String
-        String stating the id of the radar. For example: 'I5'.
+    save_name : String
+        String that comes before the field string in the save file. This is
+        usually an ARM name, but can be changed to the user's desire. For
+        example: 'sgpxsaprcmacsurI5.c1'.
 
     Optional Parameters
     -------------------
@@ -58,7 +60,6 @@ def quicklooks(radar, facility_id, image_directory=None, sweep=3,
         dd_lobes argument is False, dms_radar2_coords is not used.
 
     """
-
     if image_directory is None:
         image_directory = os.path.expanduser('~')
 
@@ -66,8 +67,7 @@ def quicklooks(radar, facility_id, image_directory=None, sweep=3,
         radar.time['data'][0], radar.time['units'])
 
     date_string = datetime.strftime(radar_start_date, '%Y%m%d.%H%M%S')
-    arm_name = '.sgpxsaprcmacsur' + facility_id + '.c1.'
-    combined_name = arm_name + date_string
+    combined_name = '.' + save_name + '.' + date_string
 
     # Creating a plot of reflectivity before CMAC.
     lal = np.arange(min_lat, max_lat+.2, .2)
