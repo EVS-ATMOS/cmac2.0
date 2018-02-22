@@ -9,7 +9,6 @@ dependencies:
   - wradlib
   - cartopy
   - coincbc
-  - cartopy
   - cython
   - pip:
     - scikit-fuzzy
