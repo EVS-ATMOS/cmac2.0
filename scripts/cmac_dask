@@ -40,7 +40,6 @@ def run_cmac_and_plotting(radar_file_path, radar_config,
 
     # Defining variables based on the argument args.config_dict.
     save_name = radar_config['save_name']
-    facility = radar_config['facility']
     town = radar_config['town']
     alt = radar_config['site_alt']
     field_shape = radar_config['field_shape']
@@ -48,25 +47,30 @@ def run_cmac_and_plotting(radar_file_path, radar_config,
     min_lat = radar_config['min_lat']
     max_lon = radar_config['max_lon']
     min_lon = radar_config['min_lon']
-    if facility == 'I4':
-        dms_radar1_coords = [radar_config['site_i4_dms_lon'],
-                             radar_config['site_i4_dms_lat']]
-        dms_radar2_coords = [radar_config['site_i5_dms_lon'],
-                             radar_config['site_i5_dms_lat']]
-    if facility == 'I5':
-        dms_radar1_coords = [radar_config['site_i5_dms_lon'],
-                             radar_config['site_i5_dms_lat']]
-        dms_radar2_coords = [radar_config['site_i4_dms_lon'],
-                             radar_config['site_i4_dms_lat']]
-    if facility == 'I6':
-        dms_radar1_coords = [radar_config['site_i6_dms_lon'],
-                             radar_config['site_i6_dms_lat']]
-        dms_radar2_coords = [radar_config['site_i4_dms_lon'],
-                             radar_config['site_i4_dms_lat']]
+
+    facility = radar_config['facility']
+    if args.dd_lobes is True:
+        if facility == 'I4':
+            dms_radar1_coords = [radar_config['site_i4_dms_lon'],
+                                 radar_config['site_i4_dms_lat']]
+            dms_radar2_coords = [radar_config['site_i5_dms_lon'],
+                                 radar_config['site_i5_dms_lat']]
+        elif facility == 'I5':
+            dms_radar1_coords = [radar_config['site_i5_dms_lon'],
+                                 radar_config['site_i5_dms_lat']]
+            dms_radar2_coords = [radar_config['site_i4_dms_lon'],
+                                 radar_config['site_i4_dms_lat']]
+        elif facility == 'I6':
+            dms_radar1_coords = [radar_config['site_i6_dms_lon'],
+                                 radar_config['site_i6_dms_lat']]
+            dms_radar2_coords = [radar_config['site_i4_dms_lon'],
+                                 radar_config['site_i4_dms_lat']]
+    else:
+        dms_radar1_coords = None
+        dms_radar2_coords = None
 
     radar_start_date = netCDF4.num2date(radar.time['data'][0],
                                         radar.time['units'])
-
     year_str = "%04d" % radar_start_date.year
     month_str = "%02d" % radar_start_date.month
     day_str = "%02d" % radar_start_date.day
