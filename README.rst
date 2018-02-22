@@ -61,6 +61,4 @@ the config_dict argument.
 Lead Developers
 ---------------
 
-Scott Collis
-Robert Jackson
-Zach Sherman
+Scott Collis, Robert Jackson and Zach Sherman
