@@ -30,8 +30,7 @@ def main():
         'start_date', type=str,
         help="Start date string to do mp4 creation. Example:'20170909'")
     parser.add_argument(
-        'end_date',
-        type=str,
+        'end_date', type=str,
         help="End date string to do mp4 creation. Example:'20170928'")
     parser.add_argument(
         '-fr', '--frame_rate', type=float, default=1.0,
@@ -57,6 +56,7 @@ def main():
             '/lustre/or-hydra/cades-arm/proj-shared/'
             + 'sgpxsaprcmacsur' + site + '.c1.png/' + date
             + '**/cmac*', recursive=True)
+
         # If a date has no image files, loop goes to the next date.
         if not files:
             print(date + ' has no image files. Moving to the next date.')
