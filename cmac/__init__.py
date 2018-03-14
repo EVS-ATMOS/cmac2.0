@@ -3,7 +3,7 @@
 CMAC
 ====
 
-CMAC functions for determing gate ids, detect second trip returns and
+CMAC functions for determining gate ids, detect second trip returns and
 more.
 
     config_xsapr_i4

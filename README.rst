@@ -24,7 +24,7 @@ instructions below::
         cd cmac2.0
         conda env create -f environment-3.6.yml
         source activate cmac_env
-        export COIN_INSTALL_DIR= /Users/yourusername/youranacondadir/envs/cmac_env
+        export COIN_INSTALL_DIR=/Users/yourusername/youranacondadir/envs/cmac_env
         pip install git+https://github.com/jjhelmus/CyLP.git@py3
 
 Scripts such as cmac_animation and cmac_dask require additional dependencies::
