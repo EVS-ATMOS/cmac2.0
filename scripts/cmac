@@ -46,8 +46,13 @@ def main():
     parser.add_argument('--no-dd-lobes', dest='dd_lobes', action='store_false',
                         help=('Do not plot Dual Doppler lobes',
                               'between i4 and i5.'))
+    parser.add_argument('--verbose', dest='verbose', action='store_true',
+                        help='Display debugging output.')
+    parser.add_argument('--no-verbose', dest='verbose', action='store_false',
+                        help='Hide debugging output.')
 
     parser.set_defaults(dd_lobes=False)
+    parser.set_defaults(verbose=False)
     args = parser.parse_args()
 
     config_module = importlib.import_module('cmac.config')
@@ -88,15 +93,17 @@ def main():
     sonde = netCDF4.Dataset(args.sonde_file)
 
     # Load clutter files.
-    print('## Loading clutter file ' + args.clutter_file)
-    print('## Reading dictionary...')
+    if(args.verbose==True):
+        print('## Loading clutter file ' + args.clutter_file)
+        print('## Reading dictionary...')
     clutter_field_dict = clutter_radar.fields['xsapr_clutter']
-    print('## Adding clutter field..')
+    if(args.verbose==True):
+        print('## Adding clutter field..')
     radar.add_field(
         'xsapr_clutter', clutter_field_dict, replace_existing=True)
     del clutter_radar
 
-    cmac_radar = cmac(radar, sonde, facility, town, alt)
+    cmac_radar = cmac(radar, sonde, facility, town, alt, verbose=args.verbose)
     sonde.close()
 
     radar_start_date = netCDF4.num2date(radar.time['data'][0],

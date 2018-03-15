@@ -16,7 +16,7 @@ from scipy import ndimage, interpolate
 import skfuzzy as fuzz
 
 
-def snr_and_sounding(radar, soundings_dir, override_file=None):
+def snr_and_sounding(radar, soundings_dir, override_file=None, verbose=True):
     if override_file is None:
         radar_start_date = netCDF4.num2date(radar.time['data'][0],
                                             radar.time['units'])
@@ -34,8 +34,9 @@ def snr_and_sounding(radar, soundings_dir, override_file=None):
     times = interp_sonde.variables['time'][:]
     heights = interp_sonde.variables['height'][:]
     my_profile = pyart.retrieve.fetch_radar_time_profile(interp_sonde, radar)
-    print(my_profile['temp'].shape)
-    print(my_profile['height'])
+    if(verbose==True):
+        print(my_profile['temp'].shape)
+        print(my_profile['height'])
     info_dict = {'long_name': 'Sounding temperature at gate',
                  'standard_name': 'temperature',
                  'valid_min': -100,
@@ -109,7 +110,7 @@ def cum_score_fuzzy_logic(radar, mbfs=None,
     flds = radar.fields
     scores = {}
     for key in mbfs.keys():
-        if debug:
+        if debug==True:
             print('##    Doing', key)
         this_score = np.zeros(
             flds[list(flds.keys())[0]]['data'].shape).flatten() * 0.0
@@ -126,7 +127,7 @@ def cum_score_fuzzy_logic(radar, mbfs=None,
     if hard_const is not None:
         # hard_const = [[class, field, (v1, v2)], ...]
         for this_const in hard_const:
-            if debug:
+            if debug==True:
                 print('##    Doing hard constraining', this_const[0])
             key = this_const[0]
             const = this_const[1]
@@ -135,7 +136,7 @@ def cum_score_fuzzy_logic(radar, mbfs=None,
             upper = this_const[2][1]
             const_area = np.where(np.logical_and(fld_data >= lower,
                                                  fld_data <= upper))
-            if debug:
+            if debug==True:
                 print('##    ', str(const_area))
             scores[key][const_area] = 0.0
     stacked_scores = np.dstack([scores[key] for key in scores.keys()])
@@ -165,9 +166,11 @@ def cum_score_fuzzy_logic(radar, mbfs=None,
     return rv
 
 
-def do_my_fuzz(radar, tex_start=2.0, tex_end=2.1):
-    print('##')
-    print('## CMAC calculation using fuzzy logic:')
+def do_my_fuzz(radar, tex_start=2.0, tex_end=2.1, verbose=True):
+    if(verbose==True):
+        print('##')
+        print('## CMAC calculation using fuzzy logic:')
+
     second_trip = {'velocity_texture': [[tex_start, tex_end, 130., 130.], 4.0],
                    'cross_correlation_ratio': [[.5, .7, 1, 1], 0.0],
                    'normalized_coherent_power': [[0, 0, .5, .6], 1.0],
@@ -212,7 +215,7 @@ def do_my_fuzz(radar, tex_start=2.0, tex_end=2.1):
                   ['rain', 'sounding_temperature', (-1000, -5)],
                   ['melting', 'velocity_texture', (3, 300)]]
 
-    gid_fld, cats = cum_score_fuzzy_logic(radar, mbfs=mbfs, debug=True,
+    gid_fld, cats = cum_score_fuzzy_logic(radar, mbfs=mbfs, debug=verbose,
                                           hard_const=hard_const)
     rain_val = list(cats).index('rain')
     snow_val = list(cats).index('snow')

@@ -100,11 +100,14 @@ def run_cmac_and_plotting(radar_file_path, radar_config,
 
     # Load clutter files.
     clutter_file_path = args.clutter_file
-    print('## Loading clutter file ' + clutter_file_path)
+    if(args.verbose==True):
+        print('## Loading clutter file ' + clutter_file_path)
     clutter = pyart.io.read(clutter_file_path)
-    print('## Reading dictionary...')
+    if(args.verbose==True):
+        print('## Reading dictionary...')
     clutter_field_dict = clutter.fields['xsapr_clutter']
-    print('## Adding clutter field..')
+    if(args.verbose==True):
+        print('## Adding clutter field..')
     radar.add_field(
         'xsapr_clutter', clutter_field_dict, replace_existing=True)
     del clutter
@@ -117,7 +120,7 @@ def run_cmac_and_plotting(radar_file_path, radar_config,
     sonde = netCDF4.Dataset(sonde_file)
 
     # Running the cmac code to produce a cmac_radar object.
-    cmac_radar = cmac(radar, sonde, facility, town, alt)
+    cmac_radar = cmac(radar, sonde, facility, town, alt, verbose=args.verbose)
 
     # Free up some memory.
     del radar
@@ -199,8 +202,13 @@ def main():
     parser.add_argument('--no-overwrite', dest='overwrite',
                         action='store_false',
                         help=('Do not overwrite prexisting cmac files.'))
+    parser.add_argument('--verbose', dest='verbose', action='store_true',
+                        help='Display debugging output.')
+    parser.add_argument('--no-verbose', dest='verbose', action='store_false',
+                        help='Hide debugging output.')
     parser.set_defaults(dd_lobes=False)
     parser.set_defaults(overwrite=False)
+    parser.set_defaults(verbose=False)
 
     args = parser.parse_args()
 
