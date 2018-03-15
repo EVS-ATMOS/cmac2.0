@@ -13,7 +13,8 @@ from . import cmac_processing
 
 
 def cmac(radar, sonde, facility, town, alt,
-         attenuation_a_coef=None, meta_append=None):
+         attenuation_a_coef=None, meta_append=None,
+         verbose=True):
     """
     Corrected Moments in Antenna Coordinates
 
@@ -29,14 +30,15 @@ def cmac(radar, sonde, facility, town, alt,
         String stating the town of the radar. For example: 'Garber, OK'.
     alt : Float
         Value to use as default altitude for the radar object.
-
+        
     Other Parameters
     ----------------
     attenuation_a_coef : float
         A coefficient in attenuation calculation.
     meta_append : dictonary
         Value key pairs to attend to global attributes.
-
+    verbose: bool
+        If True this will display more statistics
     Returns
     -------
     radar : Radar
@@ -55,21 +57,35 @@ def cmac(radar, sonde, facility, town, alt,
     texture = cmac_processing.get_texture(radar)
 
     snr = pyart.retrieve.calculate_snr_from_reflectivity(radar)
-    print('##')
-    print('## These radar fields are being added:')
+    if(verbose==False):
+        print('## Adding radar fields...')
+        
+    if(verbose==True):
+        print('##')
+        print('## These radar fields are being added:')
+        
     radar.add_field('sounding_temperature', temp_dict, replace_existing=True)
-    print('##    sounding_temperature')
+    
+    if(verbose==True):
+        print('##    sounding_temperature')
     radar.add_field('height', z_dict, replace_existing=True)
-    print('##    height')
+    
+    if(verbose==True):
+        print('##    height')
+        
     radar.add_field('SNR', snr, replace_existing=True)
-    print('##    SNR')
+    if(verbose==True):
+        print('##    SNR')
+        
     radar.add_field('velocity_texture', texture, replace_existing=True)
-    print('##    velocity_texture')
+    if(verbose==True):
+        print('##    velocity_texture')
 
     # Performing fuzzy logic to obtain the gate ids.
-    print('##    gate_id')
+    if(verbose==True):
+        print('##    gate_id')
     my_fuzz, _ = cmac_processing.do_my_fuzz(radar, tex_start=2.4,
-                                            tex_end=2.7)
+                                            tex_end=2.7, verbose=verbose)
     radar.add_field('gate_id', my_fuzz,
                     replace_existing=True)
 
@@ -85,7 +101,8 @@ def cmac(radar, sonde, facility, town, alt,
             {pair_str.split(':')[1]:int(pair_str.split(':')[0])})
 
     # Corrected velocity using pyart's region dealiaser.
-    print('##    corrected_velocity')
+    if(verbose==True):
+        print('##    corrected_velocity')
     cmac_gates = pyart.correct.GateFilter(radar)
     cmac_gates.exclude_all()
     cmac_gates.include_equal('gate_id', cat_dict['rain'])
@@ -99,7 +116,8 @@ def cmac(radar, sonde, facility, town, alt,
     fzl = cmac_processing.get_melt(radar)
 
     # Calculating differential phase fields.
-    print('##    corrected_differential_phase')
+    if(verbose==True):
+        print('##    corrected_differential_phase')
     phidp, kdp = pyart.correct.phase_proc_lp(radar, 0.0, debug=True,
                                              nowrap=50, fzl=fzl)
 
@@ -109,12 +127,14 @@ def cmac(radar, sonde, facility, town, alt,
 
     radar.add_field('corrected_differential_phase', phidp)
     radar.add_field('filtered_corrected_differential_phase', phidp_flt)
-
-    print('##    corrected_specific_diff_phase')
+    
+    if(verbose==True):
+        print('##    corrected_specific_diff_phase')
     radar.add_field('corrected_specific_diff_phase', kdp)
     radar.add_field('filtered_corrected_specific_diff_phase', kdp_filt)
-
-    print('##    specific_attenuation')
+    
+    if(verbose==True):
+        print('##    specific_attenuation')
     if attenuation_a_coef is None:
         attenuation_a_coef = 0.17 #X-Band
 
@@ -128,7 +148,8 @@ def cmac(radar, sonde, facility, town, alt,
 
     cat_dict = {}
     for pair_str in radar.fields['gate_id']['notes'].split(','):
-        print(pair_str)
+        if(verbose==True):
+            print(pair_str)
         cat_dict.update({pair_str.split(':')[1]: int(pair_str.split(':')[0])})
 
     rain_gates = pyart.correct.GateFilter(radar)
@@ -138,11 +159,14 @@ def cmac(radar, sonde, facility, town, alt,
     spec_at['data'][rain_gates.gate_excluded] = 0.0
 
     radar.add_field('specific_attenuation', spec_at)
-    print('##    attenuation_corrected_reflectivity')
+    if(verbose==True):
+        print('##    attenuation_corrected_reflectivity')
     radar.add_field('attenuation_corrected_reflectivity', cor_z_atten)
 
     # Calculating rain rate.
-    print('## Rainfall rate as a function of A ##')
+    if(verbose==True):
+        print('## Rainfall rate as a function of A ##')
+        
     R = 51.3 * (radar.fields['specific_attenuation']['data']) ** 0.81
     rainrate = copy.deepcopy(radar.fields['specific_attenuation'])
     rainrate['data'] = R
