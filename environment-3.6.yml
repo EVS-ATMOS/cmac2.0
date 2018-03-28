@@ -9,7 +9,7 @@ dependencies:
   - wradlib
   - cartopy
   - coincbc
-  - cython
+  - cython=0.27.3
   - pip:
     - scikit-fuzzy
     - git+https://github.com/zssherman/xsapr_clutter_project.git
