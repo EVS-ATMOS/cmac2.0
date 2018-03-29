@@ -1,5 +1,5 @@
-#PBS -l nodes=32:ppn=16
-#PBS -l walltime=10:00:00
+#PBS -l nodes=1:ppn=32
+#PBS -l walltime=6:00:00
 #PBS -q batch
 #PBS -l qos=std
 #PBS -W group_list=cades-arm
@@ -10,13 +10,12 @@ echo "number of nodes"
 export PBS_NUM_NODES=`wc -l ${PBS_NODEFILE} | cut -f1 -d" "`
 echo $PBS_NUM_NODES
 source activate cmac_env
-cd /home/zsherman/cmac2.0/scripts
-export TMPDIR=/home/zsherman/temp_dir
+cd /home/rjackson/cmac2.0/scripts
+export TMPDIR=/home/rjackson/temp_dir
 export MPLBACKEND="agg"
+ 
+pbsdsh -c 1 -v -- $PBS_O_WORKDIR/start_scheduler.sh /home/rjackson/scheduler4.json /home/rjackson/temp_dir &
+sleep 30
+pbsdsh -u -v -- $PBS_O_WORKDIR/start_worker.sh /home/rjackson/scheduler4.json /home/rjackson/temp_dir 
 
-pbsdsh -c 1 -v -- $PBS_O_WORKDIR/start_scheduler.sh /home/zsherman/scheduler.json /home/zsherman/temp_dir &
-pbsdsh -u -v -- $PBS_O_WORKDIR/start_worker.sh /home/zsherman/scheduler.json /home/zsherman/temp_dir &
 
-sleep 60 
-
-./cmac_dask /lustre/or-hydra/cades-arm/proj-shared/cmac_sgpxsaprppiI5.00/201708/ /lustre/or-hydra/cades-arm/proj-shared/sgpsondewnpnC1.b1/ config_xsapr_i5 --scheduler_file=/home/zsherman/scheduler.json -o /lustre/or-hydra/cades-arm/proj-shared/sgpxsaprcmacsurI5.c1 -id /lustre/or-hydra/cades-arm/proj-shared/sgpxsaprcmacsurI5.c1.png

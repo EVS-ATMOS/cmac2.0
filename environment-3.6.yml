@@ -11,6 +11,9 @@ dependencies:
   - coincbc
   - cython=0.27.3
   - nb_conda
+  - bokeh=0.12.7
+  - tornado=4.4
+  - imageio
   - pip:
     - scikit-fuzzy
     - git+https://github.com/zssherman/xsapr_clutter_project.git
