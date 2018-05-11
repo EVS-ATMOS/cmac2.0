@@ -14,7 +14,7 @@ from . import cmac_processing
 
 
 def cmac(radar, sonde, config,
-         meta_append=False, verbose=True):
+         meta_append=None, verbose=True):
     """
     Corrected Moments in Antenna Coordinates
 
@@ -30,8 +30,8 @@ def cmac(radar, sonde, config,
 
     Other Parameters
     ----------------
-    meta_append : dict, json, False
-        Value key pairs to attend to global attributes. If False,
+    meta_append : dict, json and None
+        Value key pairs to attend to global attributes. If None,
         a default metadata will be created. The metadata can also
         be created by providing a dictionary or a json file.
     verbose: bool
@@ -184,7 +184,7 @@ def cmac(radar, sonde, config,
 
     # Adding the metadata to the cmac radar object.
     print('## Appending metadata')
-    if meta_append is False:
+    if meta_append is None:
         command_line = ''
         for item in sys.argv:
             command_line = command_line + ' ' + item
@@ -216,6 +216,8 @@ def cmac(radar, sonde, config,
         if meta_append.lower().endswith('.json'):
             with open(meta_append, 'r') as infile:
                 meta = json.load(infile)
+        else:
+            meta = config['metadata']
 
     radar.metadata.clear()
     radar.metadata.update(meta)
