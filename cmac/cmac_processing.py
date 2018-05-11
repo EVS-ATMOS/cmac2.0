@@ -34,7 +34,7 @@ def snr_and_sounding(radar, soundings_dir, override_file=None, verbose=True):
     times = interp_sonde.variables['time'][:]
     heights = interp_sonde.variables['height'][:]
     my_profile = pyart.retrieve.fetch_radar_time_profile(interp_sonde, radar)
-    if(verbose==True):
+    if verbose:
         print(my_profile['temp'].shape)
         print(my_profile['height'])
     info_dict = {'long_name': 'Sounding temperature at gate',
@@ -66,8 +66,9 @@ def get_texture(radar, nyq=None):
 
 # Moment : [[start_up, finish_up, start_down, finish_down], weight]
 def cum_score_fuzzy_logic(radar, mbfs=None,
-                          debug=False, ret_scores=False,
-                          hard_const=None):
+                          ret_scores=False,
+                          hard_const=None,
+                          verbose=False):
     if mbfs is None:
         second_trip = {'velocity_texture': [[0, 0, 1.8, 2], 1.0],
                        'cross_correlation_ratio': [[.5, .7, 1, 1], 0.0],
@@ -110,7 +111,7 @@ def cum_score_fuzzy_logic(radar, mbfs=None,
     flds = radar.fields
     scores = {}
     for key in mbfs.keys():
-        if debug==True:
+        if verbose:
             print('##    Doing', key)
         this_score = np.zeros(
             flds[list(flds.keys())[0]]['data'].shape).flatten() * 0.0
@@ -127,7 +128,7 @@ def cum_score_fuzzy_logic(radar, mbfs=None,
     if hard_const is not None:
         # hard_const = [[class, field, (v1, v2)], ...]
         for this_const in hard_const:
-            if debug==True:
+            if verbose:
                 print('##    Doing hard constraining', this_const[0])
             key = this_const[0]
             const = this_const[1]
@@ -136,7 +137,7 @@ def cum_score_fuzzy_logic(radar, mbfs=None,
             upper = this_const[2][1]
             const_area = np.where(np.logical_and(fld_data >= lower,
                                                  fld_data <= upper))
-            if debug==True:
+            if verbose:
                 print('##    ', str(const_area))
             scores[key][const_area] = 0.0
     stacked_scores = np.dstack([scores[key] for key in scores.keys()])
@@ -167,7 +168,7 @@ def cum_score_fuzzy_logic(radar, mbfs=None,
 
 
 def do_my_fuzz(radar, tex_start=2.0, tex_end=2.1, verbose=True):
-    if(verbose==True):
+    if verbose:
         print('##')
         print('## CMAC calculation using fuzzy logic:')
 
@@ -215,7 +216,7 @@ def do_my_fuzz(radar, tex_start=2.0, tex_end=2.1, verbose=True):
                   ['rain', 'sounding_temperature', (-1000, -5)],
                   ['melting', 'velocity_texture', (3, 300)]]
 
-    gid_fld, cats = cum_score_fuzzy_logic(radar, mbfs=mbfs, debug=verbose,
+    gid_fld, cats = cum_score_fuzzy_logic(radar, mbfs=mbfs, verbose=verbose,
                                           hard_const=hard_const)
     rain_val = list(cats).index('rain')
     snow_val = list(cats).index('snow')
@@ -244,7 +245,6 @@ def get_melt(radar, melt_cat=None):
     print(fzl)
     if fzl > 5000:
         fzl = 3500.0
-
     return fzl
 
 def fix_phase_fields(orig_kdp, orig_phidp, rrange, happy_kdp,
@@ -275,8 +275,10 @@ def return_csu_kdp(radar):
         fdN, radar, units='deg', long_name='Filtered Differential Phase',
         standard_name='Filtered Differential Phase', dz_field='reflectivity')
     csu_kdp_sd = _csu_to_field(
-        sdN, radar, units='deg', long_name='Standard Deviation of Differential Phase',
-        standard_name='Standard Deviation of Differential Phase', dz_field='reflectivity')
+        sdN, radar, units='deg',
+        long_name='Standard Deviation of Differential Phase',
+        standard_name='Standard Deviation of Differential Phase',
+        dz_field='reflectivity')
     return  csu_kdp_field, csu_filt_dp, csu_kdp_sd
 
 
@@ -309,7 +311,8 @@ def _fix_rain_above_bb(gid_fld, rain_class, melt_class, snow_class):
     new_gid = copy.deepcopy(gid_fld)
     for ray_num in range(new_gid['data'].shape[0]):
         if melt_class in new_gid['data'][ray_num, :]:
-            max_loc = np.where(new_gid['data'][ray_num, :] == melt_class)[0].max()
+            max_loc = np.where(
+                new_gid['data'][ray_num, :] == melt_class)[0].max()
             rain_above_locs = np.where(
                 new_gid['data'][ray_num, max_loc:] == rain_class)[0] + max_loc
             new_gid['data'][ray_num, rain_above_locs] = snow_class
