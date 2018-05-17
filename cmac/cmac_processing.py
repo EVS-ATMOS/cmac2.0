@@ -75,35 +75,35 @@ def cum_score_fuzzy_logic(radar, mbfs=None,
                        'normalized_coherent_power': [[0, 0, .5, .6], 3.0],
                        'height': [[0, 0, 5000, 8000], 1.0],
                        'sounding_temperature': [[-100, -100, 100, 100], 0.0],
-                       'SNR': [[15, 20, 1000, 1000], 1.0]}
+                       'signal_to_noise_ratio': [[15, 20, 1000, 1000], 1.0]}
 
         rain = {'differential_phase_texture': [[0, 0, 80, 90], 1.0],
                 'cross_correlation_ratio': [[0.94, 0.96, 1, 1], 1.0],
                 'normalized_coherent_power': [[0.4, 0.5, 1, 1], 1.0],
                 'height': [[0, 0, 5000, 6000], 0.0],
                 'sounding_temperature': [[0, 3, 100, 100], 2.0],
-                'SNR': [[8, 10, 1000, 1000], 1.0]}
+                'signal_to_noise_ratio': [[8, 10, 1000, 1000], 1.0]}
 
         snow = {'differential_phase_texture': [[0, 0, 80, 90], 1.0],
                 'cross_correlation_ratio': [[0.85, 0.9, 1, 1], 1.0],
                 'normalized_coherent_power': [[0.4, 0.5, 1, 1], 1.0],
                 'height': [[0, 0, 25000, 25000], 0.0],
                 'sounding_temperature': [[-100, -100, 0, 1.], 2.0],
-                'SNR': [[8, 10, 1000, 1000], 1.0]}
+                'signal_to_noise_ratio': [[8, 10, 1000, 1000], 1.0]}
 
         no_scatter = {'differential_phase_texture': [[90, 90, 400, 400], 0.0],
                       'cross_correlation_ratio': [[0, 0, 0.1, 0.2], 0.0],
                       'normalized_coherent_power': [[0, 0, 0.1, 0.2], 0.0],
                       'height': [[0, 0, 25000, 25000], 0.0],
                       'sounding_temperature': [[-100, -100, 100, 100], 0.0],
-                      'SNR': [[-100, -100, 8, 10], 6.0]}
+                      'signal_to_noise_ratio': [[-100, -100, 8, 10], 6.0]}
 
         melting = {'differential_phase_texture': [[20, 30, 80, 90], 0.0],
                    'cross_correlation_ratio': [[0.6, 0.7, .94, .96], 4.],
                    'normalized_coherent_power': [[0.4, 0.5, 1, 1], 0],
                    'height': [[0, 0, 25000, 25000], 0.0],
                    'sounding_temperature': [[-1., 0, 3.5, 5], 2.],
-                   'SNR': [[8, 10, 1000, 1000], 0.0]}
+                   'signal_to_noise_ratio': [[8, 10, 1000, 1000], 0.0]}
 
         mbfs = {'multi_trip': second_trip, 'rain': rain, 'snow': snow,
                 'no_scatter': no_scatter, 'melting': melting}
@@ -177,35 +177,35 @@ def do_my_fuzz(radar, tex_start=2.0, tex_end=2.1, verbose=True):
                    'normalized_coherent_power': [[0, 0, .5, .6], 1.0],
                    'height': [[0, 0, 5000, 8000], 0.0],
                    'sounding_temperature': [[-100, -100, 100, 100], 0.0],
-                   'SNR': [[5, 10, 1000, 1000], 1.0]}
+                   'signal_to_noise_ratio': [[5, 10, 1000, 1000], 1.0]}
 
     rain = {'velocity_texture': [[0, 0, tex_start, tex_end], 1.0],
             'cross_correlation_ratio': [[0.97, 0.98, 1, 1], 1.0],
             'normalized_coherent_power': [[0.4, 0.5, 1, 1], 1.0],
             'height': [[0, 0, 5000, 6000], 0.0],
             'sounding_temperature': [[2., 5., 100, 100], 2.0],
-            'SNR': [[8, 10, 1000, 1000], 1.0]}
+            'signal_to_noise_ratio': [[8, 10, 1000, 1000], 1.0]}
 
     snow = {'velocity_texture': [[0, 0, tex_start, tex_end], 1.0],
             'cross_correlation_ratio': [[0.65, 0.9, 1, 1], 1.0],
             'normalized_coherent_power': [[0.4, 0.5, 1, 1], 1.0],
             'height': [[0, 0, 25000, 25000], 0.0],
             'sounding_temperature': [[-100, -100, .5, 4.], 2.0],
-            'SNR': [[8, 10, 1000, 1000], 1.0]}
+            'signal_to_noise_ratio': [[8, 10, 1000, 1000], 1.0]}
 
     no_scatter = {'velocity_texture': [[tex_start, tex_end, 330., 330.], 2.0],
                   'cross_correlation_ratio': [[0, 0, 0.1, 0.2], 0.0],
                   'normalized_coherent_power': [[0, 0, 0.1, 0.2], 0.0],
                   'height': [[0, 0, 25000, 25000], 0.0],
                   'sounding_temperature': [[-100, -100, 100, 100], 0.0],
-                  'SNR': [[-100, -100, 5, 10], 4.0]}
+                  'signal_to_noise_ratio': [[-100, -100, 5, 10], 4.0]}
 
     melting = {'velocity_texture': [[0, 0, tex_start, tex_end], 0.0],
                'cross_correlation_ratio': [[0.6, 0.65, .9, .96], 2.0],
                'normalized_coherent_power': [[0.4, 0.5, 1, 1], 0],
                'height': [[0, 0, 25000, 25000], 0.0],
                'sounding_temperature': [[0, 0.1, 2, 4], 4.0],
-               'SNR': [[8, 10, 1000, 1000], 0.0]}
+               'signal_to_noise_ratio': [[8, 10, 1000, 1000], 0.0]}
 
     mbfs = {'multi_trip': second_trip, 'rain': rain, 'snow': snow,
             'no_scatter': no_scatter, 'melting': melting}
