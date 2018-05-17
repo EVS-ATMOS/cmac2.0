@@ -216,8 +216,12 @@ def cmac(radar, sonde, config,
         if meta_append.lower().endswith('.json'):
             with open(meta_append, 'r') as infile:
                 meta = json.load(infile)
-        else:
+        elif meta_append == 'config':
             meta = config['metadata']
+        else:
+            raise RuntimeError('Must provide the file name of the json file',
+                               'or say config to use the meta data from',
+                               'config.py')
 
     radar.metadata.clear()
     radar.metadata.update(meta)
