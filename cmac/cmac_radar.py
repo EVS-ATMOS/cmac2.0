@@ -184,11 +184,10 @@ def cmac(radar, sonde, config,
 
     # Adding the metadata to the cmac radar object.
     print('## Appending metadata')
-    if meta_append is None:
-        command_line = ''
+    command_line = ''
         for item in sys.argv:
             command_line = command_line + ' ' + item
-
+    if meta_append is None:
         meta = {
             'site_id': 'sgp',
             'data_level': 'c1',
@@ -207,7 +206,6 @@ def cmac(radar, sonde, config,
             'known_issues': (
                 'False phidp jumps in insect regions. Still uses old',
                 'Giangrande code.'),
-            'command_line': command_line,
             'developers': 'Robert Jackson, ANL. Zachary Sherman, ANL.',
             'translator': 'Scott Collis, ANL.',
             'mentors': ('Nitin Bharadwaj, PNNL. Bradley Isom, PNNL.',
@@ -225,4 +223,5 @@ def cmac(radar, sonde, config,
 
     radar.metadata.clear()
     radar.metadata.update(meta)
+    radar.metadata['command_line'] = command_line
     return radar
