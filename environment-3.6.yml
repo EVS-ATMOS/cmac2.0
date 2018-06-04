@@ -6,6 +6,7 @@ dependencies:
   - python=3.6
   - arm_pyart
   - basemap
+  - json
   - wradlib
   - cartopy
   - coincbc
