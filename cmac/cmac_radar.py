@@ -185,7 +185,7 @@ def cmac(radar, sonde, config,
     # Adding the metadata to the cmac radar object.
     print('## Appending metadata')
     command_line = ''
-        for item in sys.argv:
+    for item in sys.argv:
             command_line = command_line + ' ' + item
     if meta_append is None:
         meta = {
