@@ -7,12 +7,12 @@ dependencies:
   - arm_pyart
   - basemap
   - json
-  - wradlib
+  - gcc
   - cartopy
   - coincbc
   - cython=0.27.3
+  - scikit-fuzzy
   - pip:
-    - scikit-fuzzy
-    - git+https://github.com/EVS-ATMOS/xsapr_clutter_project.git
+    - git+https://github.com/ARM-DOE/pyart.git
     - git+https://github.com/CSU-Radarmet/CSU_RadarTools.git
     - git+https://github.com/EVS-ATMOS/cmac2.0.git
