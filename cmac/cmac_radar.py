@@ -190,7 +190,7 @@ def cmac(radar, sonde, config,
     print('## Appending metadata')
     command_line = ''
     for item in sys.argv:
-        command_line = command_line + ' ' + item
+       command_line = command_line + ' ' + item
     if meta_append is None:
         meta = {
             'site_id': 'sgp',
