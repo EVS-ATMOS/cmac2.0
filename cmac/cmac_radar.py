@@ -7,8 +7,8 @@ import json
 import sys
 
 import netCDF4
-import pyart
 import numpy as np
+import pyart
 
 from . import cmac_processing
 
@@ -190,7 +190,7 @@ def cmac(radar, sonde, config,
     print('## Appending metadata')
     command_line = ''
     for item in sys.argv:
-       command_line = command_line + ' ' + item
+        command_line = command_line + ' ' + item
     if meta_append is None:
         meta = {
             'site_id': 'sgp',

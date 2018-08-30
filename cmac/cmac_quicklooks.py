@@ -100,7 +100,7 @@ def quicklooks(radar, config, image_directory=None,
     fig = plt.figure(figsize=[12, 8])
     display.plot_ppi_map('reflectivity', sweep=sweep, resolution='50m',
                          vmin=-8, vmax=64, mask_outside=False,
-                         cmap=pyart.graph.cm.LangRainbow12,
+                         cmap=pyart.graph.cm_colorblind.HomeyerRainbow,
                          min_lat=min_lat, min_lon=min_lon,
                          max_lat=max_lat, max_lon=max_lon,
                          lat_lines=lal, lon_lines=lol,
@@ -128,9 +128,11 @@ def quicklooks(radar, config, image_directory=None,
                   'multi_trip': 'red',
                   'no_scatter': 'gray',
                   'snow': 'cyan',
-                  'melting': 'yellow',
-                  'clutter': 'black'}
-    lab_colors = ['red', 'cyan', 'grey', 'green', 'yellow', 'black']
+                  'melting': 'yellow'}
+    lab_colors = ['red', 'cyan', 'grey', 'green', 'yellow']
+    if 'xsapr_clutter' in radar.fields.keys():
+        cat_colors['clutter'] = 'black'
+        lab_colors = np.append(lab_colors, 'black')
     lab_colors = [cat_colors[kitty[0]] for kitty in sorted_cats]
     cmap = matplotlib.colors.ListedColormap(lab_colors)
 
@@ -159,7 +161,7 @@ def quicklooks(radar, config, image_directory=None,
                          min_lon=min_lon, max_lon=max_lon, min_lat=min_lat,
                          max_lat=max_lat, lat_lines=lal, lon_lines=lol,
                          resolution='50m',
-                         cmap=pyart.graph.cm.LangRainbow12,
+                         cmap=pyart.graph.cm_colorblind.HomeyerRainbow,
                          projection=ccrs.PlateCarree())
     if dd_lobes:
         plt.contour(grid_lon, grid_lat, bca,
@@ -207,7 +209,7 @@ def quicklooks(radar, config, image_directory=None,
     display.plot_ppi_map('reflectivity',
                          sweep=sweep, resolution='50m',
                          vmin=-8, vmax=64, mask_outside=False,
-                         cmap=pyart.graph.cm.LangRainbow12,
+                         cmap=pyart.graph.cm_colorblind.HomeyerRainbow,
                          title=_generate_title(
                              radar, 'masked_corrected_reflectivity',
                              sweep),
@@ -233,7 +235,7 @@ def quicklooks(radar, config, image_directory=None,
                          title=_generate_title(
                              radar, 'attenuation_corrected_reflectivity',
                              sweep),
-                         cmap=pyart.graph.cm.LangRainbow12,
+                         cmap=pyart.graph.cm_colorblind.HomeyerRainbow,
                          min_lat=min_lat, min_lon=min_lon,
                          max_lat=max_lat, max_lon=max_lon,
                          lat_lines=lal, lon_lines=lol,
