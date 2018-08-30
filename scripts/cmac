@@ -72,12 +72,11 @@ def main():
         clutter_field_dict = clutter_radar.fields['xsapr_clutter']
         radar.add_field(
             'xsapr_clutter', clutter_field_dict, replace_existing=True)
-
+        del clutter_radar
     if args.verbose:
         print('## Loading clutter file ' + args.clutter_file)
         print('## Reading dictionary...')
         print('## Adding clutter field..')
-    del clutter_radar
 
     cmac_radar = cmac(radar, sonde, config,
                       meta_append=args.meta_append,

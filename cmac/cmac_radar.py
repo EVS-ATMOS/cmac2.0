@@ -135,7 +135,7 @@ def cmac(radar, sonde, config,
     # Calculating attenuation by using pyart.
     attenuation_a_coef = config['attenuation_a_coef']
     spec_at, cor_z_atten = pyart.correct.calculate_attenuation(
-        radar, offset=ref_offset, refl_field='reflectivity',
+        radar, z_offset=ref_offset, refl_field='reflectivity',
         ncp_field='normalized_coherent_power',
         rhv_field='cross_correlation_ratio',
         phidp_field='filtered_corrected_differential_phase',
