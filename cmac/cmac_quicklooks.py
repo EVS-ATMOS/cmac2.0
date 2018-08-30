@@ -151,7 +151,12 @@ def quicklooks(radar, config, image_directory=None,
                     colors='k')
 
     cbax = plt.gca()
-    tick_locs = np.linspace(0, len(sorted_cats) - 2, len(sorted_cats)) + 0.5
+    if 'xsapr_clutter' in radar.fields.keys():
+        tick_locs = np.linspace(
+            0, len(sorted_cats) - 2, len(sorted_cats)) + 0.5
+    else:
+        tick_locs = np.linspace(
+            0, len(sorted_cats) - 1, len(sorted_cats)) + 0.5
     display.cbs[-1].locator = matplotlib.ticker.FixedLocator(tick_locs)
     catty_list = [sorted_cats[i][0] for i in range(len(sorted_cats))]
     display.cbs[-1].formatter = matplotlib.ticker.FixedFormatter(catty_list)
