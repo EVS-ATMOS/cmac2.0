@@ -81,12 +81,13 @@ def cmac(radar, sonde, config,
     radar.add_field('gate_id', my_fuzz,
                     replace_existing=True)
 
-    # Adding fifth gate id, clutter.
-    clutter_data = radar.fields['xsapr_clutter']['data']
-    radar.fields['gate_id']['data'][clutter_data == 1] = 5
-    notes = radar.fields['gate_id']['notes']
-    radar.fields['gate_id']['notes'] = notes + ',5:clutter'
-    radar.fields['gate_id']['valid_max'] = 5
+    if 'xsapr_clutter' in radar.fields.keys():
+        # Adding fifth gate id, clutter.
+        clutter_data = radar.fields['xsapr_clutter']['data']
+        radar.fields['gate_id']['data'][clutter_data == 1] = 5
+        notes = radar.fields['gate_id']['notes']
+        radar.fields['gate_id']['notes'] = notes + ',5:clutter'
+        radar.fields['gate_id']['valid_max'] = 5
     cat_dict = {}
     for pair_str in radar.fields['gate_id']['notes'].split(','):
         cat_dict.update(
@@ -111,9 +112,12 @@ def cmac(radar, sonde, config,
 
     fzl = cmac_processing.get_melt(radar)
 
+    ref_offset = config['ref_offset']
+    self_const = config['self_const']
     # Calculating differential phase fields.
-    phidp, kdp = pyart.correct.phase_proc_lp(radar, 0.0, debug=True,
-                                             nowrap=50, fzl=fzl)
+    phidp, kdp = pyart.correct.phase_proc_lp_gf(
+        radar, gatefilter=cmac_gates, offset=ref_offset, debug=True, nowrap=50,
+        fzl=fzl, self_const=self_const)
     phidp_filt, kdp_filt = cmac_processing.fix_phase_fields(
         copy.deepcopy(kdp), copy.deepcopy(phidp), radar.range['data'],
         cmac_gates)
@@ -131,7 +135,7 @@ def cmac(radar, sonde, config,
     # Calculating attenuation by using pyart.
     attenuation_a_coef = config['attenuation_a_coef']
     spec_at, cor_z_atten = pyart.correct.calculate_attenuation(
-        radar, 0, refl_field='reflectivity',
+        radar, offset=ref_offset, refl_field='reflectivity',
         ncp_field='normalized_coherent_power',
         rhv_field='cross_correlation_ratio',
         phidp_field='filtered_corrected_differential_phase',
@@ -185,8 +189,8 @@ def cmac(radar, sonde, config,
     # Adding the metadata to the cmac radar object.
     print('## Appending metadata')
     command_line = ''
-        for item in sys.argv:
-            command_line = command_line + ' ' + item
+    for item in sys.argv:
+        command_line = command_line + ' ' + item
     if meta_append is None:
         meta = {
             'site_id': 'sgp',

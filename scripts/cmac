@@ -23,12 +23,12 @@ def main():
         'sonde_file', type=str,
         help='Sonde file to use for CMAC calculation.')
     parser.add_argument(
-        'clutter_file', type=str,
-        help='clutter file to use for addition of clutter gate id.')
-    parser.add_argument(
         'config_dict', type=str, help=('Name of the configuration dictionary',
                                        'found in config.py for the specific',
                                        'radar being used.'))
+    parser.add_argument(
+        '-cf', '--clutter_file', type=str, default=None,
+        help='clutter file to use for addition of clutter gate id.')
     parser.add_argument(
         '-o', '--out_radar_directory', type=str, default=None,
         help=('Out file path and name to use for the CMAC radar.',
@@ -66,11 +66,12 @@ def main():
     radar = pyart.io.read(args.radar_file)
     sonde = netCDF4.Dataset(args.sonde_file)
 
-    # Load clutter files.
-    clutter_radar = pyart.io.read(args.clutter_file)
-    clutter_field_dict = clutter_radar.fields['xsapr_clutter']
-    radar.add_field(
-        'xsapr_clutter', clutter_field_dict, replace_existing=True)
+    if args.clutter_file is not None:
+        # Load clutter files.
+        clutter_radar = pyart.io.read(args.clutter_file)
+        clutter_field_dict = clutter_radar.fields['xsapr_clutter']
+        radar.add_field(
+            'xsapr_clutter', clutter_field_dict, replace_existing=True)
 
     if args.verbose:
         print('## Loading clutter file ' + args.clutter_file)
