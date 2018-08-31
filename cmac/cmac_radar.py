@@ -50,14 +50,15 @@ def cmac(radar, sonde, config,
         radar.time['data'][0], radar.time['units'])
     print('##', str(radar_start_date))
 
-    sonde_temp = config['sonde']['temperature']
-    sonde_alt = config['sonde']['height']
+    temp_field = config['sonde']['temperature']
+    alt_field = config['sonde']['height']
 
     z_dict, temp_dict = pyart.retrieve.map_profile_to_gates(
-        sonde.variables[sonde_temp][:], sonde.variables[sonde_alt][:], radar)
+        sonde.variables[temp_field][:], sonde.variables[alt_field][:], radar)
     texture = cmac_processing.get_texture(radar)
 
     snr = pyart.retrieve.calculate_snr_from_reflectivity(radar)
+
     if not verbose:
         print('## Adding radar fields...')
 
@@ -102,13 +103,24 @@ def cmac(radar, sonde, config,
     cmac_gates.include_equal('gate_id', cat_dict['rain'])
     cmac_gates.include_equal('gate_id', cat_dict['melting'])
     cmac_gates.include_equal('gate_id', cat_dict['snow'])
+
+    # Create a simulated velocity field from the sonde object.
+    u_wind = sonde.variables['u_wind'][:]
+    v_wind = sonde.variables['v_wind'][:]
+    sonde_alt = sonde.variables[alt_field][:]
+    profile = pyart.core.HorizontalWindProfile(sonde_alt, u_wind, v_wind)
+    sim_vel = pyart.util.simulated_vel_from_profile(radar, profile)
+    radar.add_field('simulated_velocity', sim_vel, replace_existing=True)
+
+    # Create the corrected velocity field from the region dealias algorithm.
     corr_vel = pyart.correct.dealias_region_based(
-        radar, vel_field='velocity', keep_original=False,
-        gatefilter=cmac_gates, centered=True)
+        radar, vel_field='velocity', ref_vel_field='simulated_velocity',
+        keep_original=False, gatefilter=cmac_gates, centered=True)
 
     radar.add_field('corrected_velocity', corr_vel, replace_existing=True)
     if verbose:
         print('##    corrected_velocity')
+        print('##    simulated_velocity')
 
     fzl = cmac_processing.get_melt(radar)
 
@@ -116,8 +128,8 @@ def cmac(radar, sonde, config,
     self_const = config['self_const']
     # Calculating differential phase fields.
     phidp, kdp = pyart.correct.phase_proc_lp_gf(
-        radar, gatefilter=cmac_gates, offset=ref_offset, debug=True, nowrap=50,
-        fzl=fzl, self_const=self_const)
+        radar, gatefilter=cmac_gates, offset=ref_offset, debug=True,
+        nowrap=50, fzl=fzl, self_const=self_const)
     phidp_filt, kdp_filt = cmac_processing.fix_phase_fields(
         copy.deepcopy(kdp), copy.deepcopy(phidp), radar.range['data'],
         cmac_gates)
