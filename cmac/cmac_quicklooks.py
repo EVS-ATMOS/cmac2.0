@@ -313,12 +313,11 @@ def quicklooks(radar, config, image_directory=None,
     plt.close()
 
     # Creating a plot with region dealias corrected velocity.
-    nyq = radar.instrument_parameters['nyquist_velocity']['data'][0]
     display = pyart.graph.RadarMapDisplayCartopy(radar)
     fig = plt.figure(figsize=[12, 8])
     display.plot_ppi_map('corrected_velocity', sweep=sweep, resolution='50m',
-                         cmap=pyart.graph.cm.NWSVel, vmin=-1.5*nyq,
-                         vmax=1.5*nyq, min_lat=min_lat, min_lon=min_lon,
+                         cmap=pyart.graph.cm.NWSVel, vmin=-30,
+                         vmax=30, min_lat=min_lat, min_lon=min_lon,
                          max_lat=max_lat, max_lon=max_lon, lat_lines=lal,
                          lon_lines=lol, projection=ccrs.PlateCarree())
     if dd_lobes:
