@@ -6,3 +6,11 @@ build
 # Report files #
 ################
 IPythonMPI0*
+
+notebooks/
+data/
+images/
+
+*.headers
+*inventory_report.odt
+*.egg-info/

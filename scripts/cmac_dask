@@ -69,18 +69,19 @@ def run_cmac_and_plotting(radar_file_path, config,
         subprocess.call('chmod -R g+rw ' + the_path, shell=True)
 
     # Load clutter files.
-    clutter_file_path = args.clutter_file
-    if args.verbose:
-        print('## Loading clutter file ' + clutter_file_path)
-    clutter = pyart.io.read(clutter_file_path)
-    if args.verbose:
-        print('## Reading dictionary...')
-    clutter_field_dict = clutter.fields['xsapr_clutter']
-    if args.verbose:
-        print('## Adding clutter field..')
-    radar.add_field(
-        'xsapr_clutter', clutter_field_dict, replace_existing=True)
-    del clutter
+    if args.clutter_file is not None:
+        clutter_file_path = args.clutter_file
+        if args.verbose:
+            print('## Loading clutter file ' + clutter_file_path)
+        clutter = pyart.io.read(clutter_file_path)
+        if args.verbose:
+            print('## Reading dictionary...')
+        clutter_field_dict = clutter.fields['xsapr_clutter']
+        if args.verbose:
+            print('## Adding clutter field..')
+        radar.add_field(
+            'xsapr_clutter', clutter_field_dict, replace_existing=True)
+        del clutter
 
     # Retrieve closest sonde in time to the time of the radar file.
     closest_time = min(sounding_times,
@@ -135,11 +136,11 @@ def main():
         'sonde_path', type=str,
         help='Sonde path to use for CMAC calculation.')
     parser.add_argument(
-        'clutter_file', type=str,
-        help='Path to clutter file')
-    parser.add_argument(
         'config_dict', type=str, help=('Configuration dictionary for the',
                                        'specific radar being used.'))
+    parser.add_argument(
+        '-cf', '--clutter_file', type=str, default=None,
+        help='Path to clutter file to be used in CMAC.')
     parser.add_argument(
         '-o', '--out_radar', type=str, default=None,
         help=('Out file path and name to use for the CMAC radar.',
