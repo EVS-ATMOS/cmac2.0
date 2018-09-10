@@ -9,7 +9,7 @@ import importlib
 import netCDF4
 import pyart
 
-from cmac import cmac, quicklooks
+from cmac import cmac, get_cmac_values, quicklooks
 
 
 def main():
@@ -23,9 +23,9 @@ def main():
         'sonde_file', type=str,
         help='Sonde file to use for CMAC calculation.')
     parser.add_argument(
-        'config_dict', type=str, help=('Name of the configuration dictionary',
-                                       'found in config.py for the specific',
-                                       'radar being used.'))
+        'config', type=str, help=('Name of the radar dictionary',
+                                  'found in config.py to pull values',
+                                  'for CMAC 2.0 specific to that radar.'))
     parser.add_argument(
         '-cf', '--clutter_file', type=str, default=None,
         help='clutter file to use for addition of clutter gate id.')
@@ -60,9 +60,6 @@ def main():
     parser.set_defaults(verbose=False)
     args = parser.parse_args()
 
-    config_module = importlib.import_module('cmac.config')
-    config = getattr(config_module, args.config_dict)
-
     radar = pyart.io.read(args.radar_file)
     sonde = netCDF4.Dataset(args.sonde_file)
 
@@ -78,7 +75,7 @@ def main():
         print('## Reading dictionary...')
         print('## Adding clutter field..')
 
-    cmac_radar = cmac(radar, sonde, config,
+    cmac_radar = cmac(radar, sonde, args.config,
                       meta_append=args.meta_append,
                       verbose=args.verbose)
     sonde.close()
@@ -94,7 +91,9 @@ def main():
 
     del radar
 
-    save_name = config['save_name']
+    cmac_config = get_cmac_values(args.config)
+    save_name = cmac_config['save_name']
+
     if args.out_radar_directory is None:
         pyart.io.write_cfradial(
             (os.path.expanduser('~') + '/' + save_name + '.'
@@ -114,7 +113,7 @@ def main():
               + year_str + month_str + day_str + '.' + hour_str
               + minute_str + second_str + '.nc')
 
-    quicklooks(cmac_radar, config,
+    quicklooks(cmac_radar, args.config,
                image_directory=args.image_directory,
                dd_lobes=args.dd_lobes)
 
