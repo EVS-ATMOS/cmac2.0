@@ -10,8 +10,9 @@ import netCDF4
 import numpy as np
 import pyart
 
-from . import cmac_processing
-
+from .cmac_processing import (
+    do_my_fuzz, get_melt, get_texture, fix_phase_fields)
+from .config import get_cmac_values, get_field_names, get_metadata
 
 def cmac(radar, sonde, config,
          meta_append=None, verbose=True):
@@ -24,9 +25,9 @@ def cmac(radar, sonde, config,
         Radar object to use in the CMAC calculation.
     sonde : Object
         Object containing all the sonde data.
-    config : dict
-        A dictionary containing different values specific to a radar and
-        a sounding needed in the cmac processing.
+    config : str
+        A string pointing to dictionaries containing values for CMAC 2.0
+        specific to a radar.
 
     Other Parameters
     ----------------
@@ -34,8 +35,8 @@ def cmac(radar, sonde, config,
         Value key pairs to attend to global attributes. If None,
         a default metadata will be created. The metadata can also
         be created by providing a dictionary or a json file.
-    verbose: bool
-        If True this will display more statistics.
+    verbose : bool
+        If True, this will display more statistics.
 
     Returns
     -------
@@ -43,19 +44,24 @@ def cmac(radar, sonde, config,
         Radar object with new CMAC added fields.
 
     """
+    # Retrieve values from the configuration file.
+    cmac_config = get_cmac_values(config)
+    field_config = get_field_names(config)
+    meta_config = get_metadata(config)
+
     # Obtaining variables needed for fuzzy logic.
-    radar.altitude['data'][0] = config['site_alt']
+    radar.altitude['data'][0] = cmac_config['site_alt']
 
     radar_start_date = netCDF4.num2date(
         radar.time['data'][0], radar.time['units'])
     print('##', str(radar_start_date))
 
-    temp_field = config['sonde']['temperature']
-    alt_field = config['sonde']['height']
+    temp_field = field_config['temperature']
+    alt_field = field_config['altitude']
 
     z_dict, temp_dict = pyart.retrieve.map_profile_to_gates(
         sonde.variables[temp_field][:], sonde.variables[alt_field][:], radar)
-    texture = cmac_processing.get_texture(radar)
+    texture = get_texture(radar)
 
     snr = pyart.retrieve.calculate_snr_from_reflectivity(radar)
 
@@ -77,8 +83,8 @@ def cmac(radar, sonde, config,
         print('##    velocity_texture')
 
     # Performing fuzzy logic to obtain the gate ids.
-    my_fuzz, _ = cmac_processing.do_my_fuzz(radar, tex_start=2.4,
-                                            tex_end=2.7, verbose=verbose)
+    my_fuzz, _ = do_my_fuzz(radar, tex_start=2.4,
+                            tex_end=2.7, verbose=verbose)
     radar.add_field('gate_id', my_fuzz,
                     replace_existing=True)
 
@@ -105,16 +111,20 @@ def cmac(radar, sonde, config,
     cmac_gates.include_equal('gate_id', cat_dict['snow'])
 
     # Create a simulated velocity field from the sonde object.
-    u_wind = sonde.variables['u_wind'][:]
-    v_wind = sonde.variables['v_wind'][:]
+    u_field = field_config['u_wind']
+    v_field = field_config['v_wind']
+    u_wind = sonde.variables[u_field][:]
+    v_wind = sonde.variables[v_field][:]
+    alt_field = field_config['altitude']
     sonde_alt = sonde.variables[alt_field][:]
     profile = pyart.core.HorizontalWindProfile(sonde_alt, u_wind, v_wind)
     sim_vel = pyart.util.simulated_vel_from_profile(radar, profile)
     radar.add_field('simulated_velocity', sim_vel, replace_existing=True)
 
     # Create the corrected velocity field from the region dealias algorithm.
+    vel_field = field_config['velocity']
     corr_vel = pyart.correct.dealias_region_based(
-        radar, vel_field='velocity', ref_vel_field='simulated_velocity',
+        radar, vel_field=vel_field, ref_vel_field='simulated_velocity',
         keep_original=False, gatefilter=cmac_gates, centered=True)
 
     radar.add_field('corrected_velocity', corr_vel, replace_existing=True)
@@ -122,15 +132,15 @@ def cmac(radar, sonde, config,
         print('##    corrected_velocity')
         print('##    simulated_velocity')
 
-    fzl = cmac_processing.get_melt(radar)
+    fzl = get_melt(radar)
 
-    ref_offset = config['ref_offset']
-    self_const = config['self_const']
+    ref_offset = cmac_config['ref_offset']
+    self_const = cmac_config['self_const']
     # Calculating differential phase fields.
     phidp, kdp = pyart.correct.phase_proc_lp_gf(
         radar, gatefilter=cmac_gates, offset=ref_offset, debug=True,
         nowrap=50, fzl=fzl, self_const=self_const)
-    phidp_filt, kdp_filt = cmac_processing.fix_phase_fields(
+    phidp_filt, kdp_filt = fix_phase_fields(
         copy.deepcopy(kdp), copy.deepcopy(phidp), radar.range['data'],
         cmac_gates)
 
@@ -145,7 +155,10 @@ def cmac(radar, sonde, config,
         print('##    filtered_corrected_differential_phase')
 
     # Calculating attenuation by using pyart.
-    attenuation_a_coef = config['attenuation_a_coef']
+    refl_field = field_config['reflectivity']
+    ncp_field = field_config['normalized_coherent_power']
+    rhv_field = field_config['cross_correlation_ratio'] 
+    attenuation_a_coef = cmac_config['attenuation_a_coef']
     spec_at, cor_z_atten = pyart.correct.calculate_attenuation(
         radar, z_offset=ref_offset, refl_field='reflectivity',
         ncp_field='normalized_coherent_power',
@@ -231,7 +244,7 @@ def cmac(radar, sonde, config,
             with open(meta_append, 'r') as infile:
                 meta = json.load(infile)
         elif meta_append == 'config':
-            meta = config['metadata']
+            meta = meta_config
         else:
             raise RuntimeError('Must provide the file name of the json file',
                                'or say config to use the meta data from',

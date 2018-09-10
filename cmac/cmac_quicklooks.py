@@ -11,8 +11,10 @@ import matplotlib
 import matplotlib.pyplot as plt
 import pyart
 
-from pyart.graph.common import generate_radar_name
-from pyart.graph.common import generate_radar_time_begin
+from pyart.graph.common import (
+    generate_radar_name, generate_radar_time_begin)
+
+from .config import get_plot_values
 
 plt.switch_backend('agg')
 
@@ -26,9 +28,9 @@ def quicklooks(radar, config, image_directory=None,
     ---------
     radar : Radar
         Radar object that has CMAC applied to it.
-    config : dict
-        A dictionary from config.py that contains values such as max_lat,
-        sweep and save_name for the plotting.
+    config : str
+        A string of the radar name found from config.py that contains values
+        for plotting, specific to that radar.
 
     Optional Parameters
     -------------------
@@ -45,14 +47,17 @@ def quicklooks(radar, config, image_directory=None,
     radar_start_date = netCDF4.num2date(
         radar.time['data'][0], radar.time['units'])
 
-    save_name = config['save_name']
+    # Retrieve the plot parameter values based on the radar.
+    plot_config = get_plot_values(config)
+
+    save_name = plot_config['save_name']
     date_string = datetime.strftime(radar_start_date, '%Y%m%d.%H%M%S')
     combined_name = '.' + save_name + '.' + date_string
 
-    min_lat = config['min_lat']
-    max_lat = config['max_lat']
-    min_lon = config['min_lon']
-    max_lon = config['max_lon']
+    min_lat = plot_config['min_lat']
+    max_lat = plot_config['max_lat']
+    min_lon = plot_config['min_lon']
+    max_lon = plot_config['max_lon']
 
     # Creating a plot of reflectivity before CMAC.
     lal = np.arange(min_lat, max_lat+.2, .2)
@@ -62,22 +67,22 @@ def quicklooks(radar, config, image_directory=None,
         grid_lat = np.arange(min_lat, max_lat, 0.01)
         grid_lon = np.arange(min_lon, max_lon, 0.01)
 
-        facility = config['facility']
+        facility = plot_config['facility']
         if facility == 'I4':
-            dms_radar1_coords = [config['site_i4_dms_lon'],
-                                 config['site_i4_dms_lat']]
-            dms_radar2_coords = [config['site_i5_dms_lon'],
-                                 config['site_i5_dms_lat']]
+            dms_radar1_coords = [plot_config['site_i4_dms_lon'],
+                                 plot_config['site_i4_dms_lat']]
+            dms_radar2_coords = [plot_config['site_i5_dms_lon'],
+                                 plot_config['site_i5_dms_lat']]
         elif facility == 'I5':
-            dms_radar1_coords = [config['site_i5_dms_lon'],
-                                 config['site_i5_dms_lat']]
-            dms_radar2_coords = [config['site_i4_dms_lon'],
-                                 config['site_i4_dms_lat']]
+            dms_radar1_coords = [plot_config['site_i5_dms_lon'],
+                                 plot_config['site_i5_dms_lat']]
+            dms_radar2_coords = [plot_config['site_i4_dms_lon'],
+                                 plot_config['site_i4_dms_lat']]
         elif facility == 'I6':
-            dms_radar1_coords = [config['site_i6_dms_lon'],
-                                 config['site_i6_dms_lat']]
-            dms_radar2_coords = [config['site_i4_dms_lon'],
-                                 config['site_i4_dms_lat']]
+            dms_radar1_coords = [plot_config['site_i6_dms_lon'],
+                                 plot_config['site_i6_dms_lat']]
+            dms_radar2_coords = [plot_config['site_i4_dms_lon'],
+                                 plot_config['site_i4_dms_lat']]
 
         dec_radar1 = [_dms_to_decimal(
             dms_radar1_coords[0][0], dms_radar1_coords[0][1],
@@ -94,8 +99,9 @@ def quicklooks(radar, config, image_directory=None,
                        dec_radar1[1], grid_lon, grid_lat)
         grid_lon, grid_lat = np.meshgrid(grid_lon, grid_lat)
 
-    sweep = config['sweep']
+    sweep = plot_config['sweep']
 
+    # Plot of the raw reflectivity from the radar.
     display = pyart.graph.RadarMapDisplayCartopy(radar)
     fig = plt.figure(figsize=[12, 8])
     display.plot_ppi_map('reflectivity', sweep=sweep, resolution='50m',

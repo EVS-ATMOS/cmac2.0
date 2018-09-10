@@ -18,12 +18,14 @@ use('agg')
 import netCDF4
 import pyart
 
-from cmac import cmac, quicklooks, get_sounding_times, get_sounding_file_name
+from cmac import (cmac, get_cmac_values, quicklooks,
+                  get_sounding_times, get_sounding_file_name)
 
 
-def run_cmac_and_plotting(radar_file_path, config,
-                          sounding_times, args):
+def run_cmac_and_plotting(radar_file_path, sounding_times, args):
     """ For dask we need the radar plotting routines all in one subroutine. """
+    cmac_config = get_cmac_values(args.config)
+
     try:
         radar = pyart.io.read(radar_file_path)
     except TypeError:
@@ -47,7 +49,7 @@ def run_cmac_and_plotting(radar_file_path, config,
     minute_str = "%02d" % radar_start_date.minute
     second_str = "%02d" % radar_start_date.second
 
-    save_name = config['save_name']
+    save_name = cmac_config['save_name']
     if args.out_radar is None:
         the_path = (os.path.expanduser('~') + '/'+ year_str + month_str
                     + second_str + '/')
@@ -84,14 +86,14 @@ def run_cmac_and_plotting(radar_file_path, config,
         del clutter
 
     # Retrieve closest sonde in time to the time of the radar file.
-    closest_time = min(sounding_times,
-                       key=lambda d: abs(d - radar_start_date))
-    sonde_file = get_sounding_file_name(args.sonde_path,
-                                        closest_time)
+    closest_time = min(
+        sounding_times, key=lambda d: abs(d - radar_start_date))
+    sonde_file = get_sounding_file_name(
+        args.sonde_path, closest_time)
     sonde = netCDF4.Dataset(sonde_file)
 
     # Running the cmac code to produce a cmac_radar object.
-    cmac_radar = cmac(radar, sonde, config,
+    cmac_radar = cmac(radar, sonde, args.config,
                       meta_append=args.meta_append,
                       verbose=args.verbose)
 
@@ -111,7 +113,7 @@ def run_cmac_and_plotting(radar_file_path, config,
         subprocess.call('chmod -R g+rw ' + img_directory, shell=True)
 
     # Producing all the cmac_radar quicklooks.
-    quicklooks(cmac_radar, config,
+    quicklooks(cmac_radar, args.config,
                image_directory=img_directory,
                dd_lobes=args.dd_lobes)
 
@@ -136,8 +138,9 @@ def main():
         'sonde_path', type=str,
         help='Sonde path to use for CMAC calculation.')
     parser.add_argument(
-        'config_dict', type=str, help=('Configuration dictionary for the',
-                                       'specific radar being used.'))
+        'config', type=str, help=('Radar configuration dictionary for',
+                                  'pulling values for CMAC 2.0, specific',
+                                  'to the radar being used.'))
     parser.add_argument(
         '-cf', '--clutter_file', type=str, default=None,
         help='Path to clutter file to be used in CMAC.')
@@ -186,10 +189,9 @@ def main():
     args = parser.parse_args()
 
     # Importing radar config data depending on user chosen config dictionary.
-    config_module = importlib.import_module('cmac.config')
-    config = getattr(config_module, args.config_dict)
+    cmac_config = get_cmac_values(args.config)
 
-    x_compass = config['x_compass']
+    x_compass = cmac_config['x_compass']
     if os.path.isdir(args.radar_path):
         radar_files = glob.glob(args.radar_path + '/**/*' + x_compass
                                 + '*', recursive=True)
@@ -217,7 +219,7 @@ def main():
 
     the_bag = db.from_sequence(radar_files)
     the_function = lambda x: run_cmac_and_plotting(
-        x, config, sounding_times, args)
+        x, sounding_times, args)
     result = the_bag.map(the_function).compute()
     
     ## Do radar object loading on compute nodes.
