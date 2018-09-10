@@ -1,0 +1,14 @@
+sudo: false   # Use container-based infrastructure.
+language: python
+
+matrix:
+    include:
+    - python: 3.6
+      env:
+        - PYTHON_VERSION="3.6"
+        - PYTEST_ARGS="-v"
+
+# Create a test environment and install dependencies.
+install: source continuous_integration/install.sh
+# Command to run tests.
+script: eval xvfb-run pytest $PYTEST_ARGS
