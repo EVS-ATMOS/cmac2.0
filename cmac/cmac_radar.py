@@ -35,7 +35,7 @@ def cmac(radar, sonde, config,
         Value key pairs to attend to global attributes. If None,
         a default metadata will be created. The metadata can also
         be created by providing a dictionary or a json file.
-    verbosei : bool
+    verbose : bool
         If True, this will display more statistics.
 
     Returns
