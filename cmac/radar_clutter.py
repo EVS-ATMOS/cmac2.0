@@ -10,7 +10,7 @@ try:
     from dask import delayed
     import dask.array as da
 except ImportError:
-    warning.warn('Dask is not installed. Radar clutter module'
+    warnings.warn('Dask is not installed. Radar clutter module'
                  + ' needs Dask to be able to run.')
     pass
 
