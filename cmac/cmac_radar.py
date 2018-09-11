@@ -1,6 +1,6 @@
 """ Module that uses CMAC 2.0 to remove and correct second trip returns,
 correct velocity and more. A new radar object is then created with all CMAC
-2.0 products. """
+2.0 product. """
 
 import copy
 import json
