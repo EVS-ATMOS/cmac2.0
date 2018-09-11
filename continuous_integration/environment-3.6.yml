@@ -7,7 +7,6 @@ dependencies:
   - arm_pyart
   - numpy
   - cython
-  - json
   - gcc
   - cartopy
   - coincbc
