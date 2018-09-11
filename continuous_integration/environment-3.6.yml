@@ -5,8 +5,8 @@ channels:
 dependencies:
   - python=3.6
   - arm_pyart
-  - json
-  - gcc
+  - numpy
+  - cython
   - cartopy
   - coincbc
   - scikit-fuzzy
