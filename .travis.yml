@@ -8,6 +8,11 @@ matrix:
         - PYTHON_VERSION="3.6"
         - PYTEST_ARGS="-v"
 
+addons:
+  apt:
+    packages:
+    - gfortran
+
 # Create a test environment and install dependencies.
 install: source continuous_integration/install.sh
 # Command to run tests.
