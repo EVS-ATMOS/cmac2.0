@@ -1,11 +1,18 @@
 """ Code that calculates clutter by using running stats. """
 
 from copy import deepcopy
+import warnings
 
-import dask.array as da
-from dask import delayed
 import numpy as np
 import pyart
+
+try:
+    from dask import delayed
+    import dask.array as da
+except ImportError:
+    warning.warn('Dask is not installed. Radar clutter module'
+                 + ' needs Dask to be able to run.')
+    pass
 
 
 def tall_clutter(files, clutter_thresh_min=0.0002,
