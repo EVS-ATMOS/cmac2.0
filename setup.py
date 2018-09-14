@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 """ CMAC Corrected Precipitation Radar Moments in Antenna Coordinates
 
 Using fuzzy logic, scipy, and more to identify gates as rain, melting,
@@ -11,56 +10,113 @@ More information can be found at https://www.arm.gov/data/data-sources/cmac-69
 
 import glob
 
-from numpy.distutils.core import setup
-from numpy.distutils.misc_util import Configuration
-
+import subprocess
+from setuptools import setup, find_packages
 
 DOCLINES = __doc__.split("\n")
 
+CLASSIFIERS = """\
+Development Status :: 2 - Pre-Alpha
+Intended Audience :: Science/Research
+Intended Audience :: Developers
+License :: OSI Approved :: BSD License
+Programming Language :: Python
+Programming Language :: Python :: 3.6
+Topic :: Scientific/Engineering
+Topic :: Scientific/Engineering :: Atmospheric Science
+Operating System :: POSIX :: Linux
+"""
+
 NAME = 'cmac'
-MAINTAINER = 'Scott Collis, Zach Sherman and Robert Jackson'
+AUTHOR = 'Scott Collis, Zachary Sherman, Robert Jackson'
+MAINTAINER = 'Data Informatics and Geophysical Retrievals (DIGR)'
 DESCRIPTION = DOCLINES[0]
-# INSTALL_REQUIRES = ['pyart', 'scipy', scikit-fuzzy, CSU_radartools]
 LONG_DESCRIPTION = "\n".join(DOCLINES[2:])
+URL = 'https://github.com/EVS-ATMOS/cmac2.0'
 LICENSE = 'BSD'
-PLATFORMS = "Linux"
+CLASSIFIERS = filter(None, CLASSIFIERS.split('\n'))
 MAJOR = 0
 MINOR = 1
 MICRO = 0
 SCRIPTS = glob.glob('scripts/*')
-TEST_SUITE = 'nose.collector'
-TESTS_REQUIRE = ['nose']
 VERSION = '%d.%d.%d' % (MAJOR, MINOR, MICRO)
 
-def configuration(parent_package='', top_path=None):
-    """ Configuration of the cmac package. """
-    config = Configuration(None, parent_package, top_path)
-    config.set_options(ignore_setup_xxx_py=True,
-                       assume_default_configuration=True,
-                       delegate_options_to_subpackages=True,
-                       quiet=True)
 
-    config.add_subpackage('cmac')
-    return config
+# Return the git revision as a string
+def git_version():
+    def _minimal_ext_cmd(cmd):
+        # construct minimal environment
+        env = {}
+        for k in ['SYSTEMROOT', 'PATH']:
+            v = os.environ.get(k)
+            if v is not None:
+                env[k] = v
+        # LANGUAGE is used on win32
+        env['LANGUAGE'] = 'C'
+        env['LANG'] = 'C'
+        env['LC_ALL'] = 'C'
+        out = subprocess.Popen(
+            cmd, stdout=subprocess.PIPE, env=env).communicate()[0]
+        return out
+
+    try:
+        out = _minimal_ext_cmd(['git', 'rev-parse', 'HEAD'])
+        GIT_REVISION = out.strip().decode('ascii')
+    except OSError:
+        GIT_REVISION = "Unknown"
+
+    return GIT_REVISION
 
 
-def setup_package():
-    """ Setup of cmac package. """
-    setup(
-        name=NAME,
-        maintainer=MAINTAINER,
-        description=DESCRIPTION,
-        long_description=LONG_DESCRIPTION,
-        version=VERSION,
-        license=LICENSE,
-        platforms=PLATFORMS,
-        configuration=configuration,
-        include_package_data=True,
-        # install_requires=INSTALL_REQUIRES,
-        test_suite=TEST_SUITE,
-        tests_require=TESTS_REQUIRE,
-        scripts=SCRIPTS,
-    )
+def write_version_py(filename='cmac/version.py'):
+    cnt = """
+# THIS FILE IS GENERATED FROM PYART SETUP.PY
+short_version = '%(version)s'
+version = '%(version)s'
+full_version = '%(full_version)s'
+git_revision = '%(git_revision)s'
+release = %(isrelease)s
 
-if __name__ == '__main__':
-    setup_package()
+if not release:
+    version = full_version
+"""
+    # Adding the git rev number needs to be done inside write_version_py(),
+    # otherwise the import of cmac.version messes up the build under Python 3.
+    FULLVERSION = VERSION
+    if os.path.exists('.git'):
+        GIT_REVISION = git_version()
+    elif os.path.exists('cmac/version.py'):
+        # must be a source distribution, use existing version file
+        try:
+            from cmac.version import git_revision as GIT_REVISION
+        except ImportError:
+            raise ImportError("Unable to import git_revision. Try removing "
+                              "cmac/version.py and the build directory "
+                              "before building.")
+    else:
+        GIT_REVISION = "Unknown"
+
+    if not ISRELEASED:
+        FULLVERSION += '.dev+' + GIT_REVISION[:7]
+
+    a = open(filename, 'w')
+    try:
+        a.write(cnt % {'version': VERSION,
+                       'full_version': FULLVERSION,
+                       'git_revision': GIT_REVISION,
+                       'isrelease': str(ISRELEASED)})
+    finally:
+        a.close()
+
+
+setup(
+    name=NAME,
+    version=VERSION,
+    description=DESCRIPTION,
+    long_description=LONG_DESCRIPTION,
+    url=URL,
+    author=AUTHOR,
+    maintainer=MAINTAINER,
+    license=LICENSE,
+    classifiers=CLASSIFIERS,
+    packages=find_packages())
