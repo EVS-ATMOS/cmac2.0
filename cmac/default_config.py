@@ -15,8 +15,8 @@ being used.
 ##############################################################################
 
 _DEFAULT_METADATA = {
-    # X-SAPR I6 metadata
-    'xsapr_i6': {
+    # X-SAPR I6 PPI metadata
+    'xsapr_i6_ppi': {
         'site_id': 'sgp',
         'facility_id': 'I6' + ': ' + 'Deer Creek, OK',
         'data_level': 'c1',
@@ -39,8 +39,8 @@ _DEFAULT_METADATA = {
         'mentors': ('Nitin Bharadwaj, PNNL. Bradley Isom, PNNL.',
                     'Joseph Hardin, PNNL. Iosif Lindenmaier, PNNL.')},
 
-    # X-SAPR I5 metadata
-    'xsapr_i5': {
+    # X-SAPR I5 PPI metadata
+    'xsapr_i5_ppi': {
         'site_id': 'sgp',
         'facility_id': 'I5' + ': ' + 'Garber, OK',
         'data_level': 'c1',
@@ -63,8 +63,80 @@ _DEFAULT_METADATA = {
         'mentors': ('Nitin Bharadwaj, PNNL. Bradley Isom, PNNL.',
                     'Joseph Hardin, PNNL. Iosif Lindenmaier, PNNL.')},
 
-    # X-SAPR I4 metadata
-    'xsapr_i4': {
+    # X-SAPR I4 PPI metadata
+    'xsapr_i4_ppi': {
+        'site_id': 'sgp',
+        'facility_id': 'I4' + ': ' + 'Billings, OK',
+        'data_level': 'c1',
+        'comment': (
+            'This is highly experimental and initial data. There are many',
+            'known and unknown issues. Please do not use before',
+            'contacting the Translator responsible scollis@anl.gov'),
+        'attributions': (
+            'This data is collected by the ARM Climate Research facility.',
+            'Radar system is operated by the radar engineering team',
+            'radar@arm.gov and the data is processed by the precipitation',
+            'radar products team. LP code courtesy of Scott Giangrande BNL.'),
+        'version': '2.0 lite',
+        'vap_name': 'cmac',
+        'known_issues': (
+            'False phidp jumps in insect regions. Still uses old',
+            'Giangrande code.'),
+        'developers': 'Robert Jackson, ANL. Zachary Sherman, ANL.',
+        'translator': 'Scott Collis, ANL.',
+        'mentors': ('Nitin Bharadwaj, PNNL. Bradley Isom, PNNL.',
+                    'Joseph Hardin, PNNL. Iosif Lindenmaier, PNNL.')},
+
+    # X-SAPR I6 Sector metadata
+    'xsapr_i6_sec': {
+        'site_id': 'sgp',
+        'facility_id': 'I6' + ': ' + 'Deer Creek, OK',
+        'data_level': 'c1',
+        'comment': (
+            'This is highly experimental and initial data. There are many',
+            'known and unknown issues. Please do not use before',
+            'contacting the Translator responsible scollis@anl.gov'),
+        'attributions': (
+            'This data is collected by the ARM Climate Research facility.',
+            'Radar system is operated by the radar engineering team',
+            'radar@arm.gov and the data is processed by the precipitation',
+            'radar products team. LP code courtesy of Scott Giangrande BNL.'),
+        'version': '2.0 lite',
+        'vap_name': 'cmac',
+        'known_issues': (
+            'False phidp jumps in insect regions. Still uses old',
+            'Giangrande code.'),
+        'developers': 'Robert Jackson, ANL. Zachary Sherman, ANL.',
+        'translator': 'Scott Collis, ANL.',
+        'mentors': ('Nitin Bharadwaj, PNNL. Bradley Isom, PNNL.',
+                    'Joseph Hardin, PNNL. Iosif Lindenmaier, PNNL.')},
+
+    # X-SAPR I5 Sector metadata
+    'xsapr_i5_sec': {
+        'site_id': 'sgp',
+        'facility_id': 'I5' + ': ' + 'Garber, OK',
+        'data_level': 'c1',
+        'comment': (
+            'This is highly experimental and initial data. There are many',
+            'known and unknown issues. Please do not use before',
+            'contacting the Translator responsible scollis@anl.gov'),
+        'attributions': (
+            'This data is collected by the ARM Climate Research facility.',
+            'Radar system is operated by the radar engineering team',
+            'radar@arm.gov and the data is processed by the precipitation',
+            'radar products team. LP code courtesy of Scott Giangrande BNL.'),
+        'version': '2.0 lite',
+        'vap_name': 'cmac',
+        'known_issues': (
+            'False phidp jumps in insect regions. Still uses old',
+            'Giangrande code.'),
+        'developers': 'Robert Jackson, ANL. Zachary Sherman, ANL.',
+        'translator': 'Scott Collis, ANL.',
+        'mentors': ('Nitin Bharadwaj, PNNL. Bradley Isom, PNNL.',
+                    'Joseph Hardin, PNNL. Iosif Lindenmaier, PNNL.')},
+
+    # X-SAPR I4 Sector metadata
+    'xsapr_i4_sec': {
         'site_id': 'sgp',
         'facility_id': 'I4' + ': ' + 'Billings, OK',
         'data_level': 'c1',
@@ -97,8 +169,8 @@ _DEFAULT_METADATA = {
 ##############################################################################
 
 _DEFAULT_FIELD_NAMES = {
-    # X-SAPR I6 field names
-    'xsapr_i6': {
+    # X-SAPR I6 PPI field names
+    'xsapr_i6_ppi': {
         # Radar field names
         'reflectivity': 'reflectivity',
         'velocity': 'velocity',
@@ -110,8 +182,8 @@ _DEFAULT_FIELD_NAMES = {
         'u_wind': 'u_wind',
         'v_wind': 'v_wind'},
 
-    # X-SAPR I5 field names
-    'xsapr_i5': {
+    # X-SAPR I5 PPI field names
+    'xsapr_i5_ppi': {
         # Radar field names
         'reflectivity': 'reflectivity',
         'velocity': 'velocity',
@@ -123,8 +195,47 @@ _DEFAULT_FIELD_NAMES = {
         'u_wind': 'u_wind',
         'v_wind': 'v_wind'},
 
-    # X-SAPR I4 field names
-    'xsapr_i4': {
+    # X-SAPR I4 PPI field names
+    'xsapr_i4_ppi': {
+        # Radar field names
+        'reflectivity': 'reflectivity',
+        'velocity': 'velocity',
+        'normalized_coherent_power': 'normalized_coherent_power',
+        'cross_correlation_ratio': 'cross_correlation_ratio',
+        # Sonde field names
+        'altitude': 'alt',
+        'temperature': 'tdry',
+        'u_wind': 'u_wind',
+        'v_wind': 'v_wind'},
+
+    # X-SAPR I6 Sector field names
+    'xsapr_i6_sec': {
+        # Radar field names
+        'reflectivity': 'reflectivity',
+        'velocity': 'velocity',
+        'normalized_coherent_power': 'normalized_coherent_power',
+        'cross_correlation_ratio': 'cross_correlation_ratio',
+        # Sonde field names
+        'altitude': 'alt',
+        'temperature': 'tdry',
+        'u_wind': 'u_wind',
+        'v_wind': 'v_wind'},
+
+    # X-SAPR I5 Sector field names
+    'xsapr_i5_sec': {
+        # Radar field names
+        'reflectivity': 'reflectivity',
+        'velocity': 'velocity',
+        'normalized_coherent_power': 'normalized_coherent_power',
+        'cross_correlation_ratio': 'cross_correlation_ratio',
+        # Sonde field names
+        'altitude': 'alt',
+        'temperature': 'tdry',
+        'u_wind': 'u_wind',
+        'v_wind': 'v_wind'},
+
+    # X-SAPR I4 Sector field names
+    'xsapr_i4_sec': {
         # Radar field names
         'reflectivity': 'reflectivity',
         'velocity': 'velocity',
@@ -149,8 +260,8 @@ _DEFAULT_FIELD_NAMES = {
 ##############################################################################
 
 _DEFAULT_CMAC_VALUES = {
-    # X-SAPR I6 CMAC 2.0 processing values
-    'xsapr_i6': {
+    # X-SAPR I6 PPI CMAC 2.0 processing values
+    'xsapr_i6_ppi': {
         'save_name': 'sgpxsaprcmacsurI6.c1',
         'x_compass': 'XNW',
         'site_alt': 341,
@@ -158,8 +269,8 @@ _DEFAULT_CMAC_VALUES = {
         'self_const': 60000.00,
         'attenuation_a_coef': 0.17},
 
-    # X-SAPR I5 CMAC 2.0 processing values
-    'xsapr_i5': {
+    # X-SAPR I5 PPI CMAC 2.0 processing values
+    'xsapr_i5_ppi': {
         'save_name': 'sgpxsaprcmacsurI5.c1',
         'x_compass': 'XSW',
         'site_alt': 328,
@@ -167,9 +278,36 @@ _DEFAULT_CMAC_VALUES = {
         'self_const': 60000.00,
         'attenuation_a_coef': 0.17},
 
-    # X-SAPR I4 CMAC 2.0 processing values
-    'xsapr_i4': {
+    # X-SAPR I4 PPI CMAC 2.0 processing values
+    'xsapr_i4_ppi': {
         'save_name': 'sgpxsaprcmacsurI4.c1',
+        'x_compass': 'XSE',
+        'site_alt': 330,
+        'ref_offset': 0.0,
+        'self_const': 60000.00,
+        'attenuation_a_coef': 0.17},
+
+    # X-SAPR I6 Sector CMAC 2.0 processing values
+    'xsapr_i6_sec': {
+        'save_name': 'sgpxsaprcmacsecI6.c1',
+        'x_compass': 'XNW',
+        'site_alt': 341,
+        'ref_offset': 0.0,
+        'self_const': 60000.00,
+        'attenuation_a_coef': 0.17},
+
+    # X-SAPR I5 Sector CMAC 2.0 processing values
+    'xsapr_i5_sec': {
+        'save_name': 'sgpxsaprcmacsecI5.c1',
+        'x_compass': 'XSW',
+        'site_alt': 328,
+        'ref_offset': 0.0,
+        'self_const': 60000.00,
+        'attenuation_a_coef': 0.17},
+
+    # X-SAPR I4 Sector CMAC 2.0 processing values
+    'xsapr_i4_sec': {
+        'save_name': 'sgpxsaprcmacsecI4.c1',
         'x_compass': 'XSE',
         'site_alt': 330,
         'ref_offset': 0.0,
@@ -190,8 +328,8 @@ _DEFAULT_CMAC_VALUES = {
 ##############################################################################
 
 _DEFAULT_PLOT_VALUES = {
-    # X-SAPR I6 plot values
-    'xsapr_i6': {
+    # X-SAPR I6 PPI plot values
+    'xsapr_i6_ppi': {
         'save_name': 'sgpxsaprcmacsurI6.c1',
         'sweep': 3,
         'max_lat': 37.3,
@@ -205,8 +343,8 @@ _DEFAULT_PLOT_VALUES = {
         'site_i4_dms_lat': (36, 34, 44.4),
         'site_i4_dms_lon': (-97, 21, 49.32)},
 
-    # X-SAPR I5 plot values
-    'xsapr_i5': {
+    # X-SAPR I5 PPI plot values
+    'xsapr_i5_ppi': {
         'save_name': 'sgpxsaprcmacsurI5.c1',
         'sweep': 3,
         'max_lat': 37.0,
@@ -220,8 +358,8 @@ _DEFAULT_PLOT_VALUES = {
         'site_i4_dms_lat': (36, 34, 44.4),
         'site_i4_dms_lon': (-97, 21, 49.32)},
 
-    # X-SAPR I4 plot values
-    'xsapr_i4': {
+    # X-SAPR I4 PPI plot values
+    'xsapr_i4_ppi': {
         'save_name': 'sgpxsaprcmacsurI4.c1',
         'sweep': 3,
         'max_lat': 37.1,
@@ -233,5 +371,50 @@ _DEFAULT_PLOT_VALUES = {
         'site_i5_dms_lat': (36, 29, 29.4),
         'site_i5_dms_lon': (-97, 35, 37.68),
         'site_i4_dms_lat': (36, 34, 44.4),
-        'site_i4_dms_lon': (-97, 21, 49.32)}
+        'site_i4_dms_lon': (-97, 21, 49.32)},
+
+    # X-SAPR I6 Sector plot values
+    'xsapr_i6_sec': {
+        'save_name': 'sgpxsaprcmacsecI6.c1',
+        'sweep': 3,
+        'max_lat': 36.85,
+        'min_lat': 35.8,
+        'max_lon': -96.5,
+        'min_lon': -98.15,
+        'site_i6_dms_lat': (36, 46, 2.28),
+        'site_i6_dms_lon': (-97, 32, 53.16),
+        'site_i5_dms_lat': (36, 29, 29.4),
+        'site_i5_dms_lon': (-97, 35, 37.68),
+        'site_i4_dms_lat': (36, 34, 44.4),
+        'site_i4_dms_lon': (-97, 21, 49.32)},
+
+    # X-SAPR I5 Sector plot values
+    'xsapr_i5_sec': {
+        'save_name': 'sgpxsaprcmacsecI5.c1',
+        'sweep': 3,
+        'max_lat': 37.4,
+        'min_lat': 36.49,
+        'max_lon': -96.45,
+        'min_lon': -97.8,
+        'site_i6_dms_lat': (36, 46, 2.28),
+        'site_i6_dms_lon': (-97, 32, 53.16),
+        'site_i5_dms_lat': (36, 29, 29.4),
+        'site_i5_dms_lon': (-97, 35, 37.68),
+        'site_i4_dms_lat': (36, 34, 44.4),
+        'site_i4_dms_lon': (-97, 21, 49.32)},
+
+    # X-SAPR I4 Sector plot values
+    'xsapr_i4_sec': {
+        'save_name': 'sgpxsaprcmacsecI4.c1',
+        'sweep': 3,
+        'max_lat': 37.4,
+        'min_lat': 36.05,
+        'max_lon': -97.3,
+        'min_lon': -98.6,
+        'site_i6_dms_lat': (36, 46, 2.28),
+        'site_i6_dms_lon': (-97, 32, 53.16),
+        'site_i5_dms_lat': (36, 29, 29.4),
+        'site_i5_dms_lon': (-97, 35, 37.68),
+        'site_i4_dms_lat': (36, 34, 44.4),
+        'site_i4_dms_lon': (-97, 21, 49.32)},
 }
