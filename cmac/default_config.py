@@ -376,7 +376,7 @@ _DEFAULT_PLOT_VALUES = {
     # X-SAPR I6 Sector plot values
     'xsapr_i6_sec': {
         'save_name': 'sgpxsaprcmacsecI6.c1',
-        'sweep': 3,
+        'sweep': 1,
         'max_lat': 36.85,
         'min_lat': 35.8,
         'max_lon': -96.5,
@@ -391,7 +391,7 @@ _DEFAULT_PLOT_VALUES = {
     # X-SAPR I5 Sector plot values
     'xsapr_i5_sec': {
         'save_name': 'sgpxsaprcmacsecI5.c1',
-        'sweep': 3,
+        'sweep': 1,
         'max_lat': 37.4,
         'min_lat': 36.49,
         'max_lon': -96.45,
@@ -406,7 +406,7 @@ _DEFAULT_PLOT_VALUES = {
     # X-SAPR I4 Sector plot values
     'xsapr_i4_sec': {
         'save_name': 'sgpxsaprcmacsecI4.c1',
-        'sweep': 3,
+        'sweep': 1,
         'max_lat': 37.4,
         'min_lat': 36.05,
         'max_lon': -97.3,
