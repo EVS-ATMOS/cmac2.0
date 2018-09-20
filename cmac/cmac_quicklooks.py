@@ -60,8 +60,8 @@ def quicklooks(radar, config, image_directory=None,
     max_lon = plot_config['max_lon']
 
     # Creating a plot of reflectivity before CMAC.
-    lal = np.arange(min_lat, max_lat+.2, .2)
-    lol = np.arange(min_lon, max_lon+.2, .2)
+    lal = np.arange(min_lat, max_lat+.2, .4)
+    lol = np.arange(min_lon, max_lon+.2, .4)
 
     if dd_lobes:
         grid_lat = np.arange(min_lat, max_lat, 0.01)
