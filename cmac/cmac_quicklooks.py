@@ -54,14 +54,19 @@ def quicklooks(radar, config, image_directory=None,
     date_string = datetime.strftime(radar_start_date, '%Y%m%d.%H%M%S')
     combined_name = '.' + save_name + '.' + date_string
 
-    min_lat = plot_config['min_lat']
-    max_lat = plot_config['max_lat']
-    min_lon = plot_config['min_lon']
-    max_lon = plot_config['max_lon']
+    #min_lat = plot_config['min_lat']
+    #max_lat = plot_config['max_lat']
+    #min_lon = plot_config['min_lon']
+    #max_lon = plot_config['max_lon']
+
+    max_lat = radar.gate_latitude['data'].max() + .1
+    min_lat = radar.gate_latitude['data'].min() - .1
+    max_lon = radar.gate_longitude['data'].max() + .1
+    min_lon = radar.gate_longitude['data'].min() - .1
 
     # Creating a plot of reflectivity before CMAC.
-    lal = np.arange(min_lat, max_lat+.2, .4)
-    lol = np.arange(min_lon, max_lon+.2, .4)
+    lal = np.arange(min_lat, max_lat, .5)
+    lol = np.arange(min_lon, max_lon, .5)
 
     if dd_lobes:
         grid_lat = np.arange(min_lat, max_lat, 0.01)
