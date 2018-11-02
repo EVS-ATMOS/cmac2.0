@@ -96,7 +96,6 @@ def cmac(radar, sonde, config, flip_velocity=False,
 
     if 'xsapr_clutter' in radar.fields.keys():
         # Adding fifth gate id, clutter.
-        ref = radar.fields['reflectivity']['data']
         clutter_data = radar.fields['xsapr_clutter']['data']
         gate_data = radar.fields['gate_id']['data']
         clutter_data[gate_data == 0] = 0
@@ -134,7 +133,7 @@ def cmac(radar, sonde, config, flip_velocity=False,
 
     # Create the corrected velocity field from the region dealias algorithm.
     corr_vel = pyart.correct.dealias_region_based(
-        radar, vel_field=vel_field, ref_field='simulated_velocity',
+        radar, vel_field=vel_field, ref_vel_field='simulated_velocity',
         keep_original=False, gatefilter=cmac_gates, centered=True)
 
     radar.add_field('corrected_velocity', corr_vel, replace_existing=True)
