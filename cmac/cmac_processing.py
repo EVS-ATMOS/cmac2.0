@@ -48,14 +48,14 @@ def snr_and_sounding(radar, soundings_dir, override_file=None, verbose=True):
     return z_dict, temp_dict, snr
 
 
-def get_texture(radar, nyq=None):
+def get_texture(radar, vel_field, nyq=None):
     """ Calculates velocity texture field. """
     if nyq is None:
         nyq = radar.instrument_parameters['nyquist_velocity']['data'][0]
     else:
         nyq = nyq
     start_time = time.time()
-    std_dev = pyart.util.angular_texture_2d(radar.fields['velocity']['data'],
+    std_dev = pyart.util.angular_texture_2d(radar.fields[vel_field]['data'],
                                             4, nyq)
     filtered_data = ndimage.filters.median_filter(std_dev, size=(4, 4))
     texture_field = pyart.config.get_metadata('velocity')
@@ -167,42 +167,43 @@ def cum_score_fuzzy_logic(radar, mbfs=None,
     return rv
 
 
-def do_my_fuzz(radar, tex_start=2.0, tex_end=2.1, verbose=True):
+def do_my_fuzz(radar, rhv_field, ncp_field,
+               tex_start=2.0, tex_end=2.1, verbose=True):
     if verbose:
         print('##')
         print('## CMAC calculation using fuzzy logic:')
 
     second_trip = {'velocity_texture': [[tex_start, tex_end, 130., 130.], 4.0],
-                   'cross_correlation_ratio': [[.5, .7, 1, 1], 0.0],
-                   'normalized_coherent_power': [[0, 0, .5, .6], 1.0],
+                   rhv_field: [[.5, .7, 1, 1], 0.0],
+                   ncp_field: [[0, 0, .5, .6], 1.0],
                    'height': [[0, 0, 5000, 8000], 0.0],
                    'sounding_temperature': [[-100, -100, 100, 100], 0.0],
                    'signal_to_noise_ratio': [[5, 10, 1000, 1000], 1.0]}
 
     rain = {'velocity_texture': [[0, 0, tex_start, tex_end], 1.0],
-            'cross_correlation_ratio': [[0.97, 0.98, 1, 1], 1.0],
-            'normalized_coherent_power': [[0.4, 0.5, 1, 1], 1.0],
+            rhv_field: [[0.97, 0.98, 1, 1], 1.0],
+            ncp_field: [[0.4, 0.5, 1, 1], 1.0],
             'height': [[0, 0, 5000, 6000], 0.0],
             'sounding_temperature': [[2., 5., 100, 100], 2.0],
             'signal_to_noise_ratio': [[8, 10, 1000, 1000], 1.0]}
 
     snow = {'velocity_texture': [[0, 0, tex_start, tex_end], 1.0],
-            'cross_correlation_ratio': [[0.65, 0.9, 1, 1], 1.0],
-            'normalized_coherent_power': [[0.4, 0.5, 1, 1], 1.0],
+            rhv_field: [[0.65, 0.9, 1, 1], 1.0],
+            ncp_field: [[0.4, 0.5, 1, 1], 1.0],
             'height': [[0, 0, 25000, 25000], 0.0],
             'sounding_temperature': [[-100, -100, .5, 4.], 2.0],
             'signal_to_noise_ratio': [[8, 10, 1000, 1000], 1.0]}
 
     no_scatter = {'velocity_texture': [[tex_start, tex_end, 330., 330.], 2.0],
-                  'cross_correlation_ratio': [[0, 0, 0.1, 0.2], 0.0],
-                  'normalized_coherent_power': [[0, 0, 0.1, 0.2], 0.0],
+                  rhv_field: [[0, 0, 0.1, 0.2], 0.0],
+                  ncp_field: [[0, 0, 0.1, 0.2], 0.0],
                   'height': [[0, 0, 25000, 25000], 0.0],
                   'sounding_temperature': [[-100, -100, 100, 100], 0.0],
                   'signal_to_noise_ratio': [[-100, -100, 5, 10], 4.0]}
 
     melting = {'velocity_texture': [[0, 0, tex_start, tex_end], 0.0],
-               'cross_correlation_ratio': [[0.6, 0.65, .9, .96], 2.0],
-               'normalized_coherent_power': [[0.4, 0.5, 1, 1], 0],
+               rhv_field: [[0.6, 0.65, .9, .96], 2.0],
+               ncp_field: [[0.4, 0.5, 1, 1], 0],
                'height': [[0, 0, 25000, 25000], 0.0],
                'sounding_temperature': [[0, 0.1, 2, 4], 4.0],
                'signal_to_noise_ratio': [[8, 10, 1000, 1000], 0.0]}

@@ -14,7 +14,7 @@ from .cmac_processing import (
     do_my_fuzz, get_melt, get_texture, fix_phase_fields)
 from .config import get_cmac_values, get_field_names, get_metadata
 
-def cmac(radar, sonde, config,
+def cmac(radar, sonde, config, flip_velocity=False,
          meta_append=None, verbose=True):
     """
     Corrected Moments in Antenna Coordinates
@@ -58,10 +58,14 @@ def cmac(radar, sonde, config,
 
     temp_field = field_config['temperature']
     alt_field = field_config['altitude']
+    vel_field = field_config['velocity']
 
+    if flip_velocity:
+        radar.fields[vel_field]['data'] = radar.fields[
+            vel_field]['data'] * -1.0
     z_dict, temp_dict = pyart.retrieve.map_profile_to_gates(
         sonde.variables[temp_field][:], sonde.variables[alt_field][:], radar)
-    texture = get_texture(radar)
+    texture = get_texture(radar, vel_field)
 
     snr = pyart.retrieve.calculate_snr_from_reflectivity(radar)
 
@@ -83,7 +87,9 @@ def cmac(radar, sonde, config,
         print('##    velocity_texture')
 
     # Performing fuzzy logic to obtain the gate ids.
-    my_fuzz, _ = do_my_fuzz(radar, tex_start=2.4,
+    rhv_field = field_config['cross_correlation_ratio']
+    ncp_field = field_config['normalized_coherent_power']
+    my_fuzz, _ = do_my_fuzz(radar, rhv_field, ncp_field, tex_start=2.4,
                             tex_end=2.7, verbose=verbose)
     radar.add_field('gate_id', my_fuzz,
                     replace_existing=True)
@@ -91,6 +97,9 @@ def cmac(radar, sonde, config,
     if 'xsapr_clutter' in radar.fields.keys():
         # Adding fifth gate id, clutter.
         clutter_data = radar.fields['xsapr_clutter']['data']
+        gate_data = radar.fields['gate_id']['data']
+        clutter_data[gate_data == 0] = 0
+        clutter_data[gate_data == 3] = 0
         radar.fields['gate_id']['data'][clutter_data == 1] = 5
         notes = radar.fields['gate_id']['notes']
         radar.fields['gate_id']['notes'] = notes + ',5:clutter'
@@ -117,12 +126,12 @@ def cmac(radar, sonde, config,
     v_wind = sonde.variables[v_field][:]
     alt_field = field_config['altitude']
     sonde_alt = sonde.variables[alt_field][:]
-    profile = pyart.core.HorizontalWindProfile(sonde_alt, u_wind, v_wind)
+    profile = pyart.core.HorizontalWindProfile.from_u_and_v(
+        sonde_alt, u_wind, v_wind)
     sim_vel = pyart.util.simulated_vel_from_profile(radar, profile)
     radar.add_field('simulated_velocity', sim_vel, replace_existing=True)
 
     # Create the corrected velocity field from the region dealias algorithm.
-    vel_field = field_config['velocity']
     corr_vel = pyart.correct.dealias_region_based(
         radar, vel_field=vel_field, ref_vel_field='simulated_velocity',
         keep_original=False, gatefilter=cmac_gates, centered=True)
@@ -144,10 +153,14 @@ def cmac(radar, sonde, config,
         copy.deepcopy(kdp), copy.deepcopy(phidp), radar.range['data'],
         cmac_gates)
 
-    radar.add_field('corrected_differential_phase', phidp)
-    radar.add_field('filtered_corrected_differential_phase', phidp_filt)
-    radar.add_field('corrected_specific_diff_phase', kdp)
-    radar.add_field('filtered_corrected_specific_diff_phase', kdp_filt)
+    radar.add_field('corrected_differential_phase', phidp,
+                    replace_existing=True)
+    radar.add_field('filtered_corrected_differential_phase', phidp_filt,
+                    replace_existing=True)
+    radar.add_field('corrected_specific_diff_phase', kdp,
+                    replace_existing=True)
+    radar.add_field('filtered_corrected_specific_diff_phase', kdp_filt,
+                    replace_existing=True)
     if verbose:
         print('##    corrected_specific_diff_phase')
         print('##    filtered_corrected_specific_diff_phase')
@@ -156,13 +169,10 @@ def cmac(radar, sonde, config,
 
     # Calculating attenuation by using pyart.
     refl_field = field_config['reflectivity']
-    ncp_field = field_config['normalized_coherent_power']
-    rhv_field = field_config['cross_correlation_ratio'] 
     attenuation_a_coef = cmac_config['attenuation_a_coef']
     spec_at, cor_z_atten = pyart.correct.calculate_attenuation(
-        radar, z_offset=ref_offset, refl_field='reflectivity',
-        ncp_field='normalized_coherent_power',
-        rhv_field='cross_correlation_ratio',
+        radar, z_offset=ref_offset, refl_field=refl_field,
+        ncp_field=ncp_field, rhv_field=rhv_field,
         phidp_field='filtered_corrected_differential_phase',
         a_coef=attenuation_a_coef)
 
@@ -177,8 +187,9 @@ def cmac(radar, sonde, config,
     rain_gates.include_equal('gate_id', cat_dict['rain'])
     spec_at['data'][rain_gates.gate_excluded] = 0.0
 
-    radar.add_field('specific_attenuation', spec_at)
-    radar.add_field('attenuation_corrected_reflectivity', cor_z_atten)
+    radar.add_field('specific_attenuation', spec_at, replace_existing=True)
+    radar.add_field('attenuation_corrected_reflectivity', cor_z_atten,
+                    replace_existing=True)
     if verbose:
         print('##    specific_attenuation')
         print('##    attenuation_corrected_reflectivity')

@@ -14,7 +14,7 @@ import pyart
 from pyart.graph.common import (
     generate_radar_name, generate_radar_time_begin)
 
-from .config import get_plot_values
+from .config import get_plot_values, get_field_names
 
 plt.switch_backend('agg')
 
@@ -49,7 +49,7 @@ def quicklooks(radar, config, image_directory=None,
 
     # Retrieve the plot parameter values based on the radar.
     plot_config = get_plot_values(config)
-
+    field_config = get_field_names(config)
     save_name = plot_config['save_name']
     date_string = datetime.strftime(radar_start_date, '%Y%m%d.%H%M%S')
     combined_name = '.' + save_name + '.' + date_string
@@ -198,7 +198,8 @@ def quicklooks(radar, config, image_directory=None,
                     levels=[np.pi/6, 5*np.pi/6], linewidths=2,
                     colors='k')
     plt.subplot(2, 2, 4, projection=ccrs.PlateCarree())
-    display.plot_ppi_map('cross_correlation_ratio', sweep=sweep, vmin=.5,
+    rhv_field = field_config['cross_correlation_ratio']
+    display.plot_ppi_map(rhv_field, sweep=sweep, vmin=.5,
                          vmax=1, min_lon=min_lon, max_lon=max_lon,
                          min_lat=min_lat, max_lat=max_lat, lat_lines=lal,
                          lon_lines=lol, resolution='50m',
@@ -264,6 +265,21 @@ def quicklooks(radar, config, image_directory=None,
         image_directory
         + '/attenuation_corrected_reflectivity' + combined_name + '.png')
     plt.close()
+
+      # Creating a plot with differential phase.
+    display = pyart.graph.RadarMapDisplayCartopy(radar)
+    fig = plt.figure(figsize=[12, 8])
+    display.plot_ppi_map('differential_phase', sweep=sweep,
+                         resolution='50m',
+                         min_lat=min_lat, min_lon=min_lon,
+                         max_lat=max_lat, max_lon=max_lon,
+                         lat_lines=lal, lon_lines=lol,
+                         projection=ccrs.PlateCarree())
+    plt.savefig(
+        image_directory
+        + '/differential_phase' + combined_name + '.png')
+    plt.close()
+
 
     # Creating a plot of specific attenuation.
     display = pyart.graph.RadarMapDisplayCartopy(radar)

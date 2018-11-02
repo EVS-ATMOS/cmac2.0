@@ -16,7 +16,7 @@ except ImportError:
 
 
 def tall_clutter(files, clutter_thresh_min=0.0002,
-                 clutter_thresh_max=1.5, radius=1,
+                 clutter_thresh_max=0.25, radius=1,
                  write_radar=True, out_file=None,
                  use_dask=False):
     """
