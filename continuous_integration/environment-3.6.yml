@@ -1,16 +1,15 @@
-name: cmac_env
+name: test_env
 channels:
   - conda-forge
   - defaults
 dependencies:
   - python=3.6
   - arm_pyart
-  - basemap
-  - gcc
+  - numpy
+  - cython
   - cartopy
   - coincbc
-  - cython
   - scikit-fuzzy
+  - pytest
   - pip:
     - git+https://github.com/CSU-Radarmet/CSU_RadarTools.git
-    - git+https://github.com/EVS-ATMOS/cmac2.0.git

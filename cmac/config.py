@@ -1,63 +1,47 @@
 """
-Configuration file for the Corrected Moments Antenna Coordinates (CMAC2.0).
+cmac.config
+===========
+CMAC 2.0 Configuration.
 
-The values for a number of parameters that change depending on which X-SAPR
-is being used (I4, I5 and I6). Note: If a different type of radar is used,
-values within the kdp, rainrate amd specific attenuation, for example, will
-have to also be changed.
+    get_metadata
+    get_field_names
+    get_cmac_values
+    get_plot_values
 
 """
 
-config_xsapr_i6 = {
-    'save_name': 'sgpxsaprcmacsurI6.c1',
-    'facility': 'I6',
-    'town': 'Deer Creek, OK',
-    'x_compass': 'XNW',
-    'site_alt': 341,
-    'field_shape': (8280, 501),
-    'max_lat': 37.3,
-    'min_lat': 36.25,
-    'max_lon': -96.9,
-    'min_lon': -98.2,
-    'site_i6_dms_lat': (36, 46, 2.28),
-    'site_i6_dms_lon': (-97, 32, 53.16),
-    'site_i5_dms_lat': (36, 29, 29.4),
-    'site_i5_dms_lon': (-97, 35, 37.68),
-    'site_i4_dms_lat': (36, 34, 44.4),
-    'site_i4_dms_lon': (-97, 21, 49.32)}
+from .default_config import (_DEFAULT_METADATA, _DEFAULT_FIELD_NAMES,
+                             _DEFAULT_CMAC_VALUES, _DEFAULT_PLOT_VALUES)
 
-config_xsapr_i5 = {
-    'save_name': 'sgpxsaprcmacsurI5.c1',
-    'facility': 'I5',
-    'town': 'Garber, OK',
-    'x_compass': 'XSW',
-    'site_alt': 328,
-    'field_shape': (8680, 501),
-    'max_lat': 37.0,
-    'min_lat': 36.0,
-    'max_lon': -97.0,
-    'min_lon': -98.3,
-    'site_i6_dms_lat': (36, 46, 2.28),
-    'site_i6_dms_lon': (-97, 32, 53.16),
-    'site_i5_dms_lat': (36, 29, 29.4),
-    'site_i5_dms_lon': (-97, 35, 37.68),
-    'site_i4_dms_lat': (36, 34, 44.4),
-    'site_i4_dms_lon': (-97, 21, 49.32)}
 
-config_xsapr_i4 = {
-    'save_name': 'sgpxsaprcmacsurI4.c1',
-    'facility': 'I4',
-    'town': 'Billings, OK',
-    'x_compass': 'XSE',
-    'site_alt': 330,
-    'field_shape': (9200, 501),
-    'max_lat': 37.1,
-    'min_lat': 36.1,
-    'max_lon': -96.7,
-    'min_lon': -98.0,
-    'site_i6_dms_lat': (36, 46, 2.28),
-    'site_i6_dms_lon': (-97, 32, 53.16),
-    'site_i5_dms_lat': (36, 29, 29.4),
-    'site_i5_dms_lon': (-97, 35, 37.68),
-    'site_i4_dms_lat': (36, 34, 44.4),
-    'site_i4_dms_lon': (-97, 21, 49.32)}
+def get_metadata(radar):
+    """
+    Return a dictionary of metadata for a given radar. An empty dictionary
+    will be returned in no metadata dictionary exists for parameter radar.
+    """
+    if radar in _DEFAULT_METADATA:
+        return _DEFAULT_METADATA[radar].copy()
+    else:
+        return {}
+
+
+def get_field_names(radar):
+    """
+    Return the field name from the configuration file for a given field.
+    """
+    return _DEFAULT_FIELD_NAMES[radar]
+
+
+def get_cmac_values(radar):
+    """
+    Return the values specific to a radar for processing the radar data,
+    using CMAC 2.0.
+    """
+    return _DEFAULT_CMAC_VALUES[radar].copy()
+
+
+def get_plot_values(radar):
+    """
+    Return the values specific to a radar for plotting the radar fields.
+    """
+    return _DEFAULT_PLOT_VALUES[radar].copy()

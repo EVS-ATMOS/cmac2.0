@@ -11,16 +11,16 @@ import matplotlib
 import matplotlib.pyplot as plt
 import pyart
 
-from pyart.graph.common import generate_radar_name
-from pyart.graph.common import generate_radar_time_begin
+from pyart.graph.common import (
+    generate_radar_name, generate_radar_time_begin)
+
+from .config import get_plot_values, get_field_names
 
 plt.switch_backend('agg')
 
 
-def quicklooks(radar, save_name, image_directory=None, sweep=3,
-               max_lat=37.0, min_lat=36.0, max_lon=-97.0, min_lon=-98.3,
-               dd_lobes=True, dms_radar1_coords=None,
-               dms_radar2_coords=None):
+def quicklooks(radar, config, image_directory=None,
+               dd_lobes=True):
     """
     Quicklooks, images produced with regards to CMAC
 
@@ -28,36 +28,17 @@ def quicklooks(radar, save_name, image_directory=None, sweep=3,
     ---------
     radar : Radar
         Radar object that has CMAC applied to it.
-    save_name : String
-        String that comes before the field string in the save file. This is
-        usually an ARM name, but can be changed to the user's desire. For
-        example: 'sgpxsaprcmacsurI5.c1'.
+    config : str
+        A string of the radar name found from config.py that contains values
+        for plotting, specific to that radar.
 
     Optional Parameters
     -------------------
     image_directory : str
         File path to the image folder of which to save the CMAC images. If no
         image file path is given, image path defaults to users home directory.
-    sweep : int
-        Sweep number to have plotted. Default is 3.
-    max_lat : float
-        Maximum latitude for plot bounds. Default is 37.0.
-    min_lat : float
-        Minimum latitude for plot bounds. Default is 36.0.
-    max_lon : float
-        Maximum longitude for plot bounds. Default is -97.0.
-    min_lon : float
-        Minimum longitude for plot bounds. Default is -98.3.
     dd_lobes : bool
         Plot DD lobes between radars if dd_lobes is True.
-    dms_radar1_coords : List
-        Values in degrees of the longitude and latitude coordinates for the
-        main radar being plotted for the dd_lobes_calculation. If dd_lobes
-        argument is False, dms_radar1_coords is not used.
-    dms_radar2_coords : List
-        Values in degrees of the longitude and latitude coordinates for the
-        secondary radar within the plot for the dd_lobes_calculation. If
-        dd_lobes argument is False, dms_radar2_coords is not used.
 
     """
     if image_directory is None:
@@ -66,16 +47,48 @@ def quicklooks(radar, save_name, image_directory=None, sweep=3,
     radar_start_date = netCDF4.num2date(
         radar.time['data'][0], radar.time['units'])
 
+    # Retrieve the plot parameter values based on the radar.
+    plot_config = get_plot_values(config)
+    field_config = get_field_names(config)
+    save_name = plot_config['save_name']
     date_string = datetime.strftime(radar_start_date, '%Y%m%d.%H%M%S')
     combined_name = '.' + save_name + '.' + date_string
 
-    # Creating a plot of reflectivity before CMAC.
-    lal = np.arange(min_lat, max_lat+.2, .2)
-    lol = np.arange(min_lon, max_lon+.2, .2)
+    #min_lat = plot_config['min_lat']
+    #max_lat = plot_config['max_lat']
+    #min_lon = plot_config['min_lon']
+    #max_lon = plot_config['max_lon']
 
-    if dd_lobes is True:
+    max_lat = radar.gate_latitude['data'].max() + .1
+    min_lat = radar.gate_latitude['data'].min() - .1
+    max_lon = radar.gate_longitude['data'].max() + .1
+    min_lon = radar.gate_longitude['data'].min() - .1
+
+    # Creating a plot of reflectivity before CMAC.
+    lal = np.arange(min_lat, max_lat, .5)
+    lol = np.arange(min_lon, max_lon, .5)
+
+    if dd_lobes:
         grid_lat = np.arange(min_lat, max_lat, 0.01)
         grid_lon = np.arange(min_lon, max_lon, 0.01)
+
+        facility = plot_config['facility']
+        if facility == 'I4':
+            dms_radar1_coords = [plot_config['site_i4_dms_lon'],
+                                 plot_config['site_i4_dms_lat']]
+            dms_radar2_coords = [plot_config['site_i5_dms_lon'],
+                                 plot_config['site_i5_dms_lat']]
+        elif facility == 'I5':
+            dms_radar1_coords = [plot_config['site_i5_dms_lon'],
+                                 plot_config['site_i5_dms_lat']]
+            dms_radar2_coords = [plot_config['site_i4_dms_lon'],
+                                 plot_config['site_i4_dms_lat']]
+        elif facility == 'I6':
+            dms_radar1_coords = [plot_config['site_i6_dms_lon'],
+                                 plot_config['site_i6_dms_lat']]
+            dms_radar2_coords = [plot_config['site_i4_dms_lon'],
+                                 plot_config['site_i4_dms_lat']]
+
         dec_radar1 = [_dms_to_decimal(
             dms_radar1_coords[0][0], dms_radar1_coords[0][1],
             dms_radar1_coords[0][2]), _dms_to_decimal(
@@ -91,16 +104,19 @@ def quicklooks(radar, save_name, image_directory=None, sweep=3,
                        dec_radar1[1], grid_lon, grid_lat)
         grid_lon, grid_lat = np.meshgrid(grid_lon, grid_lat)
 
+    sweep = plot_config['sweep']
+
+    # Plot of the raw reflectivity from the radar.
     display = pyart.graph.RadarMapDisplayCartopy(radar)
     fig = plt.figure(figsize=[12, 8])
     display.plot_ppi_map('reflectivity', sweep=sweep, resolution='50m',
                          vmin=-8, vmax=64, mask_outside=False,
-                         cmap=pyart.graph.cm.LangRainbow12,
+                         cmap=pyart.graph.cm_colorblind.HomeyerRainbow,
                          min_lat=min_lat, min_lon=min_lon,
                          max_lat=max_lat, max_lon=max_lon,
                          lat_lines=lal, lon_lines=lol,
                          projection=ccrs.PlateCarree())
-    if dd_lobes is True:
+    if dd_lobes:
         plt.contour(grid_lon, grid_lat, bca,
                     levels=[np.pi/6, 5*np.pi/6], linewidths=2,
                     colors='k')
@@ -123,9 +139,11 @@ def quicklooks(radar, save_name, image_directory=None, sweep=3,
                   'multi_trip': 'red',
                   'no_scatter': 'gray',
                   'snow': 'cyan',
-                  'melting': 'yellow',
-                  'clutter': 'black'}
-    lab_colors = ['red', 'cyan', 'grey', 'green', 'yellow', 'black']
+                  'melting': 'yellow'}
+    lab_colors = ['red', 'cyan', 'grey', 'green', 'yellow']
+    if 'xsapr_clutter' in radar.fields.keys():
+        cat_colors['clutter'] = 'black'
+        lab_colors = np.append(lab_colors, 'black')
     lab_colors = [cat_colors[kitty[0]] for kitty in sorted_cats]
     cmap = matplotlib.colors.ListedColormap(lab_colors)
 
@@ -138,13 +156,18 @@ def quicklooks(radar, save_name, image_directory=None, sweep=3,
                          lat_lines=lal, lon_lines=lol, cmap=cmap,
                          vmin=0, vmax=5, projection=ccrs.PlateCarree())
 
-    if dd_lobes is True:
+    if dd_lobes:
         plt.contour(grid_lon, grid_lat, bca,
                     levels=[np.pi/6, 5*np.pi/6], linewidths=2,
                     colors='k')
 
     cbax = plt.gca()
-    tick_locs = np.linspace(0, len(sorted_cats) - 2, len(sorted_cats)) + 0.5
+    if 'xsapr_clutter' in radar.fields.keys():
+        tick_locs = np.linspace(
+            0, len(sorted_cats) - 2, len(sorted_cats)) + 0.5
+    else:
+        tick_locs = np.linspace(
+            0, len(sorted_cats) - 1, len(sorted_cats)) + 0.5
     display.cbs[-1].locator = matplotlib.ticker.FixedLocator(tick_locs)
     catty_list = [sorted_cats[i][0] for i in range(len(sorted_cats))]
     display.cbs[-1].formatter = matplotlib.ticker.FixedFormatter(catty_list)
@@ -154,9 +177,9 @@ def quicklooks(radar, save_name, image_directory=None, sweep=3,
                          min_lon=min_lon, max_lon=max_lon, min_lat=min_lat,
                          max_lat=max_lat, lat_lines=lal, lon_lines=lol,
                          resolution='50m',
-                         cmap=pyart.graph.cm.LangRainbow12,
+                         cmap=pyart.graph.cm_colorblind.HomeyerRainbow,
                          projection=ccrs.PlateCarree())
-    if dd_lobes is True:
+    if dd_lobes:
         plt.contour(grid_lon, grid_lat, bca,
                     levels=[np.pi/6, 5*np.pi/6], linewidths=2,
                     colors='k')
@@ -170,18 +193,19 @@ def quicklooks(radar, save_name, image_directory=None, sweep=3,
                              radar, 'velocity_texture', sweep),
                          cmap=pyart.graph.cm.NWSRef,
                          projection=ccrs.PlateCarree())
-    if dd_lobes is True:
+    if dd_lobes:
         plt.contour(grid_lon, grid_lat, bca, latlon='True',
                     levels=[np.pi/6, 5*np.pi/6], linewidths=2,
                     colors='k')
     plt.subplot(2, 2, 4, projection=ccrs.PlateCarree())
-    display.plot_ppi_map('cross_correlation_ratio', sweep=sweep, vmin=.5,
+    rhv_field = field_config['cross_correlation_ratio']
+    display.plot_ppi_map(rhv_field, sweep=sweep, vmin=.5,
                          vmax=1, min_lon=min_lon, max_lon=max_lon,
                          min_lat=min_lat, max_lat=max_lat, lat_lines=lal,
                          lon_lines=lol, resolution='50m',
                          cmap=pyart.graph.cm.Carbone42,
                          projection=ccrs.PlateCarree())
-    if dd_lobes is True:
+    if dd_lobes:
         plt.contour(grid_lon, grid_lat, bca,
                     levels=[np.pi/6, 5*np.pi/6], linewidths=2,
                     colors='k')
@@ -202,7 +226,7 @@ def quicklooks(radar, save_name, image_directory=None, sweep=3,
     display.plot_ppi_map('reflectivity',
                          sweep=sweep, resolution='50m',
                          vmin=-8, vmax=64, mask_outside=False,
-                         cmap=pyart.graph.cm.LangRainbow12,
+                         cmap=pyart.graph.cm_colorblind.HomeyerRainbow,
                          title=_generate_title(
                              radar, 'masked_corrected_reflectivity',
                              sweep),
@@ -211,7 +235,7 @@ def quicklooks(radar, save_name, image_directory=None, sweep=3,
                          lat_lines=lal, lon_lines=lol,
                          gatefilter=cmac_gates,
                          projection=ccrs.PlateCarree())
-    if dd_lobes is True:
+    if dd_lobes:
         plt.contour(grid_lon, grid_lat, bca,
                     levels=[np.pi/6, 5*np.pi/6], linewidths=2,
                     colors='k')
@@ -228,12 +252,12 @@ def quicklooks(radar, save_name, image_directory=None, sweep=3,
                          title=_generate_title(
                              radar, 'attenuation_corrected_reflectivity',
                              sweep),
-                         cmap=pyart.graph.cm.LangRainbow12,
+                         cmap=pyart.graph.cm_colorblind.HomeyerRainbow,
                          min_lat=min_lat, min_lon=min_lon,
                          max_lat=max_lat, max_lon=max_lon,
                          lat_lines=lal, lon_lines=lol,
                          projection=ccrs.PlateCarree())
-    if dd_lobes is True:
+    if dd_lobes:
         plt.contour(grid_lon, grid_lat, bca,
                     levels=[np.pi/6, 5*np.pi/6], linewidths=2,
                     colors='k')
@@ -241,6 +265,21 @@ def quicklooks(radar, save_name, image_directory=None, sweep=3,
         image_directory
         + '/attenuation_corrected_reflectivity' + combined_name + '.png')
     plt.close()
+
+      # Creating a plot with differential phase.
+    display = pyart.graph.RadarMapDisplayCartopy(radar)
+    fig = plt.figure(figsize=[12, 8])
+    display.plot_ppi_map('differential_phase', sweep=sweep,
+                         resolution='50m',
+                         min_lat=min_lat, min_lon=min_lon,
+                         max_lat=max_lat, max_lon=max_lon,
+                         lat_lines=lal, lon_lines=lol,
+                         projection=ccrs.PlateCarree())
+    plt.savefig(
+        image_directory
+        + '/differential_phase' + combined_name + '.png')
+    plt.close()
+
 
     # Creating a plot of specific attenuation.
     display = pyart.graph.RadarMapDisplayCartopy(radar)
@@ -251,7 +290,7 @@ def quicklooks(radar, save_name, image_directory=None, sweep=3,
                          max_lat=max_lat, max_lon=max_lon,
                          lat_lines=lal, lon_lines=lol,
                          projection=ccrs.PlateCarree())
-    if dd_lobes is True:
+    if dd_lobes:
         plt.contour(grid_lon, grid_lat, bca,
                     levels=[np.pi/6, 5*np.pi/6], linewidths=2,
                     colors='k')
@@ -271,7 +310,7 @@ def quicklooks(radar, save_name, image_directory=None, sweep=3,
                          min_lon=min_lon, max_lat=max_lat, max_lon=max_lon,
                          lat_lines=lal, lon_lines=lol,
                          projection=ccrs.PlateCarree())
-    if dd_lobes is True:
+    if dd_lobes:
         plt.contour(grid_lon, grid_lat, bca,
                     levels=[np.pi/6, 5*np.pi/6], linewidths=2,
                     colors='k')
@@ -291,7 +330,7 @@ def quicklooks(radar, save_name, image_directory=None, sweep=3,
                          min_lat=min_lat, min_lon=min_lon, max_lat=max_lat,
                          max_lon=max_lon, lat_lines=lal, lon_lines=lol,
                          projection=ccrs.PlateCarree())
-    if dd_lobes is True:
+    if dd_lobes:
         plt.contour(grid_lon, grid_lat, bca,
                     levels=[np.pi/6, 5*np.pi/6], linewidths=2,
                     colors='k')
@@ -301,15 +340,14 @@ def quicklooks(radar, save_name, image_directory=None, sweep=3,
     plt.close()
 
     # Creating a plot with region dealias corrected velocity.
-    nyq = radar.instrument_parameters['nyquist_velocity']['data'][0]
     display = pyart.graph.RadarMapDisplayCartopy(radar)
     fig = plt.figure(figsize=[12, 8])
     display.plot_ppi_map('corrected_velocity', sweep=sweep, resolution='50m',
-                         cmap=pyart.graph.cm.NWSVel, vmin=-1.5*nyq,
-                         vmax=1.5*nyq, min_lat=min_lat, min_lon=min_lon,
+                         cmap=pyart.graph.cm.NWSVel, vmin=-30,
+                         vmax=30, min_lat=min_lat, min_lon=min_lon,
                          max_lat=max_lat, max_lon=max_lon, lat_lines=lal,
                          lon_lines=lol, projection=ccrs.PlateCarree())
-    if dd_lobes is True:
+    if dd_lobes:
         plt.contour(grid_lon, grid_lat, bca,
                     levels=[np.pi/6, 5*np.pi/6], linewidths=2,
                     colors='k')
@@ -325,7 +363,7 @@ def quicklooks(radar, save_name, image_directory=None, sweep=3,
                          vmin=0, vmax=120, min_lat=min_lat, min_lon=min_lon,
                          max_lat=max_lat, max_lon=max_lon, lat_lines=lal,
                          lon_lines=lol, projection=ccrs.PlateCarree())
-    if dd_lobes is True:
+    if dd_lobes:
         plt.contour(grid_lon, grid_lat, bca,
                     levels=[np.pi/6, 5*np.pi/6], linewidths=2,
                     colors='k')
@@ -346,7 +384,7 @@ def quicklooks(radar, save_name, image_directory=None, sweep=3,
                          lat_lines=lal, lon_lines=lol,
                          cmap=pyart.graph.cm.Theodore16,
                          projection=ccrs.PlateCarree())
-    if dd_lobes is True:
+    if dd_lobes:
         plt.contour(grid_lon, grid_lat, bca,
                     levels=[np.pi/6, 5*np.pi/6], linewidths=2,
                     colors='k')
@@ -367,7 +405,7 @@ def quicklooks(radar, save_name, image_directory=None, sweep=3,
                          lat_lines=lal, lon_lines=lol,
                          cmap=pyart.graph.cm.Theodore16,
                          projection=ccrs.PlateCarree())
-    if dd_lobes is True:
+    if dd_lobes:
         plt.contour(grid_lon, grid_lat, bca,
                     levels=[np.pi/6, 5*np.pi/6], linewidths=2,
                     colors='k')

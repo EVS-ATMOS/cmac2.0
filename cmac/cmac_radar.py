@@ -3,18 +3,19 @@ correct velocity and more. A new radar object is then created with all CMAC
 2.0 products. """
 
 import copy
+import json
 import sys
 
 import netCDF4
-import pyart
 import numpy as np
+import pyart
 
-from . import cmac_processing
+from .cmac_processing import (
+    do_my_fuzz, get_melt, get_texture, fix_phase_fields)
+from .config import get_cmac_values, get_field_names, get_metadata
 
-
-def cmac(radar, sonde, facility, town, alt,
-         attenuation_a_coef=None, meta_append=None,
-         verbose=True):
+def cmac(radar, sonde, config, flip_velocity=False,
+         meta_append=None, verbose=True):
     """
     Corrected Moments in Antenna Coordinates
 
@@ -24,149 +25,176 @@ def cmac(radar, sonde, facility, town, alt,
         Radar object to use in the CMAC calculation.
     sonde : Object
         Object containing all the sonde data.
-    facility : String
-        String stating the id of the radar. For example: 'I5'.
-    town : String
-        String stating the town of the radar. For example: 'Garber, OK'.
-    alt : Float
-        Value to use as default altitude for the radar object.
-        
+    config : str
+        A string pointing to dictionaries containing values for CMAC 2.0
+        specific to a radar.
+
     Other Parameters
     ----------------
-    attenuation_a_coef : float
-        A coefficient in attenuation calculation.
-    meta_append : dictonary
-        Value key pairs to attend to global attributes.
-    verbose: bool
-        If True this will display more statistics
+    meta_append : dict, json and None
+        Value key pairs to attend to global attributes. If None,
+        a default metadata will be created. The metadata can also
+        be created by providing a dictionary or a json file.
+    verbose : bool
+        If True, this will display more statistics.
+
     Returns
     -------
     radar : Radar
         Radar object with new CMAC added fields.
 
     """
+    # Retrieve values from the configuration file.
+    cmac_config = get_cmac_values(config)
+    field_config = get_field_names(config)
+    meta_config = get_metadata(config)
+
     # Obtaining variables needed for fuzzy logic.
-    radar.altitude['data'][0] = alt
+    radar.altitude['data'][0] = cmac_config['site_alt']
 
     radar_start_date = netCDF4.num2date(
         radar.time['data'][0], radar.time['units'])
     print('##', str(radar_start_date))
 
+    temp_field = field_config['temperature']
+    alt_field = field_config['altitude']
+    vel_field = field_config['velocity']
+
+    if flip_velocity:
+        radar.fields[vel_field]['data'] = radar.fields[
+            vel_field]['data'] * -1.0
     z_dict, temp_dict = pyart.retrieve.map_profile_to_gates(
-        sonde.variables['tdry'][:], sonde.variables['alt'][:], radar)
-    texture = cmac_processing.get_texture(radar)
+        sonde.variables[temp_field][:], sonde.variables[alt_field][:], radar)
+    texture = get_texture(radar, vel_field)
 
     snr = pyart.retrieve.calculate_snr_from_reflectivity(radar)
-    if(verbose==False):
+
+    if not verbose:
         print('## Adding radar fields...')
-        
-    if(verbose==True):
+
+    if verbose:
         print('##')
         print('## These radar fields are being added:')
-        
+
     radar.add_field('sounding_temperature', temp_dict, replace_existing=True)
-    
-    if(verbose==True):
-        print('##    sounding_temperature')
     radar.add_field('height', z_dict, replace_existing=True)
-    
-    if(verbose==True):
-        print('##    height')
-        
-    radar.add_field('SNR', snr, replace_existing=True)
-    if(verbose==True):
-        print('##    SNR')
-        
+    radar.add_field('signal_to_noise_ratio', snr, replace_existing=True)
     radar.add_field('velocity_texture', texture, replace_existing=True)
-    if(verbose==True):
+    if verbose:
+        print('##    sounding_temperature')
+        print('##    height')
+        print('##    signal_to_noise_ratio')
         print('##    velocity_texture')
 
     # Performing fuzzy logic to obtain the gate ids.
-    if(verbose==True):
-        print('##    gate_id')
-    my_fuzz, _ = cmac_processing.do_my_fuzz(radar, tex_start=2.4,
-                                            tex_end=2.7, verbose=verbose)
+    rhv_field = field_config['cross_correlation_ratio']
+    ncp_field = field_config['normalized_coherent_power']
+    my_fuzz, _ = do_my_fuzz(radar, rhv_field, ncp_field, tex_start=2.4,
+                            tex_end=2.7, verbose=verbose)
     radar.add_field('gate_id', my_fuzz,
                     replace_existing=True)
 
-    # Adding fifth gate id, clutter.
-    clutter_data = radar.fields['xsapr_clutter']['data']
-    radar.fields['gate_id']['data'][clutter_data == 1] = 5
-    notes = radar.fields['gate_id']['notes']
-    radar.fields['gate_id']['notes'] = notes + ',5:clutter'
-    radar.fields['gate_id']['valid_max'] = 5
+    if 'xsapr_clutter' in radar.fields.keys():
+        # Adding fifth gate id, clutter.
+        clutter_data = radar.fields['xsapr_clutter']['data']
+        gate_data = radar.fields['gate_id']['data']
+        clutter_data[gate_data == 0] = 0
+        clutter_data[gate_data == 3] = 0
+        radar.fields['gate_id']['data'][clutter_data == 1] = 5
+        notes = radar.fields['gate_id']['notes']
+        radar.fields['gate_id']['notes'] = notes + ',5:clutter'
+        radar.fields['gate_id']['valid_max'] = 5
     cat_dict = {}
     for pair_str in radar.fields['gate_id']['notes'].split(','):
         cat_dict.update(
             {pair_str.split(':')[1]:int(pair_str.split(':')[0])})
 
+    if verbose:
+        print('##    gate_id')
+
     # Corrected velocity using pyart's region dealiaser.
-    if(verbose==True):
-        print('##    corrected_velocity')
     cmac_gates = pyart.correct.GateFilter(radar)
     cmac_gates.exclude_all()
     cmac_gates.include_equal('gate_id', cat_dict['rain'])
     cmac_gates.include_equal('gate_id', cat_dict['melting'])
     cmac_gates.include_equal('gate_id', cat_dict['snow'])
+
+    # Create a simulated velocity field from the sonde object.
+    u_field = field_config['u_wind']
+    v_field = field_config['v_wind']
+    u_wind = sonde.variables[u_field][:]
+    v_wind = sonde.variables[v_field][:]
+    alt_field = field_config['altitude']
+    sonde_alt = sonde.variables[alt_field][:]
+    profile = pyart.core.HorizontalWindProfile.from_u_and_v(
+        sonde_alt, u_wind, v_wind)
+    sim_vel = pyart.util.simulated_vel_from_profile(radar, profile)
+    radar.add_field('simulated_velocity', sim_vel, replace_existing=True)
+
+    # Create the corrected velocity field from the region dealias algorithm.
     corr_vel = pyart.correct.dealias_region_based(
-        radar, vel_field='velocity', keep_original=False,
-        gatefilter=cmac_gates, centered=True)
+        radar, vel_field=vel_field, ref_vel_field='simulated_velocity',
+        keep_original=False, gatefilter=cmac_gates, centered=True)
+
     radar.add_field('corrected_velocity', corr_vel, replace_existing=True)
+    if verbose:
+        print('##    corrected_velocity')
+        print('##    simulated_velocity')
 
-    fzl = cmac_processing.get_melt(radar)
+    fzl = get_melt(radar)
 
+    ref_offset = cmac_config['ref_offset']
+    self_const = cmac_config['self_const']
     # Calculating differential phase fields.
-    if(verbose==True):
-        print('##    corrected_differential_phase')
-    phidp, kdp = pyart.correct.phase_proc_lp(radar, 0.0, debug=True,
-                                             nowrap=50, fzl=fzl)
-
-    phidp_flt, kdp_filt = cmac_processing.fix_phase_fields(
+    phidp, kdp = pyart.correct.phase_proc_lp_gf(
+        radar, gatefilter=cmac_gates, offset=ref_offset, debug=True,
+        nowrap=50, fzl=fzl, self_const=self_const)
+    phidp_filt, kdp_filt = fix_phase_fields(
         copy.deepcopy(kdp), copy.deepcopy(phidp), radar.range['data'],
         cmac_gates)
 
-    radar.add_field('corrected_differential_phase', phidp)
-    radar.add_field('filtered_corrected_differential_phase', phidp_flt)
-    
-    if(verbose==True):
+    radar.add_field('corrected_differential_phase', phidp,
+                    replace_existing=True)
+    radar.add_field('filtered_corrected_differential_phase', phidp_filt,
+                    replace_existing=True)
+    radar.add_field('corrected_specific_diff_phase', kdp,
+                    replace_existing=True)
+    radar.add_field('filtered_corrected_specific_diff_phase', kdp_filt,
+                    replace_existing=True)
+    if verbose:
         print('##    corrected_specific_diff_phase')
-    radar.add_field('corrected_specific_diff_phase', kdp)
-    radar.add_field('filtered_corrected_specific_diff_phase', kdp_filt)
-    
-    if(verbose==True):
-        print('##    specific_attenuation')
-    if attenuation_a_coef is None:
-        attenuation_a_coef = 0.17 #X-Band
+        print('##    filtered_corrected_specific_diff_phase')
+        print('##    corrected_differential_phase')
+        print('##    filtered_corrected_differential_phase')
 
     # Calculating attenuation by using pyart.
+    refl_field = field_config['reflectivity']
+    attenuation_a_coef = cmac_config['attenuation_a_coef']
     spec_at, cor_z_atten = pyart.correct.calculate_attenuation(
-        radar, 0, refl_field='reflectivity',
-        ncp_field='normalized_coherent_power',
-        rhv_field='cross_correlation_ratio',
+        radar, z_offset=ref_offset, refl_field=refl_field,
+        ncp_field=ncp_field, rhv_field=rhv_field,
         phidp_field='filtered_corrected_differential_phase',
         a_coef=attenuation_a_coef)
 
     cat_dict = {}
     for pair_str in radar.fields['gate_id']['notes'].split(','):
-        if(verbose==True):
+        if verbose:
             print(pair_str)
         cat_dict.update({pair_str.split(':')[1]: int(pair_str.split(':')[0])})
 
     rain_gates = pyart.correct.GateFilter(radar)
     rain_gates.exclude_all()
     rain_gates.include_equal('gate_id', cat_dict['rain'])
-
     spec_at['data'][rain_gates.gate_excluded] = 0.0
 
-    radar.add_field('specific_attenuation', spec_at)
-    if(verbose==True):
+    radar.add_field('specific_attenuation', spec_at, replace_existing=True)
+    radar.add_field('attenuation_corrected_reflectivity', cor_z_atten,
+                    replace_existing=True)
+    if verbose:
+        print('##    specific_attenuation')
         print('##    attenuation_corrected_reflectivity')
-    radar.add_field('attenuation_corrected_reflectivity', cor_z_atten)
 
     # Calculating rain rate.
-    if(verbose==True):
-        print('## Rainfall rate as a function of A ##')
-        
     R = 51.3 * (radar.fields['specific_attenuation']['data']) ** 0.81
     rainrate = copy.deepcopy(radar.fields['specific_attenuation'])
     rainrate['data'] = R
@@ -187,20 +215,21 @@ def cmac(radar, sonde, facility, town, alt,
                     ' R=51.3*specific_attenuation**0.81, note R=0.0 where',
                     ' norm coherent power < 0.4 or rhohv < 0.8')})
 
+    if verbose:
+        print('## Rainfall rate as a function of A ##')
+
     print('##')
     print('## All CMAC fields have been added to the radar object.')
     print('##')
 
-    # Adding the metadate to the cmac radar object.
+    # Adding the metadata to the cmac radar object.
     print('## Appending metadata')
+    command_line = ''
+    for item in sys.argv:
+        command_line = command_line + ' ' + item
     if meta_append is None:
-        command_line = ''
-        for item in sys.argv:
-            command_line = command_line + ' ' + item
-
-        meta_append = {
+        meta = {
             'site_id': 'sgp',
-            'facility_id': facility + ': ' + town,
             'data_level': 'c1',
             'comment': (
                 'This is highly experimental and initial data. There are many',
@@ -217,10 +246,22 @@ def cmac(radar, sonde, facility, town, alt,
             'known_issues': (
                 'False phidp jumps in insect regions. Still uses old',
                 'Giangrande code.'),
-            'command_line': command_line,
             'developers': 'Robert Jackson, ANL. Zachary Sherman, ANL.',
             'translator': 'Scott Collis, ANL.',
             'mentors': ('Nitin Bharadwaj, PNNL. Bradley Isom, PNNL.',
                         'Joseph Hardin, PNNL. Iosif Lindenmaier, PNNL.')}
-    radar.metadata.update(meta_append)
+    else:
+        if meta_append.lower().endswith('.json'):
+            with open(meta_append, 'r') as infile:
+                meta = json.load(infile)
+        elif meta_append == 'config':
+            meta = meta_config
+        else:
+            raise RuntimeError('Must provide the file name of the json file',
+                               'or say config to use the meta data from',
+                               'config.py')
+
+    radar.metadata.clear()
+    radar.metadata.update(meta)
+    radar.metadata['command_line'] = command_line
     return radar

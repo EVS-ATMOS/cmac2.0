@@ -24,22 +24,34 @@ def main():
                                       'in the list will be processed.'))
     parser.add_argument(
         'out_file_name', type=str, help=('Output Cf/Radial file'))
+    parser.add_argument(              
+        '-tmin', '--clutter_thresh_min', type=float, default=0.0002,
+        help=('Threshold where above the value is considered clutter.'))
+    parser.add_argument(              
+        '-tmax', '--clutter_thresh_max', type=float, default=1.5,
+        help=('Threshold where below the value is considered clutter.'))
     parser.add_argument(
-        'facility', type=str, help=('Facility ID such as I4, to show which',
-                                    'X-SAPR data is being used.')) 
+        '-ra', '--radius', type=int, default=1,
+        help='Size of circle radius for changing surrounding gates to clutter')
     args = parser.parse_args()
+
     if os.path.isdir(args.radar_path):
-        radar_files = glob.glob(args.radar_path + '/**/*' + args.facility
-                                + '*', recursive=True)
+        radar_files = glob.glob(args.radar_path + '/**/*', recursive=True)
     elif os.path.isfile(args.radar_path):
         with open(args.radar_path) as f:
             radar_files = f.readlines()
         radar_files = [x.strip() for x in radar_files]
     else:
         raise IOError('The specified radar path does not exist!')
+
     bt = time()
-    tall_clutter(radar_files, write_radar=True,
-                 out_file=args.out_file_name, use_dask=False)
+
+
+    tall_clutter(radar_files, clutter_thresh_min=args.clutter_thresh_min,
+                 clutter_thresh_max=args.clutter_thresh_max,
+                 radius=args.radius, write_radar=True,
+                 out_file=args.out_file_name, use_dask=True)
+
     print('Time to make clutter file: ' + str(time() - bt))
 
 if __name__ == '__main__':

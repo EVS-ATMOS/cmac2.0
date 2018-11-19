@@ -5,7 +5,7 @@ CMAC: Corrected Precipitation Radar Moments in Antenna Coordinates
 
 Using fuzzy logic, scipy, and more to identify gates as rain, melting,
 snow, no clutter, and second trip. Many fields such as reflectivity,
-coorelation coefficient and signal to noise ration are used, but sounding
+coorelation coefficient and signal to noise ratio are used, but sounding
 temperature from sonde data is also used.
 
 There are many new products added to the radar fields, such as specific
