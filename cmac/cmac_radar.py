@@ -170,11 +170,45 @@ def cmac(radar, sonde, config, flip_velocity=False,
     # Calculating attenuation by using pyart.
     refl_field = field_config['reflectivity']
     attenuation_a_coef = cmac_config['attenuation_a_coef']
-    spec_at, cor_z_atten = pyart.correct.calculate_attenuation(
-        radar, z_offset=ref_offset, refl_field=refl_field,
-        ncp_field=ncp_field, rhv_field=rhv_field,
-        phidp_field='filtered_corrected_differential_phase',
-        a_coef=attenuation_a_coef)
+    c_coef = cmac_config['c_coef']
+    d_coef = cmac_config['d_coef']
+    beta_coef = cmac_config['beta_coef']
+    zdr_field = field_config['differential_reflectivity']
+
+    radar.fields['corrected_differential_reflectivity'] = copy.deepcopy(
+        radar.fields[zdr_field])
+    radar.fields['corrected_reflectivity'] = copy.deepcopy(
+        radar.fields[refl_field])
+    radar.fields['corrected_reflectivity']['data'] = np.ma.masked_where(
+        cmac_gates.gate_excluded,
+        radar.fields['corrected_reflectivity']['data'])
+
+    # Get specific differential attenuation.
+    # Need height over 0C isobar.
+    iso0 = np.ma.mean(radar.fields['height']['data'][
+        np.where(np.abs(radar.fields['sounding_temperature']['data']) < 0.1)])
+    radar.fields['height_over_iso0'] = copy.deepcopy(radar.fields['height'])
+    radar.fields['height_over_iso0']['data'] -= iso0
+
+    (spec_at, pia_dict, cor_z, spec_diff_at,
+     pida_dict, cor_zdr) = pyart.correct.calculate_attenuation_zphi(
+         radar, temp_field='sounding_temperature',
+         iso0_field='height_over_iso0',
+         zdr_field='corrected_differential_reflectivity',
+         pia_field='path_integrated_attenuation',
+         refl_field='corrected_reflectivity', c=c_coef, d=d_coef,
+         a_coef=attenuation_a_coef, beta=beta_coef)
+    cor_zdr['data'] += cmac_config['zdr_offset']
+    radar.add_field('specific_attenuation', spec_at, replace_existing=True)
+    radar.add_field('path_integrated_attenuation', pia_dict,
+                    replace_existing=True)
+    radar.add_field('corrected_reflectivity', cor_z, replace_existing=True)
+    radar.add_field('specific_differential_attenuation', spec_diff_at,
+                    replace_existing=True)
+    radar.add_field('path_integrated_differential_attenuation', pida_dict,
+                    replace_existing=True)
+    radar.add_field('corrected_differential_reflectivity', cor_zdr,
+                    replace_existing=True)
 
     cat_dict = {}
     for pair_str in radar.fields['gate_id']['notes'].split(','):
@@ -186,13 +220,6 @@ def cmac(radar, sonde, config, flip_velocity=False,
     rain_gates.exclude_all()
     rain_gates.include_equal('gate_id', cat_dict['rain'])
     spec_at['data'][rain_gates.gate_excluded] = 0.0
-
-    radar.add_field('specific_attenuation', spec_at, replace_existing=True)
-    radar.add_field('attenuation_corrected_reflectivity', cor_z_atten,
-                    replace_existing=True)
-    if verbose:
-        print('##    specific_attenuation')
-        print('##    attenuation_corrected_reflectivity')
 
     # Calculating rain rate.
     R = 51.3 * (radar.fields['specific_attenuation']['data']) ** 0.81
