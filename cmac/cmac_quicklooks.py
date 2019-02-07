@@ -221,7 +221,7 @@ def quicklooks(radar, config, image_directory=None,
     cmac_gates.include_equal('gate_id', cat_dict['melting'])
     cmac_gates.include_equal('gate_id', cat_dict['snow'])
 
-    display = pyart.graph.RadarMapDisplayCartopy(radar)
+    display = pyart.graph.RadarMapDisplay(radar)
     fig = plt.figure(figsize=[12, 8])
     display.plot_ppi_map('reflectivity',
                          sweep=sweep, resolution='50m',
@@ -245,7 +245,7 @@ def quicklooks(radar, config, image_directory=None,
     plt.close()
 
     # Creating a plot with reflectivity corrected with attenuation.
-    display = pyart.graph.RadarMapDisplayCartopy(radar)
+    display = pyart.graph.RadarMapDisplay(radar)
     fig = plt.figure(figsize=[12, 8])
     display.plot_ppi_map('attenuation_corrected_reflectivity', sweep=sweep,
                          vmin=0, vmax=60., resolution='50m',
@@ -267,7 +267,7 @@ def quicklooks(radar, config, image_directory=None,
     plt.close()
 
       # Creating a plot with differential phase.
-    display = pyart.graph.RadarMapDisplayCartopy(radar)
+    display = pyart.graph.RadarMapDisplay(radar)
     fig = plt.figure(figsize=[12, 8])
     display.plot_ppi_map('differential_phase', sweep=sweep,
                          resolution='50m',
@@ -282,7 +282,7 @@ def quicklooks(radar, config, image_directory=None,
 
 
     # Creating a plot of specific attenuation.
-    display = pyart.graph.RadarMapDisplayCartopy(radar)
+    display = pyart.graph.RadarMapDisplay(radar)
     fig = plt.figure(figsize=[12, 8])
     display.plot_ppi_map('specific_attenuation', sweep=sweep, vmin=0,
                          vmax=1.0, resolution='50m',
@@ -300,7 +300,7 @@ def quicklooks(radar, config, image_directory=None,
     plt.close()
 
     # Creating a plot of corrected differential phase.
-    display = pyart.graph.RadarMapDisplayCartopy(radar)
+    display = pyart.graph.RadarMapDisplay(radar)
     fig = plt.figure(figsize=[12, 8])
     display.plot_ppi_map('corrected_differential_phase', sweep=sweep,
                          title=_generate_title(
@@ -320,7 +320,7 @@ def quicklooks(radar, config, image_directory=None,
     plt.close()
 
     # Creating a plot of corrected specific differential phase.
-    display = pyart.graph.RadarMapDisplayCartopy(radar)
+    display = pyart.graph.RadarMapDisplay(radar)
     fig = plt.figure(figsize=[12, 8])
     display.plot_ppi_map('corrected_specific_diff_phase', sweep=sweep,
                          vmin=0, vmax=6, resolution='50m',
@@ -340,7 +340,7 @@ def quicklooks(radar, config, image_directory=None,
     plt.close()
 
     # Creating a plot with region dealias corrected velocity.
-    display = pyart.graph.RadarMapDisplayCartopy(radar)
+    display = pyart.graph.RadarMapDisplay(radar)
     fig = plt.figure(figsize=[12, 8])
     display.plot_ppi_map('corrected_velocity', sweep=sweep, resolution='50m',
                          cmap=pyart.graph.cm.NWSVel, vmin=-30,
@@ -357,7 +357,7 @@ def quicklooks(radar, config, image_directory=None,
     plt.close()
 
     # Creating a plot of rain rate A
-    display = pyart.graph.RadarMapDisplayCartopy(radar)
+    display = pyart.graph.RadarMapDisplay(radar)
     fig = plt.figure(figsize=[12, 8])
     display.plot_ppi_map('rain_rate_A', sweep=sweep, resolution='50m',
                          vmin=0, vmax=120, min_lat=min_lat, min_lon=min_lon,
@@ -373,7 +373,7 @@ def quicklooks(radar, config, image_directory=None,
     plt.close()
 
     # Creating a plot of filtered corrected differential phase.
-    display = pyart.graph.RadarMapDisplayCartopy(radar)
+    display = pyart.graph.RadarMapDisplay(radar)
     fig = plt.figure(figsize=[12, 8])
     display.plot_ppi_map('filtered_corrected_differential_phase', sweep=sweep,
                          title=_generate_title(

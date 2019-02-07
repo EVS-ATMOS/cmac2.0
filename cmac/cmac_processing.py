@@ -246,6 +246,8 @@ def get_melt(radar, melt_cat=None):
     print(fzl)
     if fzl > 5000:
         fzl = 3500.0
+    if fzl < 1000:
+        fzl = 3500.0
     return fzl
 
 def fix_phase_fields(orig_kdp, orig_phidp, rrange, happy_kdp,

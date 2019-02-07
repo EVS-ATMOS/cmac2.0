@@ -63,6 +63,30 @@ _DEFAULT_METADATA = {
         'mentors': ('Nitin Bharadwaj, PNNL. Bradley Isom, PNNL.',
                     'Joseph Hardin, PNNL. Iosif Lindenmaier, PNNL.')},
 
+    # X-SAPR I5 PPI metadata.
+    'xsapr_i5_cfr_ppi': {
+        'site_id': 'sgp',
+        'facility_id': 'I5' + ': ' + 'Garber, OK',
+        'data_level': 'c1',
+        'comment': (
+            'This is highly experimental and initial data. There are many',
+            'known and unknown issues. Please do not use before',
+            'contacting the Translator responsible scollis@anl.gov'),
+        'attributions': (
+            'This data is collected by the ARM Climate Research facility.',
+            'Radar system is operated by the radar engineering team',
+            'radar@arm.gov and the data is processed by the precipitation',
+            'radar products team. LP code courtesy of Scott Giangrande BNL.'),
+        'version': '2.0 lite',
+        'vap_name': 'cmac',
+        'known_issues': (
+            'False phidp jumps in insect regions. Still uses old',
+            'Giangrande code.'),
+        'developers': 'Robert Jackson, ANL. Zachary Sherman, ANL.',
+        'translator': 'Scott Collis, ANL.',
+        'mentors': ('Nitin Bharadwaj, PNNL. Bradley Isom, PNNL.',
+                    'Joseph Hardin, PNNL. Iosif Lindenmaier, PNNL.')},
+
     # X-SAPR I4 PPI metadata.
     'xsapr_i4_ppi': {
         'site_id': 'sgp',
@@ -199,6 +223,18 @@ _DEFAULT_FIELD_NAMES = {
         'u_wind': 'u_wind',
         'v_wind': 'v_wind'},
 
+    'xsapr_i5_cfr_ppi': {
+        # Radar field names
+        'reflectivity': 'reflectivity',
+        'velocity': 'mean_doppler_velocity',
+        'normalized_coherent_power': 'normalized_coherent_power',
+        'cross_correlation_ratio': 'cross_correlation_ratio_hv',
+        # Sonde field names
+        'altitude': 'alt',
+        'temperature': 'tdry',
+        'u_wind': 'u_wind',
+        'v_wind': 'v_wind'},
+
     # X-SAPR I4 PPI field names.
     'xsapr_i4_ppi': {
         # Radar field names
@@ -297,6 +333,16 @@ _DEFAULT_CMAC_VALUES = {
         'self_const': 60000.00,
         'attenuation_a_coef': 0.17},
 
+    # X-SAPR I5 PPI CMAC 2.0 processing values.
+    'xsapr_i5_cfr_ppi': {
+        'save_name': 'sgpxsaprcmacsurI5.c1',
+        'sonde_name': 'sgpsondewnpnC1.b1',
+        'x_compass': 'XSW',
+        'site_alt': 328,
+        'ref_offset': 0.0,
+        'self_const': 60000.00,
+        'attenuation_a_coef': 0.17},
+
     # X-SAPR I4 PPI CMAC 2.0 processing values.
     'xsapr_i4_ppi': {
         'save_name': 'sgpxsaprcmacsurI4.c1',
@@ -378,6 +424,22 @@ _DEFAULT_PLOT_VALUES = {
 
     # X-SAPR I5 PPI plot values.
     'xsapr_i5_ppi': {
+        'save_name': 'sgpxsaprcmacsurI5.c1',
+        'facility': 'I5',
+        'sweep': 3,
+        'max_lat': 37.0,
+        'min_lat': 36.0,
+        'max_lon': -97.0,
+        'min_lon': -98.3,
+        'site_i6_dms_lat': (36, 46, 2.28),
+        'site_i6_dms_lon': (-97, 32, 53.16),
+        'site_i5_dms_lat': (36, 29, 29.4),
+        'site_i5_dms_lon': (-97, 35, 37.68),
+        'site_i4_dms_lat': (36, 34, 44.4),
+        'site_i4_dms_lon': (-97, 21, 49.32)},
+    
+    # X-SAPR I5 PPI plot values.
+    'xsapr_i5_cfr_ppi': {
         'save_name': 'sgpxsaprcmacsurI5.c1',
         'facility': 'I5',
         'sweep': 3,
