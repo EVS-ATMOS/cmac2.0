@@ -1,6 +1,7 @@
 """ Code that calculates clutter by using running stats. """
 
 from copy import deepcopy
+from distributed import Client, LocalCluster
 import warnings
 
 import numpy as np
@@ -69,7 +70,7 @@ def tall_clutter(files, clutter_thresh_min=0.0002,
 
             if reflect_array.shape == first_shape:
                 return reflect_array.filled(fill_value=np.nan)
-        except TypeError:
+        except (TypeError, OSError):
             print(file + ' is corrupt...skipping!')
         return np.nan*np.zeros(first_shape)
 
@@ -94,6 +95,8 @@ def tall_clutter(files, clutter_thresh_min=0.0002,
         stdev = run_stats.standard_deviation()
         clutter_values = stdev / mean
     else:
+        cluster = LocalCluster(n_workers=16, processes=True)
+        client = Client(cluster)
         first_shape = 0
         i = 0
         while first_shape == 0:
