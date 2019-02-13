@@ -204,6 +204,7 @@ _DEFAULT_FIELD_NAMES = {
         'velocity': 'velocity',
         'normalized_coherent_power': 'normalized_coherent_power',
         'cross_correlation_ratio': 'cross_correlation_ratio',
+        'differential_reflectivity': 'differential_reflectivity',
         # Sonde field names
         'altitude': 'alt',
         'temperature': 'tdry',
@@ -217,6 +218,7 @@ _DEFAULT_FIELD_NAMES = {
         'velocity': 'velocity',
         'normalized_coherent_power': 'normalized_coherent_power',
         'cross_correlation_ratio': 'cross_correlation_ratio',
+        'differential_reflectivity': 'differential_reflectivity',
         # Sonde field names
         'altitude': 'alt',
         'temperature': 'tdry',
@@ -242,6 +244,7 @@ _DEFAULT_FIELD_NAMES = {
         'velocity': 'velocity',
         'normalized_coherent_power': 'normalized_coherent_power',
         'cross_correlation_ratio': 'cross_correlation_ratio',
+        'differential_reflectivity': 'differential_reflectivity',
         # Sonde field names
         'altitude': 'alt',
         'temperature': 'tdry',
@@ -255,6 +258,7 @@ _DEFAULT_FIELD_NAMES = {
         'velocity': 'velocity',
         'normalized_coherent_power': 'normalized_coherent_power',
         'cross_correlation_ratio': 'cross_correlation_ratio',
+        'differential_reflectivity': 'differential_reflectivity',
         # Sonde field names
         'altitude': 'alt',
         'temperature': 'tdry',
@@ -268,6 +272,7 @@ _DEFAULT_FIELD_NAMES = {
         'velocity': 'velocity',
         'normalized_coherent_power': 'normalized_coherent_power',
         'cross_correlation_ratio': 'cross_correlation_ratio',
+        'differential_reflectivity': 'differential_reflectivity',
         # Sonde field names
         'altitude': 'alt',
         'temperature': 'tdry',
@@ -281,6 +286,7 @@ _DEFAULT_FIELD_NAMES = {
         'velocity': 'velocity',
         'normalized_coherent_power': 'normalized_coherent_power',
         'cross_correlation_ratio': 'cross_correlation_ratio',
+        'differential_reflectivity': 'differential_reflectivity',
         # Sonde field names
         'altitude': 'alt',
         'temperature': 'tdry',
@@ -321,7 +327,11 @@ _DEFAULT_CMAC_VALUES = {
         'site_alt': 341,
         'ref_offset': 0.0,
         'self_const': 60000.00,
-        'attenuation_a_coef': 0.17},
+        'attenuation_a_coef': 0.17,
+        'c_coef': 0.05,
+        'd_coef': 1,
+        'beta_coef': 1,
+        'zdr_offset': 3.05},
 
     # X-SAPR I5 PPI CMAC 2.0 processing values.
     'xsapr_i5_ppi': {
@@ -331,7 +341,11 @@ _DEFAULT_CMAC_VALUES = {
         'site_alt': 328,
         'ref_offset': 0.0,
         'self_const': 60000.00,
-        'attenuation_a_coef': 0.17},
+        'attenuation_a_coef': 0.17,
+        'c_coef': 0.05,
+        'd_coef': 1,
+        'beta_coef': 1,
+        'zdr_offset': 3.05},
 
     # X-SAPR I5 PPI CMAC 2.0 processing values.
     'xsapr_i5_cfr_ppi': {
@@ -351,7 +365,11 @@ _DEFAULT_CMAC_VALUES = {
         'site_alt': 330,
         'ref_offset': 0.0,
         'self_const': 60000.00,
-        'attenuation_a_coef': 0.17},
+        'attenuation_a_coef': 0.17,
+        'c_coef': 0.05,
+        'd_coef': 1,
+        'beta_coef': 1,
+        'zdr_offset': 3.05},
 
     # X-SAPR I6 Sector CMAC 2.0 processing values.
     'xsapr_i6_sec': {
@@ -361,7 +379,11 @@ _DEFAULT_CMAC_VALUES = {
         'site_alt': 341,
         'ref_offset': 0.0,
         'self_const': 60000.00,
-        'attenuation_a_coef': 0.17},
+        'attenuation_a_coef': 0.17,
+        'c_coef': 0.05,
+        'd_coef': 1,
+        'beta_coef': 1,
+        'zdr_offset': 3.05},
 
     # X-SAPR I5 Sector CMAC 2.0 processing values.
     'xsapr_i5_sec': {
@@ -371,7 +393,11 @@ _DEFAULT_CMAC_VALUES = {
         'site_alt': 328,
         'ref_offset': 0.0,
         'self_const': 60000.00,
-        'attenuation_a_coef': 0.17},
+        'attenuation_a_coef': 0.17,
+        'c_coef': 0.05,
+        'd_coef': 1,
+        'beta_coef': 1,
+        'zdr_offset': 3.05},
 
     # X-SAPR I4 Sector CMAC 2.0 processing values.
     'xsapr_i4_sec': {
@@ -381,7 +407,11 @@ _DEFAULT_CMAC_VALUES = {
         'site_alt': 330,
         'ref_offset': 0.0,
         'self_const': 60000.00,
-        'attenuation_a_coef': 0.17},
+        'attenuation_a_coef': 0.17,
+        'c_coef': 0.05,
+        'd_coef': 1,
+        'beta_coef': 1,
+        'zdr_offset': 3.05},
 
     # CACTI C-SAPR 2 CMAC 2.0 processing values.
     'cacti_csapr2_ppi': {
