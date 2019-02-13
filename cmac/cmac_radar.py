@@ -142,7 +142,8 @@ def cmac(radar, sonde, config, flip_velocity=False,
         print('##    simulated_velocity')
 
     fzl = get_melt(radar)
-
+    
+    # Is the freezing level realistic? If not, assume
     ref_offset = cmac_config['ref_offset']
     self_const = cmac_config['self_const']
     # Calculating differential phase fields.

@@ -45,10 +45,13 @@ def main():
         raise IOError('The specified radar path does not exist!')
 
     bt = time()
+
+
     tall_clutter(radar_files, clutter_thresh_min=args.clutter_thresh_min,
                  clutter_thresh_max=args.clutter_thresh_max,
                  radius=args.radius, write_radar=True,
                  out_file=args.out_file_name, use_dask=True)
+
     print('Time to make clutter file: ' + str(time() - bt))
 
 if __name__ == '__main__':

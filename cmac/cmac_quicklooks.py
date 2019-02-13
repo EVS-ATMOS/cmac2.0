@@ -245,6 +245,28 @@ def quicklooks(radar, config, image_directory=None,
     plt.close()
 
 
+    # Creating a plot with reflectivity corrected with attenuation.
+    display = pyart.graph.RadarMapDisplay(radar)
+    fig = plt.figure(figsize=[12, 8])
+    display.plot_ppi_map('attenuation_corrected_reflectivity', sweep=sweep,
+                         vmin=0, vmax=60., resolution='50m',
+                         title=_generate_title(
+                             radar, 'attenuation_corrected_reflectivity',
+                             sweep),
+                         cmap=pyart.graph.cm_colorblind.HomeyerRainbow,
+                         min_lat=min_lat, min_lon=min_lon,
+                         max_lat=max_lat, max_lon=max_lon,
+                         lat_lines=lal, lon_lines=lol,
+                         projection=ccrs.PlateCarree())
+    if dd_lobes:
+        plt.contour(grid_lon, grid_lat, bca,
+                    levels=[np.pi/6, 5*np.pi/6], linewidths=2,
+                    colors='k')
+    plt.savefig(
+        image_directory
+        + '/attenuation_corrected_reflectivity' + combined_name + '.png')
+    plt.close()
+
     # Creating a plot with differential phase.
     display = pyart.graph.RadarMapDisplay(radar)
     fig = plt.figure(figsize=[12, 8])
