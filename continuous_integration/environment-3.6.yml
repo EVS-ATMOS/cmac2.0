@@ -11,5 +11,7 @@ dependencies:
   - coincbc
   - scikit-fuzzy
   - pytest
+  - dask
+  - distributed
   - pip:
     - git+https://github.com/CSU-Radarmet/CSU_RadarTools.git
