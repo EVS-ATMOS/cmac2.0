@@ -107,7 +107,7 @@ def quicklooks(radar, config, image_directory=None,
     sweep = plot_config['sweep']
 
     # Plot of the raw reflectivity from the radar.
-    display = pyart.graph.RadarMapDisplayCartopy(radar)
+    display = pyart.graph.RadarMapDisplay(radar)
     fig = plt.figure(figsize=[12, 8])
     display.plot_ppi_map('reflectivity', sweep=sweep, resolution='50m',
                          vmin=-8, vmax=64, mask_outside=False,
@@ -147,7 +147,7 @@ def quicklooks(radar, config, image_directory=None,
     lab_colors = [cat_colors[kitty[0]] for kitty in sorted_cats]
     cmap = matplotlib.colors.ListedColormap(lab_colors)
 
-    display = pyart.graph.RadarMapDisplayCartopy(radar)
+    display = pyart.graph.RadarMapDisplay(radar)
     fig = plt.figure(figsize=[15, 10])
     plt.subplot(2, 2, 1, projection=ccrs.PlateCarree())
     display.plot_ppi_map('gate_id', sweep=sweep, min_lon=min_lon,
@@ -394,7 +394,7 @@ def quicklooks(radar, config, image_directory=None,
     plt.close()
 
     # Creating a plot of filtered corrected specific differential phase.
-    display = pyart.graph.RadarMapDisplayCartopy(radar)
+    display = pyart.graph.RadarMapDisplay(radar)
     fig = plt.figure(figsize=[12, 8])
     display.plot_ppi_map('filtered_corrected_specific_diff_phase', sweep=sweep,
                          title=_generate_title(

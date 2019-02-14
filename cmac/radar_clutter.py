@@ -2,7 +2,9 @@
 
 from copy import deepcopy
 from distributed import Client, LocalCluster
+from .config import get_field_names
 import warnings
+
 
 import numpy as np
 import pyart
@@ -16,7 +18,8 @@ except ImportError:
     pass
 
 
-def tall_clutter(files, clutter_thresh_min=0.0002,
+def tall_clutter(files, config, 
+                 clutter_thresh_min=0.0002,
                  clutter_thresh_max=0.25, radius=1,
                  write_radar=True, out_file=None,
                  use_dask=False):
@@ -27,6 +30,9 @@ def tall_clutter(files, clutter_thresh_min=0.0002,
     ----------
     files : list
         List of radar files used for the clutter calculation.
+    config : str
+        String representing the configuration for the radar.
+        Such possible configurations are listed in default_config.py
 
     Other Parameters
     ----------------
@@ -59,18 +65,27 @@ def tall_clutter(files, clutter_thresh_min=0.0002,
         other radar specifications.
 
     """
-
-
+    field_names = get_field_names(config)
+    refl_field = field_names["reflectivity"]
+    vel_field = field_names["velocity"]
+    ncp_field = field_names["normalized_coherent_power"]
+    
     def get_reflect_array(file, first_shape):
         """ Retrieves a reflectivity array for a radar volume. """
         try:
-            radar = pyart.io.read(file)
-            reflect_array = deepcopy(radar.fields['reflectivity']['data'])
+            radar = pyart.io.read(file, include_fields=[refl_field,
+                                        ncp_field, vel_field])
+            reflect_array = deepcopy(radar.fields[refl_field]['data'])
+            ncp = radar.fields[ncp_field]['data']
+            height = radar.gate_z["data"]
+            up_in_the_air = height > 2000.0
+            the_mask = np.logical_or.reduce(
+                (ncp < 0.8, reflect_array.mask, up_in_the_air))
+            reflect_array = np.ma.masked_where(the_mask, reflect_array)
             del radar
-
             if reflect_array.shape == first_shape:
                 return reflect_array.filled(fill_value=np.nan)
-        except (TypeError, OSError):
+        except(TypeError, OSError):
             print(file + ' is corrupt...skipping!')
         return np.nan*np.zeros(first_shape)
 
@@ -80,7 +95,10 @@ def tall_clutter(files, clutter_thresh_min=0.0002,
         for file in files:
             try:
                 radar = pyart.io.read(file)
-                reflect_array = radar.fields['reflectivity']['data']
+                reflect_array = radar.fields[refl_field]['data']
+                ncp = deepcopy(radar.fields[ncp_field]['data'])
+                #reflect_array = np.ma.masked_where(ncp < 0.7, reflect_array)
+
                 if first_shape == 0:
                     first_shape = reflect_array.shape
                     clutter_radar = radar
@@ -88,24 +106,27 @@ def tall_clutter(files, clutter_thresh_min=0.0002,
                 if reflect_array.shape == first_shape:
                     run_stats.push(reflect_array)
                 del radar
-            except TypeError:
+            except(TypeError, OSError):
                 print(file + ' is corrupt...skipping!')
                 continue
         mean = run_stats.mean()
         stdev = run_stats.standard_deviation()
         clutter_values = stdev / mean
+        clutter_values = np.ma.masked_invalid(clutter_values)
+        clutter_values_no_mask = clutter_values.filled(
+            clutter_values_max + 1)
     else:
-        cluster = LocalCluster(n_workers=16, processes=True)
+        cluster = LocalCluster(n_workers=20, processes=True)
         client = Client(cluster)
         first_shape = 0
         i = 0
         while first_shape == 0:
             try:
                 radar = pyart.io.read(files[i])
-                reflect_array = radar.fields['reflectivity']['data']
+                reflect_array = radar.fields[refl_field]['data']
                 first_shape = reflect_array.shape
                 clutter_radar = radar
-            except TypeError:
+            except(TypeError, OSError):
                 i = i + 1
                 print(file + ' is corrupt...skipping!')
                 continue
@@ -116,20 +137,33 @@ def tall_clutter(files, clutter_thresh_min=0.0002,
         array = da.stack(array, axis=0)
         print('## Calculating mean in parallel...')
         mean = np.array(da.nanmean(array, axis=0))
-        print('## Caluclating standard deviation...')
+        print('## Calculating standard deviation...')
+        count = np.array(da.sum(da.isfinite(array), axis=0))
         stdev = np.array(da.nanstd(array, axis=0))
         clutter_values = stdev / mean
         clutter_values = np.ma.masked_invalid(clutter_values)
-
+        clutter_values = np.ma.masked_where(np.logical_or(
+            clutter_values.mask, count < 20), clutter_values)
+        # Masked arrays can suck
+        clutter_values_no_mask = clutter_values.filled(
+            (clutter_thresh_max + 1))
+    
     shape = clutter_values.shape
-    mask = np.ma.getmask(clutter_values)
+    mask = np.ma.getmask(clutter_values) 
     is_clutters = np.argwhere(
-        np.logical_and(clutter_values > clutter_thresh_min,
-                       clutter_values < clutter_thresh_max))
+        np.logical_and.reduce((clutter_values_no_mask > clutter_thresh_min,
+                               clutter_values_no_mask < clutter_thresh_max,
+                               )))
     clutter_array = _clutter_marker(is_clutters, shape, mask, radius)
     clutter_radar.fields.clear()
+    clutter_array = clutter_array.filled(0)
     clutter_dict = _clutter_to_dict(clutter_array)
-    clutter_radar.add_field('xsapr_clutter', clutter_dict,
+    clutter_value_dict = _clutter_to_dict(clutter_values)
+    clutter_value_dict["long_name"] = "Clutter value (std. dev/mean Z)"
+    clutter_value_dict["standard_name"] = "clutter_value"
+    clutter_radar.add_field('ground_clutter', clutter_dict,
+                            replace_existing=True)
+    clutter_radar.add_field('clutter_value', clutter_value_dict,
                             replace_existing=True)
     if write_radar is True:
         pyart.io.write_cfradial(out_file, clutter_radar)
@@ -216,15 +250,14 @@ def _clutter_marker(is_clutters, shape, mask, radius):
     clutter_array = np.ma.array(temp_array, mask=mask)
     return clutter_array
 
-
 def _clutter_to_dict(clutter_array):
     """ Function that takes the clutter array
     and turn it into a dictionary to be used and added
     to the pyart radar object. """
     clutter_dict = {}
-    clutter_dict['units'] = 'unitless'
+    clutter_dict['units'] = '1'
     clutter_dict['data'] = clutter_array
-    clutter_dict['standard_name'] = 'xsapr_clutter'
-    clutter_dict['long_name'] = 'X-SAPR Clutter'
+    clutter_dict['standard_name'] = 'ground_clutter'
+    clutter_dict['long_name'] = 'Ground Clutter'
     clutter_dict['notes'] = '0: No Clutter, 1: Clutter'
     return clutter_dict

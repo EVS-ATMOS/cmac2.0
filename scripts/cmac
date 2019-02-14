@@ -66,9 +66,9 @@ def main():
     if args.clutter_file is not None:
         # Load clutter files.
         clutter_radar = pyart.io.read(args.clutter_file)
-        clutter_field_dict = clutter_radar.fields['xsapr_clutter']
+        clutter_field_dict = clutter_radar.fields['ground_clutter']
         radar.add_field(
-            'xsapr_clutter', clutter_field_dict, replace_existing=True)
+            'ground_clutter', clutter_field_dict, replace_existing=True)
         del clutter_radar
     if args.verbose:
         print('## Loading clutter file ' + args.clutter_file)
