@@ -107,7 +107,7 @@ def quicklooks(radar, config, image_directory=None,
     sweep = plot_config['sweep']
 
     # Plot of the raw reflectivity from the radar.
-    display = pyart.graph.RadarMapDisplayCartopy(radar)
+    display = pyart.graph.RadarMapDisplay(radar)
     fig = plt.figure(figsize=[12, 8])
     display.plot_ppi_map('reflectivity', sweep=sweep, resolution='50m',
                          vmin=-8, vmax=64, mask_outside=False,
@@ -147,7 +147,7 @@ def quicklooks(radar, config, image_directory=None,
     lab_colors = [cat_colors[kitty[0]] for kitty in sorted_cats]
     cmap = matplotlib.colors.ListedColormap(lab_colors)
 
-    display = pyart.graph.RadarMapDisplayCartopy(radar)
+    display = pyart.graph.RadarMapDisplay(radar)
     fig = plt.figure(figsize=[15, 10])
     plt.subplot(2, 2, 1, projection=ccrs.PlateCarree())
     display.plot_ppi_map('gate_id', sweep=sweep, min_lon=min_lon,
@@ -244,6 +244,7 @@ def quicklooks(radar, config, image_directory=None,
         + '/masked_corrected_reflectivity' + combined_name + '.png')
     plt.close()
 
+
     # Creating a plot with reflectivity corrected with attenuation.
     display = pyart.graph.RadarMapDisplay(radar)
     fig = plt.figure(figsize=[12, 8])
@@ -266,7 +267,7 @@ def quicklooks(radar, config, image_directory=None,
         + '/attenuation_corrected_reflectivity' + combined_name + '.png')
     plt.close()
 
-      # Creating a plot with differential phase.
+    # Creating a plot with differential phase.
     display = pyart.graph.RadarMapDisplay(radar)
     fig = plt.figure(figsize=[12, 8])
     display.plot_ppi_map('differential_phase', sweep=sweep,
@@ -394,7 +395,7 @@ def quicklooks(radar, config, image_directory=None,
     plt.close()
 
     # Creating a plot of filtered corrected specific differential phase.
-    display = pyart.graph.RadarMapDisplayCartopy(radar)
+    display = pyart.graph.RadarMapDisplay(radar)
     fig = plt.figure(figsize=[12, 8])
     display.plot_ppi_map('filtered_corrected_specific_diff_phase', sweep=sweep,
                          title=_generate_title(
@@ -412,6 +413,67 @@ def quicklooks(radar, config, image_directory=None,
     plt.savefig(
         image_directory
         + '/filtered_corrected_specific_diff_phase' + combined_name + '.png')
+    plt.close()
+
+    # Creating a plot of corrected differential phase.
+    display = pyart.graph.RadarMapDisplay(radar)
+    fig = plt.figure(figsize=[12, 8])
+    display.plot_ppi_map('specific_differential_attenuation', sweep=sweep,
+                         title=_generate_title(
+                             radar, 'specific_differential_attenuation',
+                             sweep),
+                         resolution='50m', min_lat=min_lat,
+                         min_lon=min_lon, max_lat=max_lat, max_lon=max_lon,
+                         lat_lines=lal, lon_lines=lol, gatefilter=cmac_gates,
+                         projection=ccrs.PlateCarree())
+    if dd_lobes:
+        plt.contour(grid_lon, grid_lat, bca,
+                    levels=[np.pi/6, 5*np.pi/6], linewidths=2,
+                    colors='k')
+    plt.savefig(
+        image_directory
+        + '/specific_differential_attenuation' + combined_name + '.png')
+    plt.close()
+
+    # Creating a plot of corrected differential phase.
+    display = pyart.graph.RadarMapDisplay(radar)
+    fig = plt.figure(figsize=[12, 8])
+    display.plot_ppi_map('path_integrated_differential_attenuation',
+                         sweep=sweep,
+                         title=_generate_title(
+                             radar, 'path_integrated_differential_attenuation',
+                             sweep),
+                         resolution='50m', min_lat=min_lat,
+                         min_lon=min_lon, max_lat=max_lat, max_lon=max_lon,
+                         lat_lines=lal, lon_lines=lol, gatefilter=cmac_gates,
+                         projection=ccrs.PlateCarree())
+    if dd_lobes:
+        plt.contour(grid_lon, grid_lat, bca,
+                    levels=[np.pi/6, 5*np.pi/6], linewidths=2,
+                    colors='k')
+    plt.savefig(
+        image_directory
+        + '/path_integrated_differential_attenuation' + combined_name + '.png')
+    plt.close()
+
+    # Creating a plot of corrected differential phase.
+    display = pyart.graph.RadarMapDisplay(radar)
+    fig = plt.figure(figsize=[12, 8])
+    display.plot_ppi_map('corrected_differential_reflectivity', sweep=sweep,
+                         title=_generate_title(
+                             radar, 'corrected_differential_reflectivity',
+                             sweep),
+                         resolution='50m', min_lat=min_lat,
+                         min_lon=min_lon, max_lat=max_lat, max_lon=max_lon,
+                         lat_lines=lal, lon_lines=lol, gatefilter=cmac_gates,
+                         projection=ccrs.PlateCarree())
+    if dd_lobes:
+        plt.contour(grid_lon, grid_lat, bca,
+                    levels=[np.pi/6, 5*np.pi/6], linewidths=2,
+                    colors='k')
+    plt.savefig(
+        image_directory
+        + '/corrected_differential_reflectivity' + combined_name + '.png')
     plt.close()
 
 
