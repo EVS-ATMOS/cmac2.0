@@ -6,10 +6,10 @@ dependencies:
   - python=3.6
   - arm_pyart
   - basemap
-  - gcc
   - cartopy
   - coincbc
-  - cython
+  - cython=0.27
+  - distributed
   - scikit-fuzzy
   - pip:
     - git+https://github.com/CSU-Radarmet/CSU_RadarTools.git

@@ -24,11 +24,13 @@ def main():
                                       'in the list will be processed.'))
     parser.add_argument(
         'out_file_name', type=str, help=('Output Cf/Radial file'))
+    parser.add_argument(
+        'config', type=str, help=('Configuration'))
     parser.add_argument(              
-        '-tmin', '--clutter_thresh_min', type=float, default=0.0002,
+        '-tmin', '--clutter_thresh_min', type=float, default=2,
         help=('Threshold where above the value is considered clutter.'))
     parser.add_argument(              
-        '-tmax', '--clutter_thresh_max', type=float, default=1.5,
+        '-tmax', '--clutter_thresh_max', type=float, default=10,
         help=('Threshold where below the value is considered clutter.'))
     parser.add_argument(
         '-ra', '--radius', type=int, default=1,
@@ -47,7 +49,8 @@ def main():
     bt = time()
 
 
-    tall_clutter(radar_files, clutter_thresh_min=args.clutter_thresh_min,
+    tall_clutter(radar_files, args.config, 
+                 clutter_thresh_min=args.clutter_thresh_min,
                  clutter_thresh_max=args.clutter_thresh_max,
                  radius=args.radius, write_radar=True,
                  out_file=args.out_file_name, use_dask=True)

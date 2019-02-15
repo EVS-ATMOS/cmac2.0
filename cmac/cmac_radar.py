@@ -96,7 +96,7 @@ def cmac(radar, sonde, config, flip_velocity=False,
 
     if 'xsapr_clutter' in radar.fields.keys():
         # Adding fifth gate id, clutter.
-        clutter_data = radar.fields['xsapr_clutter']['data']
+        clutter_data = radar.fields['ground_clutter']['data']
         gate_data = radar.fields['gate_id']['data']
         clutter_data[gate_data == 0] = 0
         clutter_data[gate_data == 3] = 0
