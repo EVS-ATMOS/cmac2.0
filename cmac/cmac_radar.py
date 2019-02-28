@@ -94,7 +94,7 @@ def cmac(radar, sonde, config, flip_velocity=False,
     radar.add_field('gate_id', my_fuzz,
                     replace_existing=True)
 
-    if 'xsapr_clutter' in radar.fields.keys():
+    if 'ground_clutter' in radar.fields.keys():
         # Adding fifth gate id, clutter.
         clutter_data = radar.fields['ground_clutter']['data']
         gate_data = radar.fields['gate_id']['data']
@@ -174,6 +174,8 @@ def cmac(radar, sonde, config, flip_velocity=False,
     c_coef = cmac_config['c_coef']
     d_coef = cmac_config['d_coef']
     beta_coef = cmac_config['beta_coef']
+    rr_a = cmac_config['rain_rate_a_coef']
+    rr_b = cmac_config['rain_rate_b_coef']
     zdr_field = field_config['differential_reflectivity']
 
     radar.fields['corrected_differential_reflectivity'] = copy.deepcopy(
@@ -190,14 +192,16 @@ def cmac(radar, sonde, config, flip_velocity=False,
         np.where(np.abs(radar.fields['sounding_temperature']['data']) < 0.1)])
     radar.fields['height_over_iso0'] = copy.deepcopy(radar.fields['height'])
     radar.fields['height_over_iso0']['data'] -= iso0
-
+    phidp_field = field_config['phidp_field']
+    
     (spec_at, pia_dict, cor_z, spec_diff_at,
      pida_dict, cor_zdr) = pyart.correct.calculate_attenuation_zphi(
          radar, temp_field='sounding_temperature',
          iso0_field='height_over_iso0',
-         zdr_field='corrected_differential_reflectivity',
-         pia_field='path_integrated_attenuation',
-         refl_field='corrected_reflectivity', c=c_coef, d=d_coef,
+         zdr_field=field_config['zdr_field'],
+         pia_field=field_config['pia_field'],
+         phidp_field=field_config['phidp_field'],
+         refl_field=field_config['refl_field'], c=c_coef, d=d_coef,
          a_coef=attenuation_a_coef, beta=beta_coef)
     cor_zdr['data'] += cmac_config['zdr_offset']
     radar.add_field('specific_attenuation', spec_at, replace_existing=True)
@@ -223,7 +227,7 @@ def cmac(radar, sonde, config, flip_velocity=False,
     spec_at['data'][rain_gates.gate_excluded] = 0.0
 
     # Calculating rain rate.
-    R = 51.3 * (radar.fields['specific_attenuation']['data']) ** 0.81
+    R = rr_a * (radar.fields['specific_attenuation']['data']) ** rr_b
     rainrate = copy.deepcopy(radar.fields['specific_attenuation'])
     rainrate['data'] = R
     rainrate['valid_min'] = 0.0

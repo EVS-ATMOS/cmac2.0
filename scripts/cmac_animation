@@ -35,12 +35,22 @@ def main():
     parser.add_argument(
         '-fr', '--frame_rate', type=float, default=1.0,
         help='Frame rate to create mp4 with. Example: 2.0')
+    parser.add_argument(
+        '-p', '--path', type=str, 
+        default=None, help='Target path')
+    parser.add_argument(
+        '-s', '--source_path', default=None,
+        help='Source path')
+
     args = parser.parse_args()
 
     site = args.xsapr_site
 
-    path = ('/lustre/or-hydra/cades-arm/proj-shared/'
-            + 'sgpxsaprcmacsur' + site + '.c1.mp4/')
+    if args.path is None:
+        path = ('/lustre/or-hydra/cades-arm/proj-shared/'
+                + 'sgpxsaprcmacsur' + site + '.c1.mp4/')
+    else:
+        path = args.path
 
     # Creates an mp4s directory if it does not exist.
     if not os.path.exists(path):
@@ -52,10 +62,14 @@ def main():
     stop = datetime.datetime.strptime(args.end_date, "%Y%m%d")
     for date_time in datespan(start, stop, delta=datetime.timedelta(days=1)):
         date = datetime.datetime.strftime(date_time, '%Y%m%d')
-        files = glob.glob(
-            '/lustre/or-hydra/cades-arm/proj-shared/'
-            + 'sgpxsaprcmacsur' + site + '.c1.png/' + date
-            + '**/cmac*', recursive=True)
+        if args.source_path is None:
+            files = glob.glob(
+                '/lustre/or-hydra/cades-arm/proj-shared/'
+                + 'sgpxsaprcmacsur' + site + '.c1.png/' + date
+                + '**/cmac*', recursive=True)
+        else:
+            files = glob.glob(args.source_path + '/' + date + '**/cmac*',
+                              recursive=True)
 
         # If a date has no image files, loop goes to the next date.
         if not files:

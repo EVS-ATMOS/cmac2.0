@@ -11,7 +11,8 @@ CMAC 2.0 Configuration.
 """
 
 from .default_config import (_DEFAULT_METADATA, _DEFAULT_FIELD_NAMES,
-                             _DEFAULT_CMAC_VALUES, _DEFAULT_PLOT_VALUES)
+                             _DEFAULT_CMAC_VALUES, _DEFAULT_PLOT_VALUES,
+                             )
 
 
 def get_metadata(radar):
