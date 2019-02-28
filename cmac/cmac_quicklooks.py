@@ -143,7 +143,6 @@ def quicklooks(radar, config, image_directory=None,
                   'snow': 'cyan',
                   'melting': 'yellow'}
     lab_colors = ['red', 'cyan', 'grey', 'green', 'yellow']
-    print(radar.fields.keys())
     if 'ground_clutter' in radar.fields.keys():
         cat_colors['clutter'] = 'black'
         lab_colors = np.append(lab_colors, 'black')

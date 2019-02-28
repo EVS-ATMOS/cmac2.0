@@ -209,8 +209,13 @@ _DEFAULT_FIELD_NAMES = {
         'altitude': 'alt',
         'temperature': 'tdry',
         'u_wind': 'u_wind',
-        'v_wind': 'v_wind'},
-
+        'v_wind': 'v_wind',
+        # Input field names to attenuation code
+        'zdr_field': 'corrected_differential_reflectivity',
+        'pia_field': 'path_integrated_attenuation',
+        'phidp_field': 'filtered_corrected_differential_phase',
+        'refl_field': 'corrected_reflectivity'},
+ 
     # X-SAPR I5 PPI field names.
     'xsapr_i5_ppi': {
         # Radar field names
@@ -223,7 +228,12 @@ _DEFAULT_FIELD_NAMES = {
         'altitude': 'alt',
         'temperature': 'tdry',
         'u_wind': 'u_wind',
-        'v_wind': 'v_wind'},
+        'v_wind': 'v_wind',
+        # Input field names to attenuation code
+        'zdr_field': 'corrected_differential_reflectivity',
+        'pia_field': 'path_integrated_attenuation',
+        'phidp_field': 'filtered_corrected_differential_phase',
+        'refl_field': 'corrected_reflectivity'},
 
     'xsapr_i5_cfr_ppi': {
         # Radar field names
@@ -235,7 +245,12 @@ _DEFAULT_FIELD_NAMES = {
         'altitude': 'alt',
         'temperature': 'tdry',
         'u_wind': 'u_wind',
-        'v_wind': 'v_wind'},
+        'v_wind': 'v_wind',
+        # Input field names to attenuation code
+        'zdr_field': 'corrected_differential_reflectivity',
+        'pia_field': 'path_integrated_attenuation',
+        'phidp_field': 'filtered_corrected_differential_phase',
+        'refl_field': 'corrected_reflectivity'},
 
     # X-SAPR I4 PPI field names.
     'xsapr_i4_ppi': {
@@ -249,7 +264,12 @@ _DEFAULT_FIELD_NAMES = {
         'altitude': 'alt',
         'temperature': 'tdry',
         'u_wind': 'u_wind',
-        'v_wind': 'v_wind'},
+        'v_wind': 'v_wind',
+        # Input field names to attenuation code
+        'zdr_field': 'corrected_differential_reflectivity',
+        'pia_field': 'path_integrated_attenuation',
+        'phidp_field': 'filtered_corrected_differential_phase',
+        'refl_field': 'corrected_reflectivity'},
 
     # X-SAPR I6 Sector field names.
     'xsapr_i6_sec': {
@@ -263,7 +283,12 @@ _DEFAULT_FIELD_NAMES = {
         'altitude': 'alt',
         'temperature': 'tdry',
         'u_wind': 'u_wind',
-        'v_wind': 'v_wind'},
+        'v_wind': 'v_wind',
+        # Input field names to attenuation code
+        'zdr_field': 'corrected_differential_reflectivity',
+        'pia_field': 'path_integrated_attenuation',
+        'phidp_field': 'filtered_corrected_differential_phase',
+        'refl_field': 'corrected_reflectivity'},
 
     # X-SAPR I5 Sector field names.
     'xsapr_i5_sec': {
@@ -277,7 +302,12 @@ _DEFAULT_FIELD_NAMES = {
         'altitude': 'alt',
         'temperature': 'tdry',
         'u_wind': 'u_wind',
-        'v_wind': 'v_wind'},
+        'v_wind': 'v_wind',
+        # Input field names to attenuation code
+        'zdr_field': 'corrected_differential_reflectivity',
+        'pia_field': 'path_integrated_attenuation',
+        'phidp_field': 'filtered_corrected_differential_phase',
+        'refl_field': 'corrected_reflectivity'},
 
     # X-SAPR I4 Sector field names.
     'xsapr_i4_sec': {
@@ -291,7 +321,12 @@ _DEFAULT_FIELD_NAMES = {
         'altitude': 'alt',
         'temperature': 'tdry',
         'u_wind': 'u_wind',
-        'v_wind': 'v_wind'},
+        'v_wind': 'v_wind',
+        # Input field names to attenuation code
+        'zdr_field': 'corrected_differential_reflectivity',
+        'pia_field': 'path_integrated_attenuation',
+        'phidp_field': 'filtered_corrected_differential_phase',
+        'refl_field': 'corrected_reflectivity'},
 
     # CACTI C-SAPR 2 field names.
     'cacti_csapr2_ppi': {
@@ -304,7 +339,12 @@ _DEFAULT_FIELD_NAMES = {
         'altitude': 'alt',
         'temperature': 'tdry',
         'u_wind': 'u_wind',
-        'v_wind': 'v_wind'}
+        'v_wind': 'v_wind',
+        # Input field names to attenuation code
+        'zdr_field': 'corrected_differential_reflectivity',
+        'pia_field': 'path_integrated_attenuation',
+        'phidp_field': 'filtered_corrected_differential_phase',
+        'refl_field': 'corrected_reflectivity'}
 }
 
 
@@ -331,7 +371,9 @@ _DEFAULT_CMAC_VALUES = {
         'c_coef': 0.05,
         'd_coef': 1,
         'beta_coef': 1,
-        'zdr_offset': 3.05},
+        'zdr_offset': 3.05,
+        'rain_rate_a_coef': 51.3,
+        'rain_rate_b_coef': 0.81},
 
     # X-SAPR I5 PPI CMAC 2.0 processing values.
     'xsapr_i5_ppi': {
@@ -345,7 +387,9 @@ _DEFAULT_CMAC_VALUES = {
         'c_coef': 0.05,
         'd_coef': 1,
         'beta_coef': 1,
-        'zdr_offset': 3.05},
+        'zdr_offset': 3.05,
+        'rain_rate_a_coef': 51.3,
+        'rain_rate_b_coef': 0.81},
 
     # X-SAPR I5 PPI CMAC 2.0 processing values.
     'xsapr_i5_cfr_ppi': {
@@ -355,7 +399,9 @@ _DEFAULT_CMAC_VALUES = {
         'site_alt': 328,
         'ref_offset': 0.0,
         'self_const': 60000.00,
-        'attenuation_a_coef': 0.17},
+        'attenuation_a_coef': 0.17,
+        'rain_rate_a_coef': 51.3,
+        'rain_rate_b_coef': 0.81},
 
     # X-SAPR I4 PPI CMAC 2.0 processing values.
     'xsapr_i4_ppi': {
@@ -369,7 +415,9 @@ _DEFAULT_CMAC_VALUES = {
         'c_coef': 0.05,
         'd_coef': 1,
         'beta_coef': 1,
-        'zdr_offset': 3.05},
+        'zdr_offset': 3.05,
+        'rain_rate_a_coef': 51.3,
+        'rain_rate_b_coef': 0.81},
 
     # X-SAPR I6 Sector CMAC 2.0 processing values.
     'xsapr_i6_sec': {
@@ -383,7 +431,9 @@ _DEFAULT_CMAC_VALUES = {
         'c_coef': 0.05,
         'd_coef': 1,
         'beta_coef': 1,
-        'zdr_offset': 3.05},
+        'zdr_offset': 3.05,
+        'rain_rate_a_coef': 51.3,
+        'rain_rate_b_coef': 0.81},
 
     # X-SAPR I5 Sector CMAC 2.0 processing values.
     'xsapr_i5_sec': {
@@ -397,7 +447,9 @@ _DEFAULT_CMAC_VALUES = {
         'c_coef': 0.05,
         'd_coef': 1,
         'beta_coef': 1,
-        'zdr_offset': 3.05},
+        'zdr_offset': 3.05,
+        'rain_rate_a_coef': 51.3,
+        'rain_rate_b_coef': 0.81},
 
     # X-SAPR I4 Sector CMAC 2.0 processing values.
     'xsapr_i4_sec': {
@@ -411,7 +463,9 @@ _DEFAULT_CMAC_VALUES = {
         'c_coef': 0.05,
         'd_coef': 1,
         'beta_coef': 1,
-        'zdr_offset': 3.05},
+        'zdr_offset': 3.05,
+        'rain_rate_a_coef': 51.3,
+        'rain_rate_b_coef': 0.81},
 
     # CACTI C-SAPR 2 CMAC 2.0 processing values.
     'cacti_csapr2_ppi': {
