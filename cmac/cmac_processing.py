@@ -55,11 +55,18 @@ def get_texture(radar, vel_field, nyq=None):
     else:
         nyq = nyq
     start_time = time.time()
-    std_dev = pyart.util.angular_texture_2d(radar.fields[vel_field]['data'],
-                                            4, nyq)
+    if 'ground_clutter' in radar.fields.keys():
+        vel = np.ma.masked_where(radar.fields['ground_clutter']['data'] == 1,
+                                 radar.fields[vel_field]['data'])
+        vel = vel.filled(np.nan)
+    else:
+        vel = radar.fields[vel_field]['data']
+    
+    std_dev = pyart.util.angular_texture_2d(vel, 4, nyq)
     filtered_data = ndimage.filters.median_filter(std_dev, size=(4, 4))
     texture_field = pyart.config.get_metadata('velocity')
-    texture_field['data'] = filtered_data
+    texture_field['data'] = np.ma.masked_where(
+        np.isnan(filtered_data), filtered_data)
     total_time = time.time() - start_time
     return texture_field
 

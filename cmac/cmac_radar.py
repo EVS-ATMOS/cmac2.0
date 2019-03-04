@@ -98,8 +98,6 @@ def cmac(radar, sonde, config, flip_velocity=False,
         # Adding fifth gate id, clutter.
         clutter_data = radar.fields['ground_clutter']['data']
         gate_data = radar.fields['gate_id']['data']
-        clutter_data[gate_data == 0] = 0
-        clutter_data[gate_data == 3] = 0
         radar.fields['gate_id']['data'][clutter_data == 1] = 5
         notes = radar.fields['gate_id']['notes']
         radar.fields['gate_id']['notes'] = notes + ',5:clutter'
@@ -202,7 +200,8 @@ def cmac(radar, sonde, config, flip_velocity=False,
          pia_field=field_config['pia_field'],
          phidp_field=field_config['phidp_field'],
          refl_field=field_config['refl_field'], c=c_coef, d=d_coef,
-         a_coef=attenuation_a_coef, beta=beta_coef)
+         a_coef=attenuation_a_coef, beta=beta_coef,
+         gatefilter=cmac_gates)
     cor_zdr['data'] += cmac_config['zdr_offset']
     radar.add_field('specific_attenuation', spec_at, replace_existing=True)
     radar.add_field('path_integrated_attenuation', pia_dict,
@@ -224,8 +223,7 @@ def cmac(radar, sonde, config, flip_velocity=False,
     rain_gates = pyart.correct.GateFilter(radar)
     rain_gates.exclude_all()
     rain_gates.include_equal('gate_id', cat_dict['rain'])
-    spec_at['data'][rain_gates.gate_excluded] = 0.0
-
+    
     # Calculating rain rate.
     R = rr_a * (radar.fields['specific_attenuation']['data']) ** rr_b
     rainrate = copy.deepcopy(radar.fields['specific_attenuation'])
@@ -241,7 +239,6 @@ def cmac(radar, sonde, config, flip_velocity=False,
     # This needs to be updated to a gatefilter.
     mask = radar.fields['reflectivity']['data'].mask
 
-    radar.fields['rain_rate_A']['data'][np.where(mask)] = 0.0
     radar.fields['rain_rate_A'].update({
         'comment': ('Rain rate calculated from specific_attenuation,',
                     ' R=51.3*specific_attenuation**0.81, note R=0.0 where',
