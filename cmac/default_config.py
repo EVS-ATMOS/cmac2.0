@@ -479,6 +479,7 @@ _DEFAULT_CMAC_VALUES = {
         'd_coef': 1.804,
         'beta_coef': 0.64884,  # ZDR corrections
         'flip_phidp': True,
+        'phidp_flipped': ['uncorrected_differential_phase','differential_phase'],
         'zdr_offset': -3.8}
 }
 
