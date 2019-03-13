@@ -66,8 +66,8 @@ def cmac(radar, sonde, config, flip_velocity=False,
         if 'phidp_flipped' in cmac_config.keys(): # user specifies fields to flip
             for fld in cmac_config['phidp_flipped']:
                 radar.fields[fld]['data'] = radar.fields[fld]['data'] * -1.0
-        else: # just flip defined phidp field
-            radar.fields[field_config['phidp']]['data'] = radar.fields[field_config['phidp']]['data']*-1.0
+        else:  # just flip defined phidp field
+            radar.fields[field_config['input_phidp']]['data'] = radar.fields[field_config['input_phidp']]['data']*-1.0
 
     if flip_velocity:
         radar.fields[vel_field]['data'] = radar.fields[

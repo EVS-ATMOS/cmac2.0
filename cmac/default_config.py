@@ -331,10 +331,11 @@ _DEFAULT_FIELD_NAMES = {
     # CACTI C-SAPR 2 field names.
     'cacti_csapr2_ppi': {
         # Radar field names
-        'reflectivity': 'reflectivity',
+        'reflectivity': 'uncorrected_reflectivity_h',  # need to change to input_reflectivity
         'velocity': 'mean_doppler_velocity',
         'normalized_coherent_power': 'normalized_coherent_power',
         'cross_correlation_ratio': 'copol_correlation_coeff',
+        'input_phidp_field': 'uncorrected_differential_phase',
         # Sonde field names
         'altitude': 'alt',
         'temperature': 'tdry',
@@ -343,8 +344,8 @@ _DEFAULT_FIELD_NAMES = {
         # Input field names to attenuation code
         'zdr_field': 'corrected_differential_reflectivity',
         'pia_field': 'path_integrated_attenuation',
-        'phidp_field': 'filtered_corrected_differential_phase',
-        'refl_field': 'corrected_reflectivity'}
+        'phidp_field': 'filtered_corrected_differential_phase',  # output phidp, need to change
+        'refl_field': 'corrected_reflectivity'}  # output Z field
 }
 
 
