@@ -64,6 +64,15 @@ def cmac(radar, sonde, config, flip_velocity=False,
     alt_field = field_config['altitude']
     vel_field = field_config['velocity']
 
+    # ZDR offsets
+
+    if 'zdr_offset' in cmac_config.keys():
+        if 'offset_zdrs' in cmac_config.keys():
+            for fld in cmac_config['offset_zdrs']:
+                radar.fields[fld]['data'] += cmac_config['zdr_offset']
+        else:
+            radar.fields[field_config['input_zdr']]['data'] += cmac_config['zdr_offset']
+
     # flipping phidp
 
     if cmac_config['flip_phidp']:
@@ -215,7 +224,8 @@ def cmac(radar, sonde, config, flip_velocity=False,
          refl_field=field_config['refl_field'], c=c_coef, d=d_coef,
          a_coef=attenuation_a_coef, beta=beta_coef,
          gatefilter=cmac_gates)
-    cor_zdr['data'] += cmac_config['zdr_offset']
+
+    #  cor_zdr['data'] += cmac_config['zdr_offset'] Now taken care of at start
     radar.add_field('specific_attenuation', spec_at, replace_existing=True)
     radar.add_field('path_integrated_attenuation', pia_dict,
                     replace_existing=True)
