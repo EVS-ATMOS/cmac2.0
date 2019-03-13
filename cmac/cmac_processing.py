@@ -360,3 +360,47 @@ def _csu_to_field(field, radar, units='unitless', long_name='Hydrometeor ID',
                   'standard_name': standard_name,
                   '_FillValue': fill_value}
     return field_dict
+
+
+def gen_clutter_field_from_refl(radar, corrected_field, uncorrected_field, diff_dbz=-12.0, max_h=2000.0):
+    """
+    Generate a Py-ART field with clutter flagging using
+    differences in reflectivity. A cludge for when you
+    have a clutter corrected field but no field with the
+    flags
+
+    Parameters
+    ----------
+    radar : Radar
+        A radar object to create the clutter field from
+    corrected_field : String
+        Field name for a field which has had gates with clutter in them reduced some how
+    uncorrected_field : String
+        Field name for raw reflectivity field
+    diff_dbz : float
+        Difference in dBZ below which a gate is considered clutter. Defaiults to -12dBZ
+    max_h : float
+        Height (in m) above which all gates are considered to be clutter free.
+
+    Returns
+    clutter_field : Dict
+        A field dictionary whith an entry 'data' where clutter is flagged as '1' and clutter
+        free is flagged as '0'
+    """
+    new_grid = radar.fields['reflectivity']['data'] - radar.fields['uncorrected_reflectivity_h']['data']
+    clutter = np.zeros(new_grid.shape, dtype=np.int)
+    possible_contamination = new_grid < -12.0
+    clutter[possible_contamination] = 1
+
+    z = radar.gate_altitude['data']
+    clutter[(z - z.min()) > 2000.] = 0
+
+    clutter_field = {'data': clutter,
+                     'standard_name': 'clutter_mask',
+                     'long_name': 'Clutter mask',
+                     'comment': '0 is good, 1 is clutter',
+                     'valid_min': 0,
+                     'valid_max': 1,
+                     'units': 'unitless'}
+
+    return clutter_field

@@ -366,6 +366,8 @@ _DEFAULT_FIELD_NAMES = {
         'normalized_coherent_power': 'normalized_coherent_power',
         'cross_correlation_ratio': 'copol_correlation_coeff',
         'input_phidp_field': 'uncorrected_differential_phase',
+        'input_clutter_corrected_reflectivity': 'reflectivity',
+        'clutter': 'ground_clutter',
         # Sonde field names
         'altitude': 'alt',
         'temperature': 'tdry',
@@ -558,7 +560,10 @@ _DEFAULT_CMAC_VALUES = {
         'zdr_offset': -3.8,
         'offset_zdrs': ['differential_reflectivity_lag_1', 'differential_reflectivity'],
         'mbfs': cacti_csapr2_ppi_mbfs,
-        'hard_const': cacti_csapr2_ppi_hard_const}
+        'hard_const': cacti_csapr2_ppi_hard_const,
+        'gen_clutter_from_refl': True,
+        'gen_clutter_from_refl_diff': -12.0,
+        'gen_clutter_from_refl_alt': 2000.0}  # We expect clutter corrected fields now
 }
 
 
