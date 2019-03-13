@@ -7,6 +7,7 @@ being used.
 """
 
 
+
 ##############################################################################
 # Default metadata
 #
@@ -185,8 +186,29 @@ _DEFAULT_METADATA = {
 
     # CACTI C-SAPR 2 metadata.
     'cacti_csapr2_ppi': {
-        'site_id': 'ARM Mobile Facility Argentina'}
+        'site_id': 'cor',  # 'ARM Mobile Facility Argentina'
+        'facility_id': 'c1',
+        'comment': (
+            'This is highly experimental and initial data. There are many',
+            'known and unknown issues. Please do not use before',
+            'contacting the Translator responsible scollis@anl.gov'),
+        'attributions': (
+            'This data is collected by the ARM Climate Research facility.',
+            'Radar system is operated by the radar engineering team',
+            'radar@arm.gov and the data is processed by the precipitation',
+            'radar products team. LP code courtesy of Scott Giangrande BNL.'),
+        'version': '2.0 lite',
+        'vap_name': 'cmac',
+        'known_issues': (
+            'False phidp jumps in insect regions. Still uses old',
+            'Giangrande code.',
+            'Issues with some snow below melting layer.'),
+        'developers': 'Robert Jackson, ANL. Zachary Sherman, ANL.',
+        'translator': 'Scott Collis, ANL.',
+        'mentors': ('Nitin Bharadwaj, PNNL. Bradley Isom, PNNL.',
+                    'Joseph Hardin, PNNL. Iosif Lindenmaier, PNNL.')},
 }
+
 
 
 ##############################################################################
@@ -200,6 +222,7 @@ _DEFAULT_FIELD_NAMES = {
     # X-SAPR I6 PPI field names.
     'xsapr_i6_ppi': {
         # Radar field names
+        'input_zdr': 'differential_reflectivity',
         'reflectivity': 'reflectivity',
         'velocity': 'velocity',
         'normalized_coherent_power': 'normalized_coherent_power',
@@ -219,6 +242,7 @@ _DEFAULT_FIELD_NAMES = {
     # X-SAPR I5 PPI field names.
     'xsapr_i5_ppi': {
         # Radar field names
+        'input_zdr': 'differential_reflectivity',
         'reflectivity': 'reflectivity',
         'velocity': 'velocity',
         'normalized_coherent_power': 'normalized_coherent_power',
@@ -237,6 +261,7 @@ _DEFAULT_FIELD_NAMES = {
 
     'xsapr_i5_cfr_ppi': {
         # Radar field names
+        'input_zdr': 'differential_reflectivity',
         'reflectivity': 'reflectivity',
         'velocity': 'mean_doppler_velocity',
         'normalized_coherent_power': 'normalized_coherent_power',
@@ -255,6 +280,7 @@ _DEFAULT_FIELD_NAMES = {
     # X-SAPR I4 PPI field names.
     'xsapr_i4_ppi': {
         # Radar field names
+        'input_zdr': 'differential_reflectivity',
         'reflectivity': 'reflectivity',
         'velocity': 'velocity',
         'normalized_coherent_power': 'normalized_coherent_power',
@@ -274,6 +300,7 @@ _DEFAULT_FIELD_NAMES = {
     # X-SAPR I6 Sector field names.
     'xsapr_i6_sec': {
         # Radar field names
+        'input_zdr': 'differential_reflectivity',
         'reflectivity': 'reflectivity',
         'velocity': 'velocity',
         'normalized_coherent_power': 'normalized_coherent_power',
@@ -293,6 +320,7 @@ _DEFAULT_FIELD_NAMES = {
     # X-SAPR I5 Sector field names.
     'xsapr_i5_sec': {
         # Radar field names
+        'input_zdr': 'differential_reflectivity',
         'reflectivity': 'reflectivity',
         'velocity': 'velocity',
         'normalized_coherent_power': 'normalized_coherent_power',
@@ -312,6 +340,7 @@ _DEFAULT_FIELD_NAMES = {
     # X-SAPR I4 Sector field names.
     'xsapr_i4_sec': {
         # Radar field names
+        'input_zdr': 'differential_reflectivity',
         'reflectivity': 'reflectivity',
         'velocity': 'velocity',
         'normalized_coherent_power': 'normalized_coherent_power',
@@ -331,10 +360,12 @@ _DEFAULT_FIELD_NAMES = {
     # CACTI C-SAPR 2 field names.
     'cacti_csapr2_ppi': {
         # Radar field names
-        'reflectivity': 'reflectivity',
+        'input_zdr': 'differential_reflectivity',
+        'reflectivity': 'uncorrected_reflectivity_h',  # need to change to input_reflectivity
         'velocity': 'mean_doppler_velocity',
         'normalized_coherent_power': 'normalized_coherent_power',
         'cross_correlation_ratio': 'copol_correlation_coeff',
+        'input_phidp_field': 'uncorrected_differential_phase',
         # Sonde field names
         'altitude': 'alt',
         'temperature': 'tdry',
@@ -343,9 +374,53 @@ _DEFAULT_FIELD_NAMES = {
         # Input field names to attenuation code
         'zdr_field': 'corrected_differential_reflectivity',
         'pia_field': 'path_integrated_attenuation',
-        'phidp_field': 'filtered_corrected_differential_phase',
-        'refl_field': 'corrected_reflectivity'}
+        'phidp_field': 'filtered_corrected_differential_phase',  # output phidp, need to change
+        'refl_field': 'corrected_reflectivity'}  # output Z field
 }
+
+##############################################################################
+# Membership functions
+#
+# This goes into the following section cmac_config
+##############################################################################
+
+# csapr2_cordoba
+cacti_csapr2_ppi_mbfs={'multi_trip': {'velocity_texture': [[2.0, 2.1, 130.0, 130.0], 4.0],
+                                 'copol_correlation_coeff': [[0.5, 0.7, 1, 1], 0.0],
+                                 'normalized_coherent_power': [[0, 0, 0.5, 0.6], 1.0],
+                                 'height': [[0, 0, 5000, 8000], 0.0],
+                                 'sounding_temperature': [[-100, -100, 100, 100], 0.0],
+                                 'signal_to_noise_ratio': [[8, 15, 1000, 1000], 1.0]},
+                  'rain': {'velocity_texture': [[0, 0, 2.0, 2.1], 1.0],
+                           'copol_correlation_coeff': [[0.97, 0.98, 1, 1], 1.0],
+                           'normalized_coherent_power': [[0.4, 0.5, 1, 1], 1.0],
+                           'height': [[0, 0, 5000, 6000], 0.0],
+                           'sounding_temperature': [[2.0, 5.0, 100, 100], 2.0],
+                           'signal_to_noise_ratio': [[8, 10, 1000, 1000], 1.0]},
+                  'snow': {'velocity_texture': [[0, 0, 2.0, 2.1], 1.0],
+                           'copol_correlation_coeff': [[0.65, 0.9, 1, 1], 1.0],
+                           'normalized_coherent_power': [[0.4, 0.5, 1, 1], 1.0],
+                           'height': [[0, 0, 25000, 25000], 0.0],
+                           'sounding_temperature': [[-100, -100, 0.5, 4.0], 2.0],
+                           'signal_to_noise_ratio': [[8, 10, 1000, 1000], 1.0]},
+                  'no_scatter': {'velocity_texture': [[2.0, 2.1, 330.0, 330.0], 2.0],
+                                 'copol_correlation_coeff': [[0, 0, 0.1, 0.2], 0.0],
+                                 'normalized_coherent_power': [[0, 0, 0.1, 0.2], 0.0],
+                                 'height': [[0, 0, 25000, 25000], 0.0],
+                                 'sounding_temperature': [[-100, -100, 100, 100], 0.0],
+                                 'signal_to_noise_ratio': [[-100, -100, 8, 15], 4.0]},
+                'melting': {'velocity_texture': [[0, 0, 2.0, 2.1], 0.0],
+                            'copol_correlation_coeff': [[0.6, 0.65, 0.9, 0.96], 2.0],
+                            'normalized_coherent_power': [[0.4, 0.5, 1, 1], 0],
+                            'height': [[0, 0, 25000, 25000], 0.0],
+                            'sounding_temperature': [[0, 0.1, 2, 4], 4.0],
+                            'signal_to_noise_ratio': [[8, 10, 1000, 1000], 0.0]}}
+
+cacti_csapr2_ppi_hard_const = [['melting', 'sounding_temperature', (10, 100)],
+                              ['multi_trip', 'height', (10000, 1000000)],
+                              ['melting', 'sounding_temperature', (-10000, -2)],
+                              ['rain', 'sounding_temperature', (-1000, -5)],
+                              ['melting', 'velocity_texture', (3, 300)]]
 
 
 ##############################################################################
@@ -474,7 +549,16 @@ _DEFAULT_CMAC_VALUES = {
         'site_alt': 1141,
         'ref_offset': 0.0,
         'self_const': 60000.00,
-        'attenuation_a_coef': 0.06}
+        'attenuation_a_coef': 0.08,
+        'c_coef': 0.3,
+        'd_coef': 1.804,
+        'beta_coef': 0.64884,  # ZDR corrections
+        'flip_phidp': True,
+        'phidp_flipped': ['uncorrected_differential_phase','differential_phase'],
+        'zdr_offset': -3.8,
+        'offset_zdrs': ['differential_reflectivity_lag_1', 'differential_reflectivity'],
+        'mbfs': cacti_csapr2_ppi_mbfs,
+        'hard_const': cacti_csapr2_ppi_hard_const}
 }
 
 

@@ -175,7 +175,9 @@ def cum_score_fuzzy_logic(radar, mbfs=None,
 
 
 def do_my_fuzz(radar, rhv_field, ncp_field,
-               tex_start=2.0, tex_end=2.1, verbose=True):
+               tex_start=2.0, tex_end=2.1,
+               custom_mbfs=None, custom_hard_constraints=None,
+               verbose=True):  # NEEDS DOCSTRING
     if verbose:
         print('##')
         print('## CMAC calculation using fuzzy logic:')
@@ -215,14 +217,20 @@ def do_my_fuzz(radar, rhv_field, ncp_field,
                'sounding_temperature': [[0, 0.1, 2, 4], 4.0],
                'signal_to_noise_ratio': [[8, 10, 1000, 1000], 0.0]}
 
-    mbfs = {'multi_trip': second_trip, 'rain': rain, 'snow': snow,
-            'no_scatter': no_scatter, 'melting': melting}
+    if custom_mbfs is None:
+        mbfs = {'multi_trip': second_trip, 'rain': rain, 'snow': snow,
+                'no_scatter': no_scatter, 'melting': melting}
+    else:
+        mbfs = custom_mbfs
 
-    hard_const = [['melting', 'sounding_temperature', (10, 100)],
-                  ['multi_trip', 'height', (10000, 1000000)],
-                  ['melting', 'sounding_temperature', (-10000, -2)],
-                  ['rain', 'sounding_temperature', (-1000, -5)],
-                  ['melting', 'velocity_texture', (3, 300)]]
+    if custom_hard_constraints is None:
+        hard_const = [['melting', 'sounding_temperature', (10, 100)],
+                      ['multi_trip', 'height', (10000, 1000000)],
+                      ['melting', 'sounding_temperature', (-10000, -2)],
+                      ['rain', 'sounding_temperature', (-1000, -5)],
+                      ['melting', 'velocity_texture', (3, 300)]]
+    else:
+        hard_const = custom_hard_constraints
 
     gid_fld, cats = cum_score_fuzzy_logic(radar, mbfs=mbfs, verbose=verbose,
                                           hard_const=hard_const)

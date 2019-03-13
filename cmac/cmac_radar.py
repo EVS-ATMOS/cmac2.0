@@ -49,8 +49,12 @@ def cmac(radar, sonde, config, flip_velocity=False,
     field_config = get_field_names(config)
     meta_config = get_metadata(config)
 
+    # Over write site altitude
+
+    if 'site_alt' in cmac_config.keys():
+        radar.altitude['data'][0] = cmac_config['site_alt']
+
     # Obtaining variables needed for fuzzy logic.
-    radar.altitude['data'][0] = cmac_config['site_alt']
 
     radar_start_date = netCDF4.num2date(
         radar.time['data'][0], radar.time['units'])
@@ -59,6 +63,24 @@ def cmac(radar, sonde, config, flip_velocity=False,
     temp_field = field_config['temperature']
     alt_field = field_config['altitude']
     vel_field = field_config['velocity']
+
+    # ZDR offsets
+
+    if 'zdr_offset' in cmac_config.keys():
+        if 'offset_zdrs' in cmac_config.keys():
+            for fld in cmac_config['offset_zdrs']:
+                radar.fields[fld]['data'] += cmac_config['zdr_offset']
+        else:
+            radar.fields[field_config['input_zdr']]['data'] += cmac_config['zdr_offset']
+
+    # flipping phidp
+
+    if cmac_config['flip_phidp']:
+        if 'phidp_flipped' in cmac_config.keys(): # user specifies fields to flip
+            for fld in cmac_config['phidp_flipped']:
+                radar.fields[fld]['data'] = radar.fields[fld]['data'] * -1.0
+        else:  # just flip defined phidp field
+            radar.fields[field_config['input_phidp']]['data'] = radar.fields[field_config['input_phidp']]['data']*-1.0
 
     if flip_velocity:
         radar.fields[vel_field]['data'] = radar.fields[
@@ -89,8 +111,18 @@ def cmac(radar, sonde, config, flip_velocity=False,
     # Performing fuzzy logic to obtain the gate ids.
     rhv_field = field_config['cross_correlation_ratio']
     ncp_field = field_config['normalized_coherent_power']
+
+    if 'mbfs' not in cmac_config:
+        cmac_config['mbfs'] = None
+
+    if 'hard_const' not in cmac_config:
+        cmac_config['hard_const'] = None
+
     my_fuzz, _ = do_my_fuzz(radar, rhv_field, ncp_field, tex_start=2.4,
-                            tex_end=2.7, verbose=verbose)
+                            tex_end=2.7, verbose=verbose,
+                            custom_mbfs=cmac_config['mbfs'],
+                            custom_hard_constraints=cmac_config['hard_const'])
+
     radar.add_field('gate_id', my_fuzz,
                     replace_existing=True)
 
@@ -202,7 +234,8 @@ def cmac(radar, sonde, config, flip_velocity=False,
          refl_field=field_config['refl_field'], c=c_coef, d=d_coef,
          a_coef=attenuation_a_coef, beta=beta_coef,
          gatefilter=cmac_gates)
-    cor_zdr['data'] += cmac_config['zdr_offset']
+
+    #  cor_zdr['data'] += cmac_config['zdr_offset'] Now taken care of at start
     radar.add_field('specific_attenuation', spec_at, replace_existing=True)
     radar.add_field('path_integrated_attenuation', pia_dict,
                     replace_existing=True)
