@@ -49,8 +49,12 @@ def cmac(radar, sonde, config, flip_velocity=False,
     field_config = get_field_names(config)
     meta_config = get_metadata(config)
 
+    # Over write site altitude
+
+    if 'site_alt' in cmac_config.keys():
+        radar.altitude['data'][0] = cmac_config['site_alt']
+
     # Obtaining variables needed for fuzzy logic.
-    radar.altitude['data'][0] = cmac_config['site_alt']
 
     radar_start_date = netCDF4.num2date(
         radar.time['data'][0], radar.time['units'])
