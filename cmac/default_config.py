@@ -474,7 +474,12 @@ _DEFAULT_CMAC_VALUES = {
         'site_alt': 1141,
         'ref_offset': 0.0,
         'self_const': 60000.00,
-        'attenuation_a_coef': 0.06}
+        'attenuation_a_coef': 0.08,
+        'c_coef': 0.3,
+        'd_coef': 1.804,
+        'beta_coef': 0.64884,  # ZDR corrections
+        'flip_phidp': True,
+        'zdr_offset': -3.8}
 }
 
 
