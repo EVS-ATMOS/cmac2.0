@@ -185,8 +185,29 @@ _DEFAULT_METADATA = {
 
     # CACTI C-SAPR 2 metadata.
     'cacti_csapr2_ppi': {
-        'site_id': 'ARM Mobile Facility Argentina'}
+        'site_id': 'cor',  # 'ARM Mobile Facility Argentina'
+        'facility_id': 'c1',
+        'comment': (
+            'This is highly experimental and initial data. There are many',
+            'known and unknown issues. Please do not use before',
+            'contacting the Translator responsible scollis@anl.gov'),
+        'attributions': (
+            'This data is collected by the ARM Climate Research facility.',
+            'Radar system is operated by the radar engineering team',
+            'radar@arm.gov and the data is processed by the precipitation',
+            'radar products team. LP code courtesy of Scott Giangrande BNL.'),
+        'version': '2.0 lite',
+        'vap_name': 'cmac',
+        'known_issues': (
+            'False phidp jumps in insect regions. Still uses old',
+            'Giangrande code.',
+            'Issues with some snow below melting layer.'),
+        'developers': 'Robert Jackson, ANL. Zachary Sherman, ANL.',
+        'translator': 'Scott Collis, ANL.',
+        'mentors': ('Nitin Bharadwaj, PNNL. Bradley Isom, PNNL.',
+                    'Joseph Hardin, PNNL. Iosif Lindenmaier, PNNL.')},
 }
+
 
 
 ##############################################################################
