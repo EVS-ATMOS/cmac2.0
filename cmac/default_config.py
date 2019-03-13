@@ -563,7 +563,8 @@ _DEFAULT_CMAC_VALUES = {
         'hard_const': cacti_csapr2_ppi_hard_const,
         'gen_clutter_from_refl': True,
         'gen_clutter_from_refl_diff': -12.0,
-        'gen_clutter_from_refl_alt': 2000.0}  # We expect clutter corrected fields now
+        'gen_clutter_from_refl_alt': 2000.0,
+        'clutter_mask_z_for_texture': True}  # We expect clutter corrected fields now
 }
 
 

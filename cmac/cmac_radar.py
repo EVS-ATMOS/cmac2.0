@@ -64,6 +64,16 @@ def cmac(radar, sonde, config, flip_velocity=False,
     alt_field = field_config['altitude']
     vel_field = field_config['velocity']
 
+    if 'gen_clutter_from_refl' not in cmac_config.keys():
+        cmac_config['gen_clutter_from_refl'] = False
+
+    if cmac_config['gen_clutter_from_refl']:
+        new_clutter_field = gen_clutter_field_from_refl(radar, field_config['input_clutter_corrected_reflectivity'],
+                                                        field_config['reflectivity'],
+                                                        diff_dbz=cmac_config['gen_clutter_from_refl_diff'],
+                                                        max_h=cmac_config['gen_clutter_from_refl_alt'])
+        radar.add_field(field_config['ground_clutter'], new_clutter_field, replace_existing=True)
+
     # ZDR offsets
 
     if 'zdr_offset' in cmac_config.keys():
@@ -90,7 +100,20 @@ def cmac(radar, sonde, config, flip_velocity=False,
             vel_field]['data'] * -1.0
     z_dict, temp_dict = pyart.retrieve.map_profile_to_gates(
         sonde.variables[temp_field][:], sonde.variables[alt_field][:], radar)
-    texture = get_texture(radar, vel_field)
+
+    if 'clutter_mask_z_for_texture' not in cmac_config.keys():
+        cmac_config['clutter_mask_z_for_texture'] = False
+
+    if cmac_config['clutter_mask_z_for_texture']:
+        masked_vr = copy.deepcopy(radar.fields[vel_field])
+        masked_vr['data'] = np.ma.masked_where(radar.fields['ground_clutter']['data'] == 1, masked_vr['data'])
+        masked_vr['data'][radar.fields['ground_clutter']['data'] == 1] = np.nan
+        radar.add_field('clutter_masked_velocity', masked_vr, replace_existing=True)
+
+        texture = get_texture(radar, 'clutter_masked_velocity')
+        texture['data'][np.isnan(texture['data'])] = 0.0
+    else:
+        texture = get_texture(radar, vel_field)
 
     snr = pyart.retrieve.calculate_snr_from_reflectivity(radar)
 
@@ -122,16 +145,6 @@ def cmac(radar, sonde, config, flip_velocity=False,
         cmac_config['hard_const'] = None
 
     # Specifically for dealing with the ingested C-SAPR2 data
-
-    if 'gen_clutter_from_refl' not in cmac_config.keys():
-        cmac_config['gen_clutter_from_refl'] = False
-
-    if cmac_config['gen_clutter_from_refl']:
-        new_clutter_field = gen_clutter_field_from_refl(radar, field_config['input_clutter_corrected_reflectivity'],
-                                                        field_config['reflectivity'],
-                                                        diff_dbz=cmac_config['gen_clutter_from_refl_diff'],
-                                                        max_h=cmac_config['gen_clutter_from_refl_alt'])
-        radar.add_field(field_config['ground_clutter'], new_clutter_field, replace_existing=True)
 
     my_fuzz, _ = do_my_fuzz(radar, rhv_field, ncp_field, verbose=verbose,
                             custom_mbfs=cmac_config['mbfs'],
