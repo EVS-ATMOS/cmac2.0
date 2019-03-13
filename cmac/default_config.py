@@ -221,6 +221,7 @@ _DEFAULT_FIELD_NAMES = {
     # X-SAPR I6 PPI field names.
     'xsapr_i6_ppi': {
         # Radar field names
+        'input_zdr': 'differential_reflectivity',
         'reflectivity': 'reflectivity',
         'velocity': 'velocity',
         'normalized_coherent_power': 'normalized_coherent_power',
@@ -240,6 +241,7 @@ _DEFAULT_FIELD_NAMES = {
     # X-SAPR I5 PPI field names.
     'xsapr_i5_ppi': {
         # Radar field names
+        'input_zdr': 'differential_reflectivity',
         'reflectivity': 'reflectivity',
         'velocity': 'velocity',
         'normalized_coherent_power': 'normalized_coherent_power',
@@ -258,6 +260,7 @@ _DEFAULT_FIELD_NAMES = {
 
     'xsapr_i5_cfr_ppi': {
         # Radar field names
+        'input_zdr': 'differential_reflectivity',
         'reflectivity': 'reflectivity',
         'velocity': 'mean_doppler_velocity',
         'normalized_coherent_power': 'normalized_coherent_power',
@@ -276,6 +279,7 @@ _DEFAULT_FIELD_NAMES = {
     # X-SAPR I4 PPI field names.
     'xsapr_i4_ppi': {
         # Radar field names
+        'input_zdr': 'differential_reflectivity',
         'reflectivity': 'reflectivity',
         'velocity': 'velocity',
         'normalized_coherent_power': 'normalized_coherent_power',
@@ -295,6 +299,7 @@ _DEFAULT_FIELD_NAMES = {
     # X-SAPR I6 Sector field names.
     'xsapr_i6_sec': {
         # Radar field names
+        'input_zdr': 'differential_reflectivity',
         'reflectivity': 'reflectivity',
         'velocity': 'velocity',
         'normalized_coherent_power': 'normalized_coherent_power',
@@ -314,6 +319,7 @@ _DEFAULT_FIELD_NAMES = {
     # X-SAPR I5 Sector field names.
     'xsapr_i5_sec': {
         # Radar field names
+        'input_zdr': 'differential_reflectivity',
         'reflectivity': 'reflectivity',
         'velocity': 'velocity',
         'normalized_coherent_power': 'normalized_coherent_power',
@@ -333,6 +339,7 @@ _DEFAULT_FIELD_NAMES = {
     # X-SAPR I4 Sector field names.
     'xsapr_i4_sec': {
         # Radar field names
+        'input_zdr': 'differential_reflectivity',
         'reflectivity': 'reflectivity',
         'velocity': 'velocity',
         'normalized_coherent_power': 'normalized_coherent_power',
@@ -352,6 +359,7 @@ _DEFAULT_FIELD_NAMES = {
     # CACTI C-SAPR 2 field names.
     'cacti_csapr2_ppi': {
         # Radar field names
+        'input_zdr': 'differential_reflectivity',
         'reflectivity': 'uncorrected_reflectivity_h',  # need to change to input_reflectivity
         'velocity': 'mean_doppler_velocity',
         'normalized_coherent_power': 'normalized_coherent_power',
