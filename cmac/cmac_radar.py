@@ -111,8 +111,18 @@ def cmac(radar, sonde, config, flip_velocity=False,
     # Performing fuzzy logic to obtain the gate ids.
     rhv_field = field_config['cross_correlation_ratio']
     ncp_field = field_config['normalized_coherent_power']
+
+    if 'mbfs' not in cmac_config:
+        cmac_config['mbfs'] = None
+
+    if 'hard_const' not in cmac_config:
+        cmac_config['hard_const'] = None
+
     my_fuzz, _ = do_my_fuzz(radar, rhv_field, ncp_field, tex_start=2.4,
-                            tex_end=2.7, verbose=verbose)
+                            tex_end=2.7, verbose=verbose,
+                            custom_mbfs=cmac_config['mbfs'],
+                            custom_hard_constraints=cmac_config['hard_const'])
+
     radar.add_field('gate_id', my_fuzz,
                     replace_existing=True)
 

@@ -7,6 +7,7 @@ being used.
 """
 
 
+
 ##############################################################################
 # Default metadata
 #
@@ -377,6 +378,50 @@ _DEFAULT_FIELD_NAMES = {
         'refl_field': 'corrected_reflectivity'}  # output Z field
 }
 
+##############################################################################
+# Membership functions
+#
+# This goes into the following section cmac_config
+##############################################################################
+
+# csapr2_cordoba
+cacti_csapr2_ppi_mbfs={'multi_trip': {'velocity_texture': [[2.0, 2.1, 130.0, 130.0], 4.0],
+                                 'copol_correlation_coeff': [[0.5, 0.7, 1, 1], 0.0],
+                                 'normalized_coherent_power': [[0, 0, 0.5, 0.6], 1.0],
+                                 'height': [[0, 0, 5000, 8000], 0.0],
+                                 'sounding_temperature': [[-100, -100, 100, 100], 0.0],
+                                 'signal_to_noise_ratio': [[8, 15, 1000, 1000], 1.0]},
+                  'rain': {'velocity_texture': [[0, 0, 2.0, 2.1], 1.0],
+                           'copol_correlation_coeff': [[0.97, 0.98, 1, 1], 1.0],
+                           'normalized_coherent_power': [[0.4, 0.5, 1, 1], 1.0],
+                           'height': [[0, 0, 5000, 6000], 0.0],
+                           'sounding_temperature': [[2.0, 5.0, 100, 100], 2.0],
+                           'signal_to_noise_ratio': [[8, 10, 1000, 1000], 1.0]},
+                  'snow': {'velocity_texture': [[0, 0, 2.0, 2.1], 1.0],
+                           'copol_correlation_coeff': [[0.65, 0.9, 1, 1], 1.0],
+                           'normalized_coherent_power': [[0.4, 0.5, 1, 1], 1.0],
+                           'height': [[0, 0, 25000, 25000], 0.0],
+                           'sounding_temperature': [[-100, -100, 0.5, 4.0], 2.0],
+                           'signal_to_noise_ratio': [[8, 10, 1000, 1000], 1.0]},
+                  'no_scatter': {'velocity_texture': [[2.0, 2.1, 330.0, 330.0], 2.0],
+                                 'copol_correlation_coeff': [[0, 0, 0.1, 0.2], 0.0],
+                                 'normalized_coherent_power': [[0, 0, 0.1, 0.2], 0.0],
+                                 'height': [[0, 0, 25000, 25000], 0.0],
+                                 'sounding_temperature': [[-100, -100, 100, 100], 0.0],
+                                 'signal_to_noise_ratio': [[-100, -100, 8, 15], 4.0]},
+                'melting': {'velocity_texture': [[0, 0, 2.0, 2.1], 0.0],
+                            'copol_correlation_coeff': [[0.6, 0.65, 0.9, 0.96], 2.0],
+                            'normalized_coherent_power': [[0.4, 0.5, 1, 1], 0],
+                            'height': [[0, 0, 25000, 25000], 0.0],
+                            'sounding_temperature': [[0, 0.1, 2, 4], 4.0],
+                            'signal_to_noise_ratio': [[8, 10, 1000, 1000], 0.0]}}
+
+cacti_csapr2_ppi_hard_const = [['melting', 'sounding_temperature', (10, 100)],
+                              ['multi_trip', 'height', (10000, 1000000)],
+                              ['melting', 'sounding_temperature', (-10000, -2)],
+                              ['rain', 'sounding_temperature', (-1000, -5)],
+                              ['melting', 'velocity_texture', (3, 300)]]
+
 
 ##############################################################################
 # Default CMAC 2.0 values
@@ -511,7 +556,9 @@ _DEFAULT_CMAC_VALUES = {
         'flip_phidp': True,
         'phidp_flipped': ['uncorrected_differential_phase','differential_phase'],
         'zdr_offset': -3.8,
-        'offset_zdrs': ['differential_reflectivity_lag_1', 'differential_reflectivity']}
+        'offset_zdrs': ['differential_reflectivity_lag_1', 'differential_reflectivity'],
+        'mbfs': cacti_csapr2_ppi_mbfs,
+        'hard_const': cacti_csapr2_ppi_hard_const}
 }
 
 
