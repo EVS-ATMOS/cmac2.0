@@ -214,7 +214,8 @@ def quicklooks(radar, config, image_directory=None,
     fig.savefig(
         image_directory
         + '/cmac_four_panel_plot' + combined_name + '.png')
-    del fig, ax
+    plt.close(fig)
+    del fig, ax, display
 
     # Creating a plot with reflectivity corrected with gate ids.
     cmac_gates = pyart.correct.GateFilter(radar)
@@ -245,7 +246,8 @@ def quicklooks(radar, config, image_directory=None,
     fig.savefig(
         image_directory
         + '/masked_corrected_reflectivity' + combined_name + '.png')
-    del fig, ax
+    plt.close(fig)
+    del fig, ax, display
 
 
     # Creating a plot with reflectivity corrected with attenuation.
@@ -269,7 +271,8 @@ def quicklooks(radar, config, image_directory=None,
     fig.savefig(
         image_directory
         + '/corrected_reflectivity' + combined_name + '.png')
-    del fig, ax
+    plt.close(fig)
+    del fig, ax, display
 
     # Creating a plot with differential phase.
     display = pyart.graph.RadarMapDisplay(radar)
@@ -284,7 +287,8 @@ def quicklooks(radar, config, image_directory=None,
     fig.savefig(
         image_directory
         + '/differential_phase' + combined_name + '.png')
-    del fig, ax
+    plt.close(fig)
+    del fig, ax, display
 
 
     # Creating a plot of specific attenuation.
@@ -304,7 +308,8 @@ def quicklooks(radar, config, image_directory=None,
     fig.savefig(
         image_directory
         + '/specific_attenuation' + combined_name + '.png')
-    del fig, ax
+    plt.close(fig)
+    del fig, ax, display
 
     # Creating a plot of corrected differential phase.
     display = pyart.graph.RadarMapDisplay(radar)
@@ -325,7 +330,8 @@ def quicklooks(radar, config, image_directory=None,
     fig.savefig(
         image_directory
         + '/corrected_differential_phase' + combined_name + '.png')
-    del fig, ax
+    plt.close(fig)
+    del fig, ax, display
 
     # Creating a plot of corrected specific differential phase.
     display = pyart.graph.RadarMapDisplay(radar)
@@ -346,7 +352,8 @@ def quicklooks(radar, config, image_directory=None,
     fig.savefig(
         image_directory
         + '/corrected_specific_diff_phase' + combined_name + '.png')
-    del fig, ax
+    plt.close(fig)
+    del fig, ax, display
 
     # Creating a plot with region dealias corrected velocity.
     display = pyart.graph.RadarMapDisplay(radar)
@@ -364,7 +371,8 @@ def quicklooks(radar, config, image_directory=None,
     fig.savefig(
         image_directory
         + '/corrected_velocity' + combined_name + '.png')
-    del fig, ax
+    plt.close(fig) 
+    del fig, ax, display
 
     # Creating a plot of rain rate A
     display = pyart.graph.RadarMapDisplay(radar)
@@ -381,7 +389,8 @@ def quicklooks(radar, config, image_directory=None,
     fig.savefig(
         image_directory
         + '/rain_rate_A' + combined_name + '.png')
-    del fig, ax
+    plt.close(fig)
+    del fig, ax, display
 
     # Creating a plot of filtered corrected differential phase.
     display = pyart.graph.RadarMapDisplay(radar)
@@ -403,7 +412,8 @@ def quicklooks(radar, config, image_directory=None,
     fig.savefig(
         image_directory
         + '/filtered_corrected_differential_phase' + combined_name + '.png')
-    del fig, ax
+    plt.close(fig)
+    del fig, ax, display
 
     # Creating a plot of filtered corrected specific differential phase.
     display = pyart.graph.RadarMapDisplay(radar)
@@ -425,7 +435,8 @@ def quicklooks(radar, config, image_directory=None,
     fig.savefig(
         image_directory
         + '/filtered_corrected_specific_diff_phase' + combined_name + '.png')
-    del fig, ax
+    plt.close(fig)
+    del fig, ax, display
 
     # Creating a plot of corrected differential phase.
     display = pyart.graph.RadarMapDisplay(radar)
@@ -446,7 +457,8 @@ def quicklooks(radar, config, image_directory=None,
     fig.savefig(
         image_directory
         + '/specific_differential_attenuation' + combined_name + '.png')
-    del fig, ax
+    plt.close(fig)
+    del fig, ax, display
 
     # Creating a plot of corrected differential phase.
     display = pyart.graph.RadarMapDisplay(radar)
@@ -468,7 +480,8 @@ def quicklooks(radar, config, image_directory=None,
     fig.savefig(
         image_directory
         + '/path_integrated_differential_attenuation' + combined_name + '.png')
-    del fig, ax
+    plt.close(fig)
+    del fig, ax, display
 
     # Creating a plot of corrected differential phase.
     display = pyart.graph.RadarMapDisplay(radar)
@@ -489,7 +502,8 @@ def quicklooks(radar, config, image_directory=None,
     fig.savefig(
         image_directory
         + '/corrected_differential_reflectivity' + combined_name + '.png')
-    del fig, ax
+    plt.close(fig)
+    del fig, ax, display
 
 
 def _generate_title(radar, field, sweep):
