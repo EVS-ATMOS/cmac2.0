@@ -34,7 +34,6 @@ dependencies:
 - trmm_rsl=1.49=2
 - xorg-libxau=1.0.8=3
 - xorg-libxdmcp=1.1.2=3
-- basemap=1.0.7=np112py36_0
 - curl=7.49.0=1
 - cython=0.25.2=py36_0
 - geos=3.5.0=0
