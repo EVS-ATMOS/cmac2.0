@@ -3,14 +3,12 @@ CMAC 2.0
 
 CMAC: Corrected Precipitation Radar Moments in Antenna Coordinates
 
-Using fuzzy logic, scipy, and more to identify gates as rain, melting,
-snow, no clutter, and second trip. Many fields such as reflectivity,
-coorelation coefficient and signal to noise ratio are used, but sounding
-temperature from sonde data is also used.
-
-There are many new products added to the radar fields, such as specific
-attenuation, rain rate A, corrected specific differential phase, attenuation
-corrected reflectivity, and more.
+CMAC 2.0 (Corrected Moments in Antenna Coordinates version 2) is a set of
+algorithms and code that does corrections to Radar data, but also adds fields
+to the original data. Using fuzzy logic CMAC also calculates gate IDs such as
+rain, snow and second-trip. Some other examples of the corrections done are
+velocity dealiasing and attenuation-corrected reflectivity. Example of fields
+added are rain_rate_A, velocity_texture and filtered_corrected_differential_phase. 
 
 More information can be found at https://www.arm.gov/capabilities/vaps/xsapr-cmac-142
 
@@ -25,7 +23,14 @@ instructions below::
         conda env create -f environment-3.6.yml
         source activate cmac_env
         export COIN_INSTALL_DIR=/Users/yourusername/youranacondadir/envs/cmac_env
-        pip install git+https://github.com/jjhelmus/CyLP.git@py3
+
+You will need to install Anaconda Compilers for the installation of CyLP.
+These compilers can be found here and differ between OS:
+https://docs.conda.io/projects/conda-build/en/latest/resources/compiler-tools.html
+
+After the compilers are installed, you should be able to install CyLP with::
+
+        pip install git+https://github.com/coin-or/CyLP.git
 
 Scripts such as cmac_animation and cmac_dask require additional dependencies::
 
