@@ -8,8 +8,6 @@ More information can be found at https://www.arm.gov/data/data-sources/cmac-69
 """
 
 
-import glob
-
 import subprocess
 from setuptools import setup, find_packages
 
@@ -38,7 +36,6 @@ CLASSIFIERS = filter(None, CLASSIFIERS.split('\n'))
 MAJOR = 0
 MINOR = 1
 MICRO = 0
-SCRIPTS = glob.glob('scripts/*')
 VERSION = '%d.%d.%d' % (MAJOR, MINOR, MICRO)
 
 
@@ -119,4 +116,10 @@ setup(
     maintainer=MAINTAINER,
     license=LICENSE,
     classifiers=CLASSIFIERS,
-    packages=find_packages())
+    packages=find_packages(),
+    scripts=['scripts/cmac',
+             'scripts/cmac_animation',
+             'scripts/cmac_dask',
+             'scripts/xsapr_cmac_ipcluster',
+             'scripts/xsapr_cmac_pyspark'],
+)
