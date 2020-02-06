@@ -19,6 +19,7 @@ dependencies:
 # radar
   - coincbc=2.9.9
   - act-atmos
+  - scikit-fuzzy
   - pip:
     - git+https://github.com/CSU-Radarmet/CSU_RadarTools.git
     - git+https://github.com/EVS-ATMOS/cmac2.0
