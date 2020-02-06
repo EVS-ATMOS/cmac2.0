@@ -36,7 +36,6 @@ CLASSIFIERS = filter(None, CLASSIFIERS.split('\n'))
 MAJOR = 0
 MINOR = 1
 MICRO = 0
-SCRIPTS = glob.glob('scripts/*')
 VERSION = '%d.%d.%d' % (MAJOR, MINOR, MICRO)
 
 
