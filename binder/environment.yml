@@ -1,0 +1,24 @@
+# packages in addition to s/buildpacks/conda/environment.yml
+name: pangeo
+channels:
+  - conda-forge
+dependencies:
+  - numpy
+  - scipy
+  - matplotlib
+  - pandas
+  - arm_pyart
+  - xarray>=0.12.2
+  - nb_conda
+# data science stuff
+# geospatial
+  - cartopy
+# jupyter-related
+  - ipyleaflet
+  - pip
+# radar
+  - coincbc=2.9.9
+  - act_atmos
+  - pip:
+    - git+https://github.com/CSU-Radarmet/CSU_RadarTools.git
+    - git+https://github.com/EVS-ATMOS/cmac2.0
