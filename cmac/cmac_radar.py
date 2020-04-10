@@ -72,7 +72,7 @@ def cmac(radar, sonde, config, flip_velocity=False,
                                                         field_config['reflectivity'],
                                                         diff_dbz=cmac_config['gen_clutter_from_refl_diff'],
                                                         max_h=cmac_config['gen_clutter_from_refl_alt'])
-        radar.add_field(field_config['ground_clutter'], new_clutter_field, replace_existing=True)
+        radar.add_field(field_config['clutter'], new_clutter_field, replace_existing=True)
 
     # ZDR offsets
 

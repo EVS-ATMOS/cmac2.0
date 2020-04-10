@@ -368,6 +368,7 @@ _DEFAULT_FIELD_NAMES = {
         'input_phidp_field': 'uncorrected_differential_phase',
         'input_clutter_corrected_reflectivity': 'reflectivity',
         'clutter': 'ground_clutter',
+        'differential_reflectivity': 'differential_reflectivity',
         # Sonde field names
         'altitude': 'alt',
         'temperature': 'tdry',
@@ -564,7 +565,9 @@ _DEFAULT_CMAC_VALUES = {
         'gen_clutter_from_refl': True,
         'gen_clutter_from_refl_diff': -12.0,
         'gen_clutter_from_refl_alt': 2000.0,
-        'clutter_mask_z_for_texture': True}  # We expect clutter corrected fields now
+        'clutter_mask_z_for_texture': True,
+        'rain_rate_a_coef': 51.3,
+        'rain_rate_b_coef': 0.81}  # We expect clutter corrected fields now
 }
 
 
