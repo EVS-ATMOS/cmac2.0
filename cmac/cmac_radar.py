@@ -57,7 +57,8 @@ def cmac(radar, sonde, config, flip_velocity=False,
     # Obtaining variables needed for fuzzy logic.
 
     radar_start_date = netCDF4.num2date(
-        radar.time['data'][0], radar.time['units'])
+        radar.time['data'][0], radar.time['units'],
+        only_use_cftime_datetimes=False, only_use_python_datetimes=True)
     print('##', str(radar_start_date))
 
     temp_field = field_config['temperature']

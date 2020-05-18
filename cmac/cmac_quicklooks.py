@@ -45,7 +45,8 @@ def quicklooks(radar, config, image_directory=None,
         image_directory = os.path.expanduser('~')
 
     radar_start_date = netCDF4.num2date(
-        radar.time['data'][0], radar.time['units'])
+        radar.time['data'][0], radar.time['units'],
+        only_use_cftime_datetimes=False, only_use_python_datetimes=True)
 
     # Retrieve the plot parameter values based on the radar.
     plot_config = get_plot_values(config)
