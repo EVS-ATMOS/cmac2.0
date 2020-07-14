@@ -47,7 +47,7 @@ def main():
 
     args = parser.parse_args()
 
-    site = args.xsapr_site
+    site = args.site_save_name
 
     if args.path is None:
         path = ('/lustre/or-hydra/cades-arm/proj-shared/'
