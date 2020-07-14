@@ -24,8 +24,11 @@ def main():
     parser = argparse.ArgumentParser(
         description='Create a mp4 of cmac_four_panel plot for a each day.')
     parser.add_argument(
-        'xsapr_site', type=str, choices=['I4','I5','I6'],
-        help='X-SAPR site location, example: I4, I5 or I6.')
+        'site_save_name', type=str,
+        help='Radar site save name for the mp4s, example: sgpxsaprcmacsurI5')
+    parser.add_argument(
+        'field', type=str,
+        help='Field name of pngs to be converted to mp4.')
     parser.add_argument(
         'start_date', type=str,
         help="Start date string to do mp4 creation. Example:'20170909'")
@@ -36,7 +39,7 @@ def main():
         '-fr', '--frame_rate', type=float, default=1.0,
         help='Frame rate to create mp4 with. Example: 2.0')
     parser.add_argument(
-        '-p', '--path', type=str, 
+        '-p', '--path', type=str,
         default=None, help='Target path')
     parser.add_argument(
         '-s', '--source_path', default=None,
@@ -44,11 +47,11 @@ def main():
 
     args = parser.parse_args()
 
-    site = args.xsapr_site
+    site = args.site_save_name
 
     if args.path is None:
         path = ('/lustre/or-hydra/cades-arm/proj-shared/'
-                + 'sgpxsaprcmacsur' + site + '.c1.mp4/')
+                + site + '.mp4/')
     else:
         path = args.path
 
@@ -68,8 +71,8 @@ def main():
                 + 'sgpxsaprcmacsur' + site + '.c1.png/' + date
                 + '**/cmac*', recursive=True)
         else:
-            files = glob.glob(args.source_path + '/' + date + '**/cmac*',
-                              recursive=True)
+            files = glob.glob(args.source_path + '/' + date + '**/'
+                              + args.field + '*', recursive=True)
 
         # If a date has no image files, loop goes to the next date.
         if not files:
@@ -96,8 +99,8 @@ def main():
                   + " ffmpeg -f image2pipe -r " + str(args.frame_rate)
                   + " -i - -movflags faststart -pix_fmt yuv420p -vf"
                   + " 'scale=trunc(iw/2)*2:trunc(ih/2)*2' -y "
-                  + date_path + "cmac_four_panel_plot.sgpxsaprcmacsur"
-                  + site + ".c1." + date + ".mp4")
+                  + date_path + args.field + args.site_save_name
+                  + date + ".mp4")
 
         # Removes temp_images directory to start fresh with each day.
         shutil.rmtree(path + 'temp_images/')
