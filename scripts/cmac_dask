@@ -101,7 +101,7 @@ def run_cmac_and_plotting(radar_file_path, sounding_times, args):
     del radar
     sonde.close()
 
-    ref_10_per, ref_40_per = cmac.
+    ref_10_per, ref_40_per = area_coverage(radar)
     cmac_radar.metadata['precipitation_coverage_percentage'] = ref_10_per
     cmac_radar.metadata['convection_coverage_percentage'] = ref_40_per
 
