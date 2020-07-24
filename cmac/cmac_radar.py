@@ -73,7 +73,7 @@ def cmac(radar, sonde, config, flip_velocity=False,
                                                         field_config['reflectivity'],
                                                         diff_dbz=cmac_config['gen_clutter_from_refl_diff'],
                                                         max_h=cmac_config['gen_clutter_from_refl_alt'])
-        radar.add_field(field_config['ground_clutter'], new_clutter_field, replace_existing=True)
+        radar.add_field(field_config['clutter'], new_clutter_field, replace_existing=True)
 
     # ZDR offsets
 
@@ -154,7 +154,7 @@ def cmac(radar, sonde, config, flip_velocity=False,
     radar.add_field('gate_id', my_fuzz,
                     replace_existing=True)
 
-    if 'ground_clutter' in radar.fields.keys():
+    if 'ground_clutter' or 'clutter' in radar.fields.keys():
         # Adding fifth gate id, clutter.
         clutter_data = radar.fields['ground_clutter']['data']
         gate_data = radar.fields['gate_id']['data']
@@ -355,3 +355,16 @@ def cmac(radar, sonde, config, flip_velocity=False,
     radar.metadata.update(meta)
     radar.metadata['command_line'] = command_line
     return radar
+
+
+def area_coverage(radar, precip_threshold=10.0, convection_threshold=40.0):
+    """ Returns percent coverage of precipitation and convection. """
+    temp_radar = radar.extract_sweeps([0])
+    ref = temp_radar.fields['corrected_reflectivity']['data']
+    total_len = len(ref.flatten())
+    ref_10_len = len(np.argwhere(ref >= precip_threshold))
+    ref_40_len = len(np.argwhere(ref >= convection_threshold))
+    ref_10_per = (ref_10_len/total_len)*100
+    ref_40_per = (ref_40_len/total_len)*100
+    del temp_radar
+    return ref_10_per, ref_40_per
