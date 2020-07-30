@@ -368,6 +368,7 @@ _DEFAULT_FIELD_NAMES = {
         'input_phidp_field': 'uncorrected_differential_phase',
         'input_clutter_corrected_reflectivity': 'reflectivity',
         'clutter': 'ground_clutter',
+        'differential_reflectivity': 'differential_reflectivity',
         # Sonde field names
         'altitude': 'alt',
         'temperature': 'tdry',
@@ -387,36 +388,36 @@ _DEFAULT_FIELD_NAMES = {
 ##############################################################################
 
 # csapr2_cordoba
-cacti_csapr2_ppi_mbfs={'multi_trip': {'velocity_texture': [[2.0, 2.1, 130.0, 130.0], 4.0],
+cacti_csapr2_ppi_mbfs={'multi_trip': {'velocity_texture': [[7.5, 7.8, 130.0, 130.0], 4.0],
                                  'copol_correlation_coeff': [[0.5, 0.7, 1, 1], 0.0],
                                  'normalized_coherent_power': [[0, 0, 0.5, 0.6], 1.0],
                                  'height': [[0, 0, 5000, 8000], 0.0],
                                  'sounding_temperature': [[-100, -100, 100, 100], 0.0],
-                                 'signal_to_noise_ratio': [[8, 15, 1000, 1000], 1.0]},
+                                 'signal_to_noise_ratio': [[5.0, 8.0, 1000, 1000], 1.0]},
                   'rain': {'velocity_texture': [[0, 0, 2.0, 2.1], 1.0],
                            'copol_correlation_coeff': [[0.97, 0.98, 1, 1], 1.0],
                            'normalized_coherent_power': [[0.4, 0.5, 1, 1], 1.0],
                            'height': [[0, 0, 5000, 6000], 0.0],
                            'sounding_temperature': [[2.0, 5.0, 100, 100], 2.0],
-                           'signal_to_noise_ratio': [[8, 10, 1000, 1000], 1.0]},
+                           'signal_to_noise_ratio': [[20, 22, 1000, 1000], 1.0]},
                   'snow': {'velocity_texture': [[0, 0, 2.0, 2.1], 1.0],
                            'copol_correlation_coeff': [[0.65, 0.9, 1, 1], 1.0],
                            'normalized_coherent_power': [[0.4, 0.5, 1, 1], 1.0],
                            'height': [[0, 0, 25000, 25000], 0.0],
                            'sounding_temperature': [[-100, -100, 0.5, 4.0], 2.0],
-                           'signal_to_noise_ratio': [[8, 10, 1000, 1000], 1.0]},
-                  'no_scatter': {'velocity_texture': [[2.0, 2.1, 330.0, 330.0], 2.0],
+                           'signal_to_noise_ratio': [[20, 22, 1000, 1000], 1.0]},
+                  'no_scatter': {'velocity_texture': [[0, 0, 330.0, 330.0], 2.0],
                                  'copol_correlation_coeff': [[0, 0, 0.1, 0.2], 0.0],
                                  'normalized_coherent_power': [[0, 0, 0.1, 0.2], 0.0],
                                  'height': [[0, 0, 25000, 25000], 0.0],
                                  'sounding_temperature': [[-100, -100, 100, 100], 0.0],
-                                 'signal_to_noise_ratio': [[-100, -100, 8, 15], 4.0]},
+                                 'signal_to_noise_ratio': [[-100, -100, 20, 22], 4.0]},
                 'melting': {'velocity_texture': [[0, 0, 2.0, 2.1], 0.0],
                             'copol_correlation_coeff': [[0.6, 0.65, 0.9, 0.96], 2.0],
                             'normalized_coherent_power': [[0.4, 0.5, 1, 1], 0],
                             'height': [[0, 0, 25000, 25000], 0.0],
                             'sounding_temperature': [[0, 0.1, 2, 4], 4.0],
-                            'signal_to_noise_ratio': [[8, 10, 1000, 1000], 0.0]}}
+                            'signal_to_noise_ratio': [[20, 22, 1000, 1000], 0.0]}}
 
 cacti_csapr2_ppi_hard_const = [['melting', 'sounding_temperature', (10, 100)],
                               ['multi_trip', 'height', (10000, 1000000)],
@@ -564,7 +565,9 @@ _DEFAULT_CMAC_VALUES = {
         'gen_clutter_from_refl': True,
         'gen_clutter_from_refl_diff': -12.0,
         'gen_clutter_from_refl_alt': 2000.0,
-        'clutter_mask_z_for_texture': True}  # We expect clutter corrected fields now
+        'clutter_mask_z_for_texture': True,
+        'rain_rate_a_coef': 51.3,
+        'rain_rate_b_coef': 0.81}  # We expect clutter corrected fields now
 }
 
 

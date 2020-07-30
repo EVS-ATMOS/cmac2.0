@@ -9,7 +9,7 @@ import importlib
 import netCDF4
 import pyart
 
-from cmac import cmac, get_cmac_values, quicklooks
+from cmac import cmac, get_cmac_values, quicklooks, area_coverage
 
 
 def main():
@@ -93,6 +93,10 @@ def main():
 
     cmac_config = get_cmac_values(args.config)
     save_name = cmac_config['save_name']
+
+    ref_10_per, ref_40_per = area_coverage(radar)
+    cmac_radar.metadata['precipitation_coverage_percentage'] = ref_10_per
+    cmac_radar.metadata['convection_coverage_percentage'] = ref_40_per
 
     if args.out_radar_directory is None:
         pyart.io.write_cfradial(

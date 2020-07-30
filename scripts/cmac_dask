@@ -19,7 +19,7 @@ import netCDF4
 import pyart
 
 from cmac import (cmac, get_cmac_values, quicklooks,
-                  get_sounding_times, get_sounding_file_name)
+                  get_sounding_times, get_sounding_file_name, area_coverage)
 
 
 def run_cmac_and_plotting(radar_file_path, sounding_times, args):
@@ -100,6 +100,11 @@ def run_cmac_and_plotting(radar_file_path, sounding_times, args):
     # Free up some memory.
     del radar
     sonde.close()
+
+    ref_10_per, ref_40_per = area_coverage(radar)
+    cmac_radar.metadata['precipitation_coverage_percentage'] = ref_10_per
+    cmac_radar.metadata['convection_coverage_percentage'] = ref_40_per
+
 
     # Produce the cmac_radar file from the cmac_radar object.
     pyart.io.write_cfradial(file_name, cmac_radar)
