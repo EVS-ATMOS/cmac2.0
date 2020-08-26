@@ -389,11 +389,11 @@ def gen_clutter_field_from_refl(radar, corrected_field, uncorrected_field, diff_
     """
     new_grid = radar.fields['reflectivity']['data'] - radar.fields['uncorrected_reflectivity_h']['data']
     clutter = np.zeros(new_grid.shape, dtype=np.int)
-    possible_contamination = new_grid < -12.0
+    possible_contamination = new_grid < diff_dbz
     clutter[possible_contamination] = 1
 
     z = radar.gate_altitude['data']
-    clutter[(z - z.min()) > 2000.] = 0
+    clutter[(z - z.min()) > max_h] = 0
 
     clutter_field = {'data': clutter,
                      'standard_name': 'clutter_mask',
