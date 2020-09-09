@@ -94,7 +94,7 @@ def cmac(radar, sonde, config, flip_velocity=False,
             for fld in cmac_config['phidp_flipped']:
                 radar.fields[fld]['data'] = radar.fields[fld]['data'] * -1.0
         else:  # just flip defined phidp field
-            radar.fields[field_config['input_phidp']]['data'] = radar.fields[field_config['input_phidp']]['data']*-1.0
+            radar.fields[field_config['input_phidp_field']]['data'] = radar.fields[field_config['input_phidp_field']]['data']*-1.0
 
     if flip_velocity:
         radar.fields[vel_field]['data'] = radar.fields[
@@ -205,6 +205,9 @@ def cmac(radar, sonde, config, flip_velocity=False,
     ref_offset = cmac_config['ref_offset']
     self_const = cmac_config['self_const']
     # Calculating differential phase fields.
+
+    radar.fields['differential_phase']['data'][
+        radar.fields['differential_phase']['data']<0] += 360.0
     phidp, kdp = pyart.correct.phase_proc_lp_gf(
         radar, gatefilter=cmac_gates, offset=ref_offset, debug=True,
         nowrap=50, fzl=fzl, self_const=self_const)
