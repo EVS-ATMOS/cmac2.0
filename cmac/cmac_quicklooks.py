@@ -105,7 +105,8 @@ def quicklooks(radar, config, image_directory=None,
                        dec_radar1[1], grid_lon, grid_lat)
         grid_lon, grid_lat = np.meshgrid(grid_lon, grid_lat)
 
-    sweep = plot_config['sweep']
+    #sweep = plot_config['sweep']
+    sweep = 0
 
     # Plot of the raw reflectivity from the radar.
     display = pyart.graph.RadarMapDisplay(radar)
@@ -147,6 +148,9 @@ def quicklooks(radar, config, image_directory=None,
     if 'ground_clutter' in radar.fields.keys():
         cat_colors['clutter'] = 'black'
         lab_colors = np.append(lab_colors, 'black')
+    if 'beam_block' in radar.fields['gate_id']['notes']:
+        cat_colors['beam_block'] = 'brown'
+        lab_colors = np.append(lab_colors, 'brown')
     lab_colors = [cat_colors[kitty[0]] for kitty in sorted_cats]
     cmap = matplotlib.colors.ListedColormap(lab_colors)
 
@@ -157,7 +161,7 @@ def quicklooks(radar, config, image_directory=None,
                          max_lon=max_lon, min_lat=min_lat,
                          max_lat=max_lat, resolution='50m',
                          lat_lines=lal, lon_lines=lol, cmap=cmap,
-                         vmin=0, vmax=5, projection=ccrs.PlateCarree())
+                         vmin=0, vmax=6, projection=ccrs.PlateCarree())
 
     if dd_lobes:
         ax[0,0].contour(grid_lon, grid_lat, bca,
@@ -165,7 +169,10 @@ def quicklooks(radar, config, image_directory=None,
                         colors='k')
 
     cbax = ax[0,0]
-    if 'ground_clutter' in radar.fields.keys():
+    if 'ground_clutter' in radar.fields.keys() and 'beam_block' in radar.fields['gate_id']['notes']:
+        tick_locs = np.linspace(
+            0, len(sorted_cats) - 3, len(sorted_cats)) + 0.5
+    elif 'ground_clutter' in radar.fields.keys():
         tick_locs = np.linspace(
             0, len(sorted_cats) - 2, len(sorted_cats)) + 0.5
     else:
@@ -503,6 +510,98 @@ def quicklooks(radar, config, image_directory=None,
     fig.savefig(
         image_directory
         + '/corrected_differential_reflectivity' + combined_name + '.png')
+    plt.close(fig)
+    del fig, ax, display
+
+    # Creating a plot with reflectivity corrected with attenuation.
+    display = pyart.graph.RadarMapDisplay(radar)
+    fig, ax = plt.subplots(1, 1, subplot_kw=dict(projection=ccrs.PlateCarree()),
+                           figsize=[12, 8])
+    display.plot_ppi_map('normalized_coherent_power', sweep=sweep,
+                         resolution='50m',
+                         title=_generate_title(
+                             radar, 'normalized_coherent_power',
+                             sweep),
+                         min_lat=min_lat, min_lon=min_lon,
+                         max_lat=max_lat, max_lon=max_lon,
+                         lat_lines=lal, lon_lines=lol, ax=ax,
+                         projection=ccrs.PlateCarree())
+    if dd_lobes:
+        ax.contour(grid_lon, grid_lat, bca,
+                   levels=[np.pi/6, 5*np.pi/6], linewidths=2,
+                   colors='k')
+    fig.savefig(
+        image_directory
+        + '/normalized_coherent_power' + combined_name + '.png')
+    plt.close(fig)
+    del fig, ax, display
+
+    # Creating a plot with reflectivity corrected with attenuation.
+    display = pyart.graph.RadarMapDisplay(radar)
+    fig, ax = plt.subplots(1, 1, subplot_kw=dict(projection=ccrs.PlateCarree()),
+                           figsize=[12, 8])
+    display.plot_ppi_map('sounding_temperature', sweep=sweep,
+                         resolution='50m',
+                         title=_generate_title(
+                             radar, 'sounding_temperature',
+                             sweep),
+                         min_lat=min_lat, min_lon=min_lon,
+                         max_lat=max_lat, max_lon=max_lon,
+                         lat_lines=lal, lon_lines=lol, ax=ax,
+                         projection=ccrs.PlateCarree())
+    if dd_lobes:
+        ax.contour(grid_lon, grid_lat, bca,
+                   levels=[np.pi/6, 5*np.pi/6], linewidths=2,
+                   colors='k')
+    fig.savefig(
+        image_directory
+        + '/sounding_temperature' + combined_name + '.png')
+    plt.close(fig)
+    del fig, ax, display
+
+   # Creating a plot with reflectivity corrected with attenuation.
+    display = pyart.graph.RadarMapDisplay(radar)
+    fig, ax = plt.subplots(1, 1, subplot_kw=dict(projection=ccrs.PlateCarree()),
+                           figsize=[12, 8])
+    display.plot_ppi_map('signal_to_noise_ratio', sweep=sweep,
+                         resolution='50m',
+                         title=_generate_title(
+                             radar, 'signal_to_noise_ratio',
+                             sweep),
+                         min_lat=min_lat, min_lon=min_lon,
+                         max_lat=max_lat, max_lon=max_lon,
+                         lat_lines=lal, lon_lines=lol, ax=ax,
+                         projection=ccrs.PlateCarree())
+    if dd_lobes:
+        ax.contour(grid_lon, grid_lat, bca,
+                   levels=[np.pi/6, 5*np.pi/6], linewidths=2,
+                   colors='k')
+    fig.savefig(
+        image_directory
+        + '/signal_to_noise_ratio' + combined_name + '.png')
+    plt.close(fig)
+    del fig, ax, display
+
+   # Creating a plot with reflectivity corrected with attenuation.
+    display = pyart.graph.RadarMapDisplay(radar)
+    fig, ax = plt.subplots(1, 1, subplot_kw=dict(projection=ccrs.PlateCarree()),
+                           figsize=[12, 8])
+    display.plot_ppi_map('height', sweep=sweep,
+                         resolution='50m',
+                         title=_generate_title(
+                             radar, 'height',
+                             sweep),
+                         min_lat=min_lat, min_lon=min_lon,
+                         max_lat=max_lat, max_lon=max_lon,
+                         lat_lines=lal, lon_lines=lol, ax=ax,
+                         projection=ccrs.PlateCarree())
+    if dd_lobes:
+        ax.contour(grid_lon, grid_lat, bca,
+                   levels=[np.pi/6, 5*np.pi/6], linewidths=2,
+                   colors='k')
+    fig.savefig(
+        image_directory
+        + '/height' + combined_name + '.png')
     plt.close(fig)
     del fig, ax, display
 
