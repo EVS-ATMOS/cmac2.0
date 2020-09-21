@@ -170,10 +170,16 @@ def cmac(radar, sonde, config, geotiff=None, flip_velocity=False,
         pbb_all, cbb_all = beam_block(
             radar, geotiff, cmac_config['radar_height_offset'],
             cmac_config['beam_width'])
-        radar.fields['gate_id']['data'][cbb_all > 0.70] = 6
+        radar.fields['gate_id']['data'][cbb_all > 0.30] = 6
         notes = radar.fields['gate_id']['notes']
-        radar.fields['gate_id']['notes'] = notes + ',6:beam_block'
+        radar.fields['gate_id']['notes'] = notes + ',6:terrain_blockage'
         radar.fields['gate_id']['valid_max'] = 6
+
+        pbb_dict = pbb_to_dict(pbb_all)
+        cbb_dict = cbb_to_dict(cbb_all)
+        radar.add_field('partial_beam_blockage', pbb_dict)
+        radar.add_field('cumulative_beam_blockage', cbb_dict)
+
     cat_dict = {}
     for pair_str in radar.fields['gate_id']['notes'].split(','):
         cat_dict.update(
@@ -383,3 +389,31 @@ def area_coverage(radar, precip_threshold=10.0, convection_threshold=40.0):
     ref_40_per = (ref_40_len/total_len)*100
     del temp_radar
     return ref_10_per, ref_40_per
+
+
+def pbb_to_dict(pbb_all):
+    """ Function that takes the pbb_all array and turns
+    it into a dictionary to be used and added to the
+    pyart radar object. """
+    pbb_dict = {}
+    pbb_dict['coordinates'] = 'elevation, azimuth, range'
+    pbb_dict['units'] = 'unitless'
+    pbb_dict['data'] = pbb_all
+    pbb_dict['standard_name'] = 'partial_beam_block'
+    pbb_dict['long_name'] = 'Partial Beam Block Fraction'
+    pbb_dict['comment'] = 'Partial beam block fraction due to terrain.'
+    return pbb_dict
+
+
+def cbb_to_dict(cbb_all):
+    """ Function that takes the cbb_all array and turns
+    it into a dictionary to be used and added to the
+    pyart radar object. """
+    cbb_dict = {}
+    cbb_dict['coordinates'] = 'elevation, azimuth, range'
+    cbb_dict['units'] = 'unitless'
+    cbb_dict['data'] = cbb_all
+    cbb_dict['standard_name'] = 'cumulative_beam_block'
+    cbb_dict['long_name'] = 'Cumulative Beam Block Fraction'
+    cbb_dict['comment'] = 'Cumulative beam block fraction due to terrain.'
+    return cbb_dict

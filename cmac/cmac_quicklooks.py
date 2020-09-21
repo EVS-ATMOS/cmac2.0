@@ -147,8 +147,8 @@ def quicklooks(radar, config, image_directory=None,
     if 'ground_clutter' in radar.fields.keys():
         cat_colors['clutter'] = 'black'
         lab_colors = np.append(lab_colors, 'black')
-    if 'beam_block' in radar.fields['gate_id']['notes']:
-        cat_colors['beam_block'] = 'brown'
+    if 'terrain_blockage' in radar.fields['gate_id']['notes']:
+        cat_colors['terrain_blockage'] = 'brown'
         lab_colors = np.append(lab_colors, 'brown')
     lab_colors = [cat_colors[kitty[0]] for kitty in sorted_cats]
     cmap = matplotlib.colors.ListedColormap(lab_colors)
@@ -168,7 +168,7 @@ def quicklooks(radar, config, image_directory=None,
                         colors='k')
 
     cbax = ax[0,0]
-    if 'ground_clutter' in radar.fields.keys() or 'beam_block' in radar.fields['gate_id']['notes']:
+    if 'ground_clutter' in radar.fields.keys() or 'terrain_blockage' in radar.fields['gate_id']['notes']:
         tick_locs = np.linspace(
             0, len(sorted_cats) - 2, len(sorted_cats)) + 0.5
     else:
