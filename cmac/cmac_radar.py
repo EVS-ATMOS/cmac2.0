@@ -170,7 +170,7 @@ def cmac(radar, sonde, config, geotiff=None, flip_velocity=False,
         pbb_all, cbb_all = beam_block(
             radar, geotiff, cmac_config['radar_height_offset'],
             cmac_config['beam_width'])
-        radar.fields['gate_id']['data'][cbb_all > 0.80] = 6
+        radar.fields['gate_id']['data'][cbb_all > 0.70] = 6
         notes = radar.fields['gate_id']['notes']
         radar.fields['gate_id']['notes'] = notes + ',6:beam_block'
         radar.fields['gate_id']['valid_max'] = 6

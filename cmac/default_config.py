@@ -563,12 +563,13 @@ _DEFAULT_CMAC_VALUES = {
         'mbfs': cacti_csapr2_ppi_mbfs,
         'hard_const': cacti_csapr2_ppi_hard_const,
         'gen_clutter_from_refl': True,
-        'gen_clutter_from_refl_diff': -12.0,
+        'gen_clutter_from_refl_diff': -0.2,
         'gen_clutter_from_refl_alt': 2000.0,
         'clutter_mask_z_for_texture': True,
         'rain_rate_a_coef': 51.3,
         'rain_rate_b_coef': 0.81,
-        'beam_width': 1.0,}  # We expect clutter corrected fields now
+        'beam_width': 1.0,
+        'radar_height_offset': 10.0,}  # We expect clutter corrected fields now
 }
 
 

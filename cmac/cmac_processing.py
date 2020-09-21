@@ -472,7 +472,7 @@ def beam_block(radar, tif_file, radar_height_offset=10.0,
     beamradius = wrl.util.half_power_radius(_range, beam_width)
     # Cycling through all sweeps in the radar object.
     for i in range(len(radar.sweep_start_ray_index['data'])):
-        print('beam_block sweep' + str(i)+' ',end='')
+        print('Calculating beam blockage.')
         index_start = radar.sweep_start_ray_index['data'][i]
         index_end = radar.sweep_end_ray_index['data'][i] + 1
         elevs = radar.elevation['data'][index_start:index_end]
@@ -492,15 +492,14 @@ def beam_block(radar, tif_file, radar_height_offset=10.0,
         alt = coords[..., 2]
         polcoords = coords[..., :2]
         rlimits = (lon.min(), lat.min(), lon.max(), lat.max())
-#         print("Radar bounding box:\n\t%.2f\n%.2f             %.2f\n\t%.2f" %
-#               (lat.max(), lon.min(), lon.max(), lat.min()))
-#         #Clip the region inside our bounding box
+
+        #Clip the region inside our bounding box
         ind = wrl.util.find_bbox_indices(rastercoords, rlimits)
         rastercoords = rastercoords[ind[0]:ind[3], ind[0]:ind[2], ...]
         rastervalues = rastervalues[ind[0]:ind[3], ind[0]:ind[2]]
-        polarvalues = wrl.ipol.cart_to_irregular_spline(rastercoords, rastervalues,
-                                                     polcoords, order=3,
-                                                     prefilter=False)
+        polarvalues = wrl.ipol.cart_to_irregular_spline(
+            rastercoords, rastervalues, polcoords, order=3,
+            prefilter=False)
         # Calculate partial beam blockage using wradlib.
         pbb = wrl.qual.beam_block_frac(polarvalues, alt, beamradius)
         pbb = np.ma.masked_invalid(pbb)
@@ -511,4 +510,5 @@ def beam_block(radar, tif_file, radar_height_offset=10.0,
     pbb_all = np.ma.concatenate(pbb_arrays)
     cbb_all = np.ma.concatenate(cbb_arrays)
     del data_raster
+    print('Beam blockage complete.')
     return pbb_all, cbb_all

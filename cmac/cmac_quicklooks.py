@@ -105,8 +105,7 @@ def quicklooks(radar, config, image_directory=None,
                        dec_radar1[1], grid_lon, grid_lat)
         grid_lon, grid_lat = np.meshgrid(grid_lon, grid_lat)
 
-    #sweep = plot_config['sweep']
-    sweep = 0
+    sweep = plot_config['sweep']
 
     # Plot of the raw reflectivity from the radar.
     display = pyart.graph.RadarMapDisplay(radar)
@@ -169,10 +168,7 @@ def quicklooks(radar, config, image_directory=None,
                         colors='k')
 
     cbax = ax[0,0]
-    if 'ground_clutter' in radar.fields.keys() and 'beam_block' in radar.fields['gate_id']['notes']:
-        tick_locs = np.linspace(
-            0, len(sorted_cats) - 3, len(sorted_cats)) + 0.5
-    elif 'ground_clutter' in radar.fields.keys():
+    if 'ground_clutter' in radar.fields.keys() or 'beam_block' in radar.fields['gate_id']['notes']:
         tick_locs = np.linspace(
             0, len(sorted_cats) - 2, len(sorted_cats)) + 0.5
     else:
