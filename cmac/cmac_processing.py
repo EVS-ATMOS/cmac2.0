@@ -14,6 +14,7 @@ import pyart
 from scipy import integrate
 from scipy import ndimage, interpolate
 import skfuzzy as fuzz
+import wradlib as wrl
 
 
 def snr_and_sounding(radar, soundings_dir, override_file=None, verbose=True):
@@ -404,3 +405,110 @@ def gen_clutter_field_from_refl(radar, corrected_field, uncorrected_field, diff_
                      'units': 'unitless'}
 
     return clutter_field
+
+
+def beam_block(radar, tif_file, radar_height_offset=10.0,
+               beam_width=1.0):
+    """
+    Beam Block Radar Calculation.
+
+    Parameters
+    ----------
+    radar : Radar
+        Radar object used.
+    tif_name : string
+        Name of geotiff file to use for the
+        calculation.
+    radar_height_offset : float
+        Add height to the radar altitude for radar towers.
+
+    Other Parameters
+    ----------------
+    beam_width : float
+        Radar's beam width for calculation.
+        Default value is 1.0.
+
+    Returns
+    -------
+    pbb_all : array
+        Array of partial beam block fractions for each
+        gate in all sweeps.
+    cbb_all : array
+        Array of cumulative beam block fractions for
+        each gate in all sweeps.
+
+    References
+    ----------
+    Bech, J., B. Codina, J. Lorente, and D. Bebbington,
+    2003: The sensitivity of single polarization weather
+    radar beam blockage correction to variability in the
+    vertical refractivity gradient. J. Atmos. Oceanic
+    Technol., 20, 845–855
+
+    Heistermann, M., Jacobi, S., and Pfaff, T., 2013:
+    Technical Note: An open source library for processing
+    weather radar data (wradlib), Hydrol. Earth Syst.
+    Sci., 17, 863-871, doi:10.5194/hess-17-863-2013
+
+    Helmus, J.J. & Collis, S.M., (2016). The Python ARM
+    Radar Toolkit (Py-ART), a Library for Working with
+    Weather Radar Data in the Python Programming Language.
+    Journal of Open Research Software. 4(1), p.e25.
+    DOI: http://doi.org/10.5334/jors.119
+    """
+    # Opening the tif file and getting the values ready to be
+    # converted into polar values.
+    rasterfile = tif_file
+    data_raster = wrl.io.open_raster(rasterfile)
+    rastervalues, rastercoords, proj = wrl.georef.extract_raster_dataset(
+        data_raster, nodata=None)
+    #rastervalues_, rastercoords_, proj = wrl.georef.extract_raster_dataset(data_raster, nodata=-32768.)
+    sitecoords = (np.float(radar.longitude['data']),
+                  np.float(radar.latitude['data']),
+                  np.float(radar.altitude['data'] + radar_height_offset))
+    pbb_arrays = []
+    cbb_arrays = []
+    _range = radar.range['data']
+    beamradius = wrl.util.half_power_radius(_range, beam_width)
+    # Cycling through all sweeps in the radar object.
+    print('Calculating beam blockage.')
+    for i in range(len(radar.sweep_start_ray_index['data'])):
+        index_start = radar.sweep_start_ray_index['data'][i]
+        index_end = radar.sweep_end_ray_index['data'][i] + 1
+        elevs = radar.elevation['data'][index_start:index_end]
+        azimuths = radar.azimuth['data'][index_start:index_end]
+        rg, azg = np.meshgrid(_range, azimuths)
+        rg, eleg = np.meshgrid(_range, elevs)
+        nrays = azimuths.shape[0]              # number of rays
+        nbins = radar.ngates                   # number of range bins
+        bw = beam_width                        # half power beam width (deg)
+        range_res = 100.                       # range resolution (meters)
+        el = radar.fixed_angle['data'][i]
+        coord = wrl.georef.sweep_centroids(nrays, range_res, nbins, el)
+        coords = wrl.georef.spherical_to_proj(rg, azg, eleg,
+                                              sitecoords, proj=proj)
+        lon = coords[..., 0]
+        lat = coords[..., 1]
+        alt = coords[..., 2]
+        polcoords = coords[..., :2]
+        rlimits = (lon.min(), lat.min(), lon.max(), lat.max())
+
+        #Clip the region inside our bounding box
+        ind = wrl.util.find_bbox_indices(rastercoords, rlimits)
+        rastercoords = rastercoords[ind[0]:ind[3], ind[0]:ind[2], ...]
+        rastervalues = rastervalues[ind[0]:ind[3], ind[0]:ind[2]]
+        polarvalues = wrl.ipol.cart_to_irregular_spline(
+            rastercoords, rastervalues, polcoords, order=3,
+            prefilter=False)
+        # Calculate partial beam blockage using wradlib.
+        pbb = wrl.qual.beam_block_frac(polarvalues, alt, beamradius)
+        pbb = np.ma.masked_invalid(pbb)
+        pbb_arrays.append(pbb)
+        # Calculate cumulative beam blockage using wradlib.
+        cbb = wrl.qual.cum_beam_block_frac(pbb)
+        cbb_arrays.append(cbb)
+    pbb_all = np.ma.concatenate(pbb_arrays)
+    cbb_all = np.ma.concatenate(cbb_arrays)
+    del data_raster
+    print('Beam blockage complete.')
+    return pbb_all, cbb_all
