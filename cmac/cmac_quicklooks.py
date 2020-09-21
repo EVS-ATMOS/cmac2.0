@@ -532,29 +532,6 @@ def quicklooks(radar, config, image_directory=None,
     plt.close(fig)
     del fig, ax, display
 
-    # Creating a plot with reflectivity corrected with attenuation.
-    display = pyart.graph.RadarMapDisplay(radar)
-    fig, ax = plt.subplots(1, 1, subplot_kw=dict(projection=ccrs.PlateCarree()),
-                           figsize=[12, 8])
-    display.plot_ppi_map('sounding_temperature', sweep=sweep,
-                         resolution='50m',
-                         title=_generate_title(
-                             radar, 'sounding_temperature',
-                             sweep),
-                         min_lat=min_lat, min_lon=min_lon,
-                         max_lat=max_lat, max_lon=max_lon,
-                         lat_lines=lal, lon_lines=lol, ax=ax,
-                         projection=ccrs.PlateCarree())
-    if dd_lobes:
-        ax.contour(grid_lon, grid_lat, bca,
-                   levels=[np.pi/6, 5*np.pi/6], linewidths=2,
-                   colors='k')
-    fig.savefig(
-        image_directory
-        + '/sounding_temperature' + combined_name + '.png')
-    plt.close(fig)
-    del fig, ax, display
-
    # Creating a plot with reflectivity corrected with attenuation.
     display = pyart.graph.RadarMapDisplay(radar)
     fig, ax = plt.subplots(1, 1, subplot_kw=dict(projection=ccrs.PlateCarree()),
@@ -575,29 +552,6 @@ def quicklooks(radar, config, image_directory=None,
     fig.savefig(
         image_directory
         + '/signal_to_noise_ratio' + combined_name + '.png')
-    plt.close(fig)
-    del fig, ax, display
-
-   # Creating a plot with reflectivity corrected with attenuation.
-    display = pyart.graph.RadarMapDisplay(radar)
-    fig, ax = plt.subplots(1, 1, subplot_kw=dict(projection=ccrs.PlateCarree()),
-                           figsize=[12, 8])
-    display.plot_ppi_map('height', sweep=sweep,
-                         resolution='50m',
-                         title=_generate_title(
-                             radar, 'height',
-                             sweep),
-                         min_lat=min_lat, min_lon=min_lon,
-                         max_lat=max_lat, max_lon=max_lon,
-                         lat_lines=lal, lon_lines=lol, ax=ax,
-                         projection=ccrs.PlateCarree())
-    if dd_lobes:
-        ax.contour(grid_lon, grid_lat, bca,
-                   levels=[np.pi/6, 5*np.pi/6], linewidths=2,
-                   colors='k')
-    fig.savefig(
-        image_directory
-        + '/height' + combined_name + '.png')
     plt.close(fig)
     del fig, ax, display
 
