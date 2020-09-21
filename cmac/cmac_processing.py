@@ -407,7 +407,7 @@ def gen_clutter_field_from_refl(radar, corrected_field, uncorrected_field, diff_
     return clutter_field
 
 
-def beam_block(radar, tif_file,
+def beam_block(radar, tif_file, radar_height_offset=10.0,
                beam_width=1.0):
     """
     Beam Block Radar Calculation.
@@ -419,6 +419,8 @@ def beam_block(radar, tif_file,
     tif_name : string
         Name of geotiff file to use for the
         calculation.
+    radar_height_offset : float
+        Add height to the radar altitude for radar towers.
 
     Other Parameters
     ----------------
@@ -463,7 +465,7 @@ def beam_block(radar, tif_file,
     #rastervalues_, rastercoords_, proj = wrl.georef.extract_raster_dataset(data_raster, nodata=-32768.)
     sitecoords = (np.float(radar.longitude['data']),
                   np.float(radar.latitude['data']),
-                  np.float(radar.altitude['data']))
+                  np.float(radar.altitude['data'] + radar_height_offset))
     pbb_arrays = []
     cbb_arrays = []
     _range = radar.range['data']
