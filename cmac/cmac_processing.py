@@ -471,8 +471,8 @@ def beam_block(radar, tif_file, radar_height_offset=10.0,
     _range = radar.range['data']
     beamradius = wrl.util.half_power_radius(_range, beam_width)
     # Cycling through all sweeps in the radar object.
+    print('Calculating beam blockage.')
     for i in range(len(radar.sweep_start_ray_index['data'])):
-        print('Calculating beam blockage.')
         index_start = radar.sweep_start_ray_index['data'][i]
         index_end = radar.sweep_end_ray_index['data'][i] + 1
         elevs = radar.elevation['data'][index_start:index_end]
