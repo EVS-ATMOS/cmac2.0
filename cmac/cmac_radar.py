@@ -169,7 +169,7 @@ def cmac(radar, sonde, config, geotiff=None, flip_velocity=False,
         gate_data = radar.fields['gate_id']['data'].copy()
         radar.fields['gate_id']['data'][clutter_data == 8] = 5
         radar.fields['gate_id']['data'][clutter_data == 16] = 5
-        radar.fields['gate_id']['data'][clutter_data == 4] = 0
+        radar.fields['gate_id']['data'][clutter_data == 4] = 5
         radar.fields['gate_id']['data'][clutter_data == 1] = 0
         radar.fields['gate_id']['data'][clutter_data == 2] = 0
         radar.fields['gate_id']['data'][gate_data == 0] = 0
