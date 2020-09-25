@@ -360,8 +360,8 @@ _DEFAULT_FIELD_NAMES = {
     # CACTI C-SAPR 2 field names.
     'cacti_csapr2_ppi': {
         # Radar field names
-        'input_zdr': 'attenuation_corrected_differential_reflectivity',
-        'reflectivity': 'attenuation_corrected_reflectivity_h',  # need to change to input_reflectivity
+        'input_zdr': 'differential_reflectivity',
+        'reflectivity': 'reflectivity',  # need to change to input_reflectivity
         'velocity': 'mean_doppler_velocity',
         'normalized_coherent_power': 'normalized_coherent_power',
         'cross_correlation_ratio': 'copol_correlation_coeff',
