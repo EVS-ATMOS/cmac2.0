@@ -51,7 +51,6 @@ def cmac(radar, sonde, config, geotiff=None, flip_velocity=False,
     cmac_config = get_cmac_values(config)
     field_config = get_field_names(config)
     meta_config = get_metadata(config)
-
     # Over write site altitude
 
     if 'site_alt' in cmac_config.keys():
@@ -79,7 +78,6 @@ def cmac(radar, sonde, config, geotiff=None, flip_velocity=False,
         radar.add_field(field_config['clutter'], new_clutter_field, replace_existing=True)
 
     # ZDR offsets
-
     if 'zdr_offset' in cmac_config.keys():
         if 'offset_zdrs' in cmac_config.keys():
             for fld in cmac_config['offset_zdrs']:
@@ -110,8 +108,9 @@ def cmac(radar, sonde, config, geotiff=None, flip_velocity=False,
 
     if cmac_config['clutter_mask_z_for_texture']:
         masked_vr = copy.deepcopy(radar.fields[vel_field])
-        masked_vr['data'] = np.ma.masked_where(radar.fields['ground_clutter']['data'] == 1, masked_vr['data'])
-        masked_vr['data'][radar.fields['ground_clutter']['data'] == 1] = np.nan
+        if 'ground_clutter' in radar.fields.keys():
+            masked_vr['data'] = np.ma.masked_where(radar.fields['ground_clutter']['data'] == 1, masked_vr['data'])
+            masked_vr['data'][radar.fields['ground_clutter']['data'] == 1] = np.nan
         radar.add_field('clutter_masked_velocity', masked_vr, replace_existing=True)
 
         texture = get_texture(radar, 'clutter_masked_velocity')
@@ -157,11 +156,23 @@ def cmac(radar, sonde, config, geotiff=None, flip_velocity=False,
     radar.add_field('gate_id', my_fuzz,
                     replace_existing=True)
 
-    if 'ground_clutter' or 'clutter' in radar.fields.keys():
+    if 'ground_clutter' in radar.fields.keys():
         # Adding fifth gate id, clutter.
         clutter_data = radar.fields['ground_clutter']['data']
-        gate_data = radar.fields['gate_id']['data']
+        gate_data = radar.fields['gate_id']['data'].copy()
         radar.fields['gate_id']['data'][clutter_data == 1] = 5
+        notes = radar.fields['gate_id']['notes']
+        radar.fields['gate_id']['notes'] = notes + ',5:clutter'
+        radar.fields['gate_id']['valid_max'] = 5
+    if 'classification_mask' in radar.fields.keys():
+        clutter_data = radar.fields['classification_mask']['data']
+        gate_data = radar.fields['gate_id']['data'].copy()
+        radar.fields['gate_id']['data'][clutter_data == 8] = 5
+        radar.fields['gate_id']['data'][clutter_data == 16] = 5
+        radar.fields['gate_id']['data'][clutter_data == 4] = 5
+        radar.fields['gate_id']['data'][clutter_data == 1] = 0
+        radar.fields['gate_id']['data'][clutter_data == 2] = 0
+        radar.fields['gate_id']['data'][gate_data == 0] = 0
         notes = radar.fields['gate_id']['notes']
         radar.fields['gate_id']['notes'] = notes + ',5:clutter'
         radar.fields['gate_id']['valid_max'] = 5

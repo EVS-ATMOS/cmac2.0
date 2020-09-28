@@ -361,7 +361,7 @@ _DEFAULT_FIELD_NAMES = {
     'cacti_csapr2_ppi': {
         # Radar field names
         'input_zdr': 'differential_reflectivity',
-        'reflectivity': 'uncorrected_reflectivity_h',  # need to change to input_reflectivity
+        'reflectivity': 'reflectivity',  # need to change to input_reflectivity
         'velocity': 'mean_doppler_velocity',
         'normalized_coherent_power': 'normalized_coherent_power',
         'cross_correlation_ratio': 'copol_correlation_coeff',
@@ -388,19 +388,19 @@ _DEFAULT_FIELD_NAMES = {
 ##############################################################################
 
 # csapr2_cordoba
-cacti_csapr2_ppi_mbfs={'multi_trip': {'velocity_texture': [[7.5, 8.5, 130.0, 130.0], 4.0],
+cacti_csapr2_ppi_mbfs={'multi_trip': {'velocity_texture': [[7.7, 10.0, 130.0, 130.0], 4.0],
                                  'copol_correlation_coeff': [[0.7, 0.8, 1, 1], 0.0],
                                  'normalized_coherent_power': [[0, 0, 0.3, 0.35], 1.0],
                                  'height': [[0, 0, 5000, 8000], 0.0],
                                  'sounding_temperature': [[-100, -100, 100, 100], 0.0],
-                                 'signal_to_noise_ratio': [[5.0, 8.0, 1000, 1000], 1.0]},
-                  'rain': {'velocity_texture': [[0, 0, 3.7, 3.8], 1.0],
+                                 'signal_to_noise_ratio': [[20, 22, 1000, 1000], 1.0]},
+                  'rain': {'velocity_texture': [[0, 0, 2.4, 2.5], 1.0],
                            'copol_correlation_coeff': [[0.97, 0.98, 1, 1], 1.0],
                            'normalized_coherent_power': [[0.4, 0.5, 1, 1], 1.0],
                            'height': [[0, 0, 5000, 6000], 0.0],
                            'sounding_temperature': [[2.0, 5.0, 100, 100], 2.0],
                            'signal_to_noise_ratio': [[20, 22, 1000, 1000], 1.0]},
-                  'snow': {'velocity_texture': [[0, 0, 3.7, 3.8], 1.0],
+                  'snow': {'velocity_texture': [[0, 0, 2.4, 2.5], 1.0],
                            'copol_correlation_coeff': [[0.65, 0.9, 1, 1], 1.0],
                            'normalized_coherent_power': [[0.4, 0.5, 1, 1], 1.0],
                            'height': [[0, 0, 25000, 25000], 0.0],
@@ -412,7 +412,7 @@ cacti_csapr2_ppi_mbfs={'multi_trip': {'velocity_texture': [[7.5, 8.5, 130.0, 130
                                  'height': [[0, 0, 25000, 25000], 0.0],
                                  'sounding_temperature': [[-100, -100, 100, 100], 0.0],
                                  'signal_to_noise_ratio': [[-100, -100, 20, 22], 4.0]},
-                'melting': {'velocity_texture': [[0, 0, 3.7, 3.8], 0.0],
+                'melting': {'velocity_texture': [[0, 0, 2.4, 2.5], 0.0],
                             'copol_correlation_coeff': [[0.6, 0.65, 0.9, 0.96], 2.0],
                             'normalized_coherent_power': [[0.4, 0.5, 1, 1], 0],
                             'height': [[0, 0, 25000, 25000], 0.0],
@@ -550,7 +550,6 @@ _DEFAULT_CMAC_VALUES = {
         'save_name': 'cacticsapr2cmacppi.c1',
         'sonde_name': 'corsondewnpnM1.b1',
         'site_alt': 1141,
-        'ref_offset': 0.0,
         'self_const': 60000.00,
         'attenuation_a_coef': 0.08,
         'c_coef': 0.3,
@@ -558,11 +557,10 @@ _DEFAULT_CMAC_VALUES = {
         'beta_coef': 0.64884,  # ZDR corrections
         'flip_phidp': True,
         'phidp_flipped': ['uncorrected_differential_phase','differential_phase'],
-        'zdr_offset': -3.8,
-        'offset_zdrs': ['differential_reflectivity_lag_1', 'differential_reflectivity'],
         'mbfs': cacti_csapr2_ppi_mbfs,
         'hard_const': cacti_csapr2_ppi_hard_const,
         'gen_clutter_from_refl': True,
+        'ref_offset': 0.0,
         'gen_clutter_from_refl_diff': -0.2,
         'gen_clutter_from_refl_alt': 2000.0,
         'clutter_mask_z_for_texture': True,
