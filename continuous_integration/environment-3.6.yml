@@ -17,3 +17,4 @@ dependencies:
   - wradlib
   - pip:
     - git+https://github.com/CSU-Radarmet/CSU_RadarTools.git
+    - requests
