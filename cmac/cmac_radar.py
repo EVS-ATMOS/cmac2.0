@@ -76,7 +76,7 @@ def cmac(radar, sonde, config, geotiff=None, flip_velocity=False,
                                                         diff_dbz=cmac_config['gen_clutter_from_refl_diff'],
                                                         max_h=cmac_config['gen_clutter_from_refl_alt'])
         radar.add_field(field_config['clutter'], new_clutter_field, replace_existing=True)
-
+        radar.fields[field_config['clutter']]['units'] = '1'
     # ZDR offsets
     if 'zdr_offset' in cmac_config.keys():
         if 'offset_zdrs' in cmac_config.keys():
@@ -128,6 +128,7 @@ def cmac(radar, sonde, config, geotiff=None, flip_velocity=False,
         print('## These radar fields are being added:')
 
     radar.add_field('sounding_temperature', temp_dict, replace_existing=True)
+    radar.fields['sounding_temperature']['units'] = 'deg_C'
     radar.add_field('height', z_dict, replace_existing=True)
     radar.add_field('signal_to_noise_ratio', snr, replace_existing=True)
     radar.add_field('velocity_texture', texture, replace_existing=True)
@@ -307,6 +308,10 @@ def cmac(radar, sonde, config, geotiff=None, flip_velocity=False,
     radar.add_field('corrected_differential_reflectivity', cor_zdr,
                     replace_existing=True)
 
+    radar.fields['corrected_velocity']['units'] = 'm/s'
+    radar.fields['simulated_velocity']['units'] = 'm/s'
+    radar.fields['velocity_texture']['units'] = 'm/s'
+
     cat_dict = {}
     for pair_str in radar.fields['gate_id']['notes'].split(','):
         if verbose:
@@ -333,9 +338,9 @@ def cmac(radar, sonde, config, geotiff=None, flip_velocity=False,
     mask = radar.fields['reflectivity']['data'].mask
 
     radar.fields['rain_rate_A'].update({
-        'comment': ('Rain rate calculated from specific_attenuation,',
-                    ' R=51.3*specific_attenuation**0.81, note R=0.0 where',
-                    ' norm coherent power < 0.4 or rhohv < 0.8')})
+        'comment': 'Rain rate calculated from specific_attenuation,'
+                   + ' R=51.3*specific_attenuation**0.81, note R=0.0 where'
+                   + ' norm coherent power < 0.4 or rhohv < 0.8')}
 
     if verbose:
         print('## Rainfall rate as a function of A ##')
@@ -351,27 +356,25 @@ def cmac(radar, sonde, config, geotiff=None, flip_velocity=False,
         command_line = command_line + ' ' + item
     if meta_append is None:
         meta = {
-            'site_id': 'sgp',
-            'data_level': 'c1',
-            'comment': (
-                'This is highly experimental and initial data. There are many',
-                'known and unknown issues. Please do not use before',
-                'contacting the Translator responsible scollis@anl.gov'),
-            'attributions': (
-                'This data is collected by the ARM Climate Research facility.',
-                'Radar system is operated by the radar engineering team',
-                'radar@arm.gov and the data is processed by the precipitation',
-                'radar products team. LP code courtesy of Scott Giangrande',
-                'BNL.'),
+            'site_id': None,
+            'data_level': 'sgp',
+            'comment': 'This is highly experimental and initial data. '
+                       + 'There are many known and unknown issues. Please do '
+                       + 'not use before contacting the Translator responsible '
+                       + 'scollis@anl.gov',
+            'attributions': 'This data is collected by the ARM Climate Research '
+                            + 'facility. Radar system is operated by the radar '
+                            + 'engineering team radar@arm.gov and the data is '
+                            + 'processed by the precipitation radar products '
+                            + 'team. LP code courtesy of Scott Giangrande, BNL.',
             'version': '2.0 lite',
             'vap_name': 'cmac',
-            'known_issues': (
-                'False phidp jumps in insect regions. Still uses old',
-                'Giangrande code.'),
+            'known_issues': 'False phidp jumps in insect regions. Still uses '
+                            + 'old Giangrande code.',
             'developers': 'Robert Jackson, ANL. Zachary Sherman, ANL.',
             'translator': 'Scott Collis, ANL.',
-            'mentors': ('Nitin Bharadwaj, PNNL. Bradley Isom, PNNL.',
-                        'Joseph Hardin, PNNL. Iosif Lindenmaier, PNNL.')}
+            'mentors': 'Bradley Isom, PNNL., Iosif Lindenmaier, PNNL.',
+            'Conventions': 'CF/Radial instrument_parameters ARM-1.3'}
     else:
         if meta_append.lower().endswith('.json'):
             with open(meta_append, 'r') as infile:
@@ -407,8 +410,8 @@ def pbb_to_dict(pbb_all):
     it into a dictionary to be used and added to the
     pyart radar object. """
     pbb_dict = {}
-    pbb_dict['coordinates'] = 'elevation, azimuth, range'
-    pbb_dict['units'] = 'unitless'
+    pbb_dict['coordinates'] = 'elevation azimuth range'
+    pbb_dict['units'] = '1'
     pbb_dict['data'] = pbb_all
     pbb_dict['standard_name'] = 'partial_beam_block'
     pbb_dict['long_name'] = 'Partial Beam Block Fraction'
@@ -421,8 +424,8 @@ def cbb_to_dict(cbb_all):
     it into a dictionary to be used and added to the
     pyart radar object. """
     cbb_dict = {}
-    cbb_dict['coordinates'] = 'elevation, azimuth, range'
-    cbb_dict['units'] = 'unitless'
+    cbb_dict['coordinates'] = 'elevation azimuth range'
+    cbb_dict['units'] = '1'
     cbb_dict['data'] = cbb_all
     cbb_dict['standard_name'] = 'cumulative_beam_block'
     cbb_dict['long_name'] = 'Cumulative Beam Block Fraction'

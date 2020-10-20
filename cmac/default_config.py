@@ -188,15 +188,14 @@ _DEFAULT_METADATA = {
     'cacti_csapr2_ppi': {
         'site_id': 'cor',  # 'ARM Mobile Facility Argentina'
         'facility_id': 'c1',
-        'comment': (
-            'This is highly experimental and initial data. There are many',
-            'known and unknown issues. Please do not use before',
-            'contacting the Translator responsible scollis@anl.gov'),
-        'attributions': (
-            'This data is collected by the ARM Climate Research facility.',
-            'Radar system is operated by the radar engineering team',
-            'radar@arm.gov and the data is processed by the precipitation',
-            'radar products team. LP code courtesy of Scott Giangrande BNL.'),
+        'comment': 'This is highly experimental and initial data. There are '
+                   + 'many known and unknown issues. Please do not use before '
+                   + 'contacting the Translator responsible scollis@anl.gov',
+        'attributions': 'This data is collected by the ARM Climate Research '
+                        + 'facility. Radar system is operated by the radar '
+                        + 'engineering team radar@arm.gov and the data is '
+                        + 'processed by the precipitation radar products team. '
+                        + 'LP code courtesy of Scott Giangrande BNL.',
         'version': '2.0 lite',
         'vap_name': 'cmac',
         'known_issues': (
@@ -205,9 +204,12 @@ _DEFAULT_METADATA = {
             'Issues with some snow below melting layer.'),
         'developers': 'Robert Jackson, ANL. Zachary Sherman, ANL.',
         'translator': 'Scott Collis, ANL.',
-        'mentors': ('Nitin Bharadwaj, PNNL. Bradley Isom, PNNL.',
-                    'Joseph Hardin, PNNL. Iosif Lindenmaier, PNNL.')},
-}
+        'mentors': 'Bradley Isom, PNNL. Iosif Lindenmaier, PNNL.',
+        'Conventions': 'CF/Radial instrument_parameters ARM-1.3',
+        'references': 'See CSAPR2 Instrument Handbook',
+        'source': 'Atmospheric Radiation Measurement (ARM) program C-band '
+                  + 'Scanning ARM Precipitation Radar 2 (CSAPR2)',
+        'doi': '10.5439/1668872',}
 
 
 
@@ -547,7 +549,7 @@ _DEFAULT_CMAC_VALUES = {
 
     # CACTI C-SAPR 2 CMAC 2.0 processing values.
     'cacti_csapr2_ppi': {
-        'save_name': 'cacticsapr2cmacppi.c1',
+        'save_name': 'corcsapr2cmacppi.c1',
         'sonde_name': 'corsondewnpnM1.b1',
         'site_alt': 1141,
         'self_const': 60000.00,
