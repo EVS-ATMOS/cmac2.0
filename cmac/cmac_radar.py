@@ -340,7 +340,7 @@ def cmac(radar, sonde, config, geotiff=None, flip_velocity=False,
     radar.fields['rain_rate_A'].update({
         'comment': 'Rain rate calculated from specific_attenuation,'
                    + ' R=51.3*specific_attenuation**0.81, note R=0.0 where'
-                   + ' norm coherent power < 0.4 or rhohv < 0.8')}
+                   + ' norm coherent power < 0.4 or rhohv < 0.8'})
 
     if verbose:
         print('## Rainfall rate as a function of A ##')
