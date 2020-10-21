@@ -210,8 +210,7 @@ _DEFAULT_METADATA = {
         'source': 'Atmospheric Radiation Measurement (ARM) program C-band '
                   + 'Scanning ARM Precipitation Radar 2 (CSAPR2)',
         'doi': '10.5439/1668872',}
-
-
+}
 
 ##############################################################################
 # Default field names
