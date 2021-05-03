@@ -379,7 +379,30 @@ _DEFAULT_FIELD_NAMES = {
         'zdr_field': 'corrected_differential_reflectivity',
         'pia_field': 'path_integrated_attenuation',
         'phidp_field': 'filtered_corrected_differential_phase',  # output phidp, need to change
-        'refl_field': 'corrected_reflectivity'}  # output Z field
+        'refl_field': 'corrected_reflectivity'},  # output Z field
+
+    # NSA X-SAPR 2 field names.
+    'nsa_xsapr_ppi': {
+        # Radar field names
+        'input_zdr': 'differential_reflectivity',
+        'reflectivity': 'reflectivity',  # need to change to input_reflectivity
+        'velocity': 'mean_doppler_velocity',
+        'normalized_coherent_power': 'normalized_coherent_power',
+        'cross_correlation_ratio': 'cross_correlation_ratio_hv',
+        'input_phidp_field': 'differential_phase',
+        'input_clutter_corrected_reflectivity': 'reflectivity',
+        'clutter': 'ground_clutter',
+        'differential_reflectivity': 'differential_reflectivity',
+        # Sonde field names
+        'altitude': 'alt',
+        'temperature': 'tdry',
+        'u_wind': 'u_wind',
+        'v_wind': 'v_wind',
+        # Input field names to attenuation code
+        'zdr_field': 'corrected_differential_reflectivity',
+        'pia_field': 'path_integrated_attenuation',
+        'phidp_field': 'filtered_corrected_differential_phase',  # output phidp, need to change
+        'refl_field': 'corrected_reflectivity'},  # output Z field
 }
 
 ##############################################################################
