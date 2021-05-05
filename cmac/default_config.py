@@ -209,7 +209,38 @@ _DEFAULT_METADATA = {
         'references': 'See CSAPR2 Instrument Handbook',
         'source': 'Atmospheric Radiation Measurement (ARM) program C-band '
                   + 'Scanning ARM Precipitation Radar 2 (CSAPR2)',
-        'doi': '10.5439/1668872',}
+        'institution': 'United States Department of Energy - '
+                       + 'Atmospheric Radiation Measurement (ARM) program',
+        'doi': '10.5439/1668872',},
+
+    # NSA X-SAPR 2 metadata.
+    'nsa_xsapr_ppi': {
+        'site_id': 'nsa',  # 'ARM Mobile Facility Argentina'
+        'facility_id': 'c1',
+        'comment': 'This is highly experimental and initial data. There are '
+                   + 'many known and unknown issues. Please do not use before '
+                   + 'contacting the Translator responsible scollis@anl.gov',
+        'attributions': 'This data is collected by the ARM Climate Research '
+                        + 'facility. Radar system is operated by the radar '
+                        + 'engineering team radar@arm.gov and the data is '
+                        + 'processed by the precipitation radar products team. '
+                        + 'LP code courtesy of Scott Giangrande BNL.',
+        'version': '2.0 lite',
+        'vap_name': 'cmac',
+        'known_issues': (
+            'False phidp jumps in insect regions. Still uses old',
+            'Giangrande code.',
+            'Issues with some snow below melting layer.'),
+        'developers': 'Robert Jackson, ANL. Zachary Sherman, ANL.',
+        'translator': 'Scott Collis, ANL.',
+        'mentors': 'Bradley Isom, PNNL. Iosif Lindenmaier, PNNL.',
+        'Conventions': 'CF/Radial instrument_parameters ARM-1.3',
+        'references': 'See XSAPR Instrument Handbook',
+        'source': 'Atmospheric Radiation Measurement (ARM) program X-band '
+                  + 'Scanning ARM Precipitation Radar (XSAPR)',
+        'institution': 'United States Department of Energy - '
+                       + 'Atmospheric Radiation Measurement (ARM) program',
+        'doi': '10.5439/1781398',},
 }
 
 ##############################################################################

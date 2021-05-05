@@ -397,12 +397,13 @@ def gen_clutter_field_from_refl(radar, corrected_field, uncorrected_field, diff_
     clutter[(z - z.min()) > max_h] = 0
 
     clutter_field = {'data': clutter,
-                     'standard_name': 'clutter_mask',
                      'long_name': 'Clutter mask',
                      'comment': '0 is good, 1 is clutter',
                      'valid_min': 0,
                      'valid_max': 1,
-                     'units': 'unitless'}
+                     'units': '1',
+                     'flag_values': [0, 1],
+                     'flag_meanings': 'no_clutter clutter'}
 
     return clutter_field
 

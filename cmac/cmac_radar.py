@@ -126,9 +126,9 @@ def cmac(radar, sonde, config, geotiff=None, flip_velocity=False,
     if verbose:
         print('##')
         print('## These radar fields are being added:')
-
+    temp_dict['units'] = 'deg_C'
+    z_dict['units'] = 'm'
     radar.add_field('sounding_temperature', temp_dict, replace_existing=True)
-    radar.fields['sounding_temperature']['units'] = 'deg_C'
     radar.add_field('height', z_dict, replace_existing=True)
     radar.add_field('signal_to_noise_ratio', snr, replace_existing=True)
     radar.add_field('velocity_texture', texture, replace_existing=True)
@@ -253,6 +253,10 @@ def cmac(radar, sonde, config, geotiff=None, flip_velocity=False,
                     replace_existing=True)
     radar.add_field('filtered_corrected_specific_diff_phase', kdp_filt,
                     replace_existing=True)
+    radar.fields['filtered_corrected_specific_diff_phase']['long_name'] = 'Filtered Corrected Specific differential phase (KDP)'
+    radar.fields['filtered_corrected_differential_phase']['long_name'] = 'Filtered Corrected Differential Phase'
+    if 'clutter_masked_velocity' in radar.fields.keys():
+        radar.fields['clutter_masked_velocity']['long_name'] = 'Radial mean Doppler velocity, positive for motion away from the instrument, clutter removed'
     if verbose:
         print('##    corrected_specific_diff_phase')
         print('##    filtered_corrected_specific_diff_phase')
@@ -309,6 +313,10 @@ def cmac(radar, sonde, config, geotiff=None, flip_velocity=False,
                     replace_existing=True)
 
     radar.fields['corrected_velocity']['units'] = 'm/s'
+    radar.fields['corrected_velocity']['valid_min'] = np.round(
+        radar.fields['corrected_velocity']['valid_min'], 4)
+    radar.fields['corrected_velocity']['valid_max'] = np.round(
+        radar.fields['corrected_velocity']['valid_max', 4)
     radar.fields['simulated_velocity']['units'] = 'm/s'
     radar.fields['velocity_texture']['units'] = 'm/s'
 
