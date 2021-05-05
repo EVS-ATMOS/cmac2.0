@@ -316,7 +316,7 @@ def cmac(radar, sonde, config, geotiff=None, flip_velocity=False,
     radar.fields['corrected_velocity']['valid_min'] = np.round(
         radar.fields['corrected_velocity']['valid_min'], 4)
     radar.fields['corrected_velocity']['valid_max'] = np.round(
-        radar.fields['corrected_velocity']['valid_max', 4)
+        radar.fields['corrected_velocity']['valid_max'], 4)
     radar.fields['simulated_velocity']['units'] = 'm/s'
     radar.fields['velocity_texture']['units'] = 'm/s'
 
