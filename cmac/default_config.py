@@ -209,7 +209,38 @@ _DEFAULT_METADATA = {
         'references': 'See CSAPR2 Instrument Handbook',
         'source': 'Atmospheric Radiation Measurement (ARM) program C-band '
                   + 'Scanning ARM Precipitation Radar 2 (CSAPR2)',
-        'doi': '10.5439/1668872',}
+        'institution': 'United States Department of Energy - '
+                       + 'Atmospheric Radiation Measurement (ARM) program',
+        'doi': '10.5439/1668872',},
+
+    # NSA X-SAPR 2 metadata.
+    'nsa_xsapr_ppi': {
+        'site_id': 'nsa',  # 'ARM Mobile Facility Argentina'
+        'facility_id': 'c1',
+        'comment': 'This is highly experimental and initial data. There are '
+                   + 'many known and unknown issues. Please do not use before '
+                   + 'contacting the Translator responsible scollis@anl.gov',
+        'attributions': 'This data is collected by the ARM Climate Research '
+                        + 'facility. Radar system is operated by the radar '
+                        + 'engineering team radar@arm.gov and the data is '
+                        + 'processed by the precipitation radar products team. '
+                        + 'LP code courtesy of Scott Giangrande BNL.',
+        'version': '2.0 lite',
+        'vap_name': 'cmac',
+        'known_issues': (
+            'False phidp jumps in insect regions. Still uses old',
+            'Giangrande code.',
+            'Issues with some snow below melting layer.'),
+        'developers': 'Robert Jackson, ANL. Zachary Sherman, ANL.',
+        'translator': 'Scott Collis, ANL.',
+        'mentors': 'Bradley Isom, PNNL. Iosif Lindenmaier, PNNL.',
+        'Conventions': 'CF/Radial instrument_parameters ARM-1.3',
+        'references': 'See XSAPR Instrument Handbook',
+        'source': 'Atmospheric Radiation Measurement (ARM) program X-band '
+                  + 'Scanning ARM Precipitation Radar (XSAPR)',
+        'institution': 'United States Department of Energy - '
+                       + 'Atmospheric Radiation Measurement (ARM) program',
+        'doi': '10.5439/1781398',},
 }
 
 ##############################################################################
@@ -379,7 +410,30 @@ _DEFAULT_FIELD_NAMES = {
         'zdr_field': 'corrected_differential_reflectivity',
         'pia_field': 'path_integrated_attenuation',
         'phidp_field': 'filtered_corrected_differential_phase',  # output phidp, need to change
-        'refl_field': 'corrected_reflectivity'}  # output Z field
+        'refl_field': 'corrected_reflectivity'},  # output Z field
+
+    # NSA X-SAPR 2 field names.
+    'nsa_xsapr_ppi': {
+        # Radar field names
+        'input_zdr': 'differential_reflectivity',
+        'reflectivity': 'reflectivity',  # need to change to input_reflectivity
+        'velocity': 'mean_doppler_velocity',
+        'normalized_coherent_power': 'normalized_coherent_power',
+        'cross_correlation_ratio': 'cross_correlation_ratio_hv',
+        'input_phidp_field': 'differential_phase',
+        'input_clutter_corrected_reflectivity': 'reflectivity',
+        'clutter': 'ground_clutter',
+        'differential_reflectivity': 'differential_reflectivity',
+        # Sonde field names
+        'altitude': 'alt',
+        'temperature': 'tdry',
+        'u_wind': 'u_wind',
+        'v_wind': 'v_wind',
+        # Input field names to attenuation code
+        'zdr_field': 'corrected_differential_reflectivity',
+        'pia_field': 'path_integrated_attenuation',
+        'phidp_field': 'filtered_corrected_differential_phase',  # output phidp, need to change
+        'refl_field': 'corrected_reflectivity'},  # output Z field
 }
 
 ##############################################################################
@@ -421,10 +475,53 @@ cacti_csapr2_ppi_mbfs={'multi_trip': {'velocity_texture': [[7.7, 10.0, 130.0, 13
                             'signal_to_noise_ratio': [[20, 22, 1000, 1000], 0.0]}}
 
 cacti_csapr2_ppi_hard_const = [['melting', 'sounding_temperature', (10, 100)],
-                              ['multi_trip', 'height', (10000, 1000000)],
-                              ['melting', 'sounding_temperature', (-10000, -2)],
-                              ['rain', 'sounding_temperature', (-1000, -5)],
-                              ['melting', 'velocity_texture', (3, 300)]]
+                               ['multi_trip', 'height', (10000, 1000000)],
+                               ['melting', 'sounding_temperature', (-10000, -2)],
+                               ['rain', 'sounding_temperature', (-1000, -5)],
+                               ['melting', 'velocity_texture', (3, 300)]]
+
+# NSA X-SAPR Fuzzy Values.
+nsa_xsapr_ppi_mbfs={'multi_trip': {'velocity_texture': [[0, 0, 1.8, 2], 1.0],
+                                   'cross_correlation_ratio': [[.5, .7, 1, 1], 0.0],
+                                   'normalized_coherent_power': [[0, 0, .5, .6], 3.0],
+                                   'height': [[0, 0, 5000, 8000], 1.0],
+                                   'sounding_temperature': [[-100, -100, 100, 100], 0.0],
+                                   'signal_to_noise_ratio': [[15, 20, 1000, 1000], 1.0]},
+
+                    'rain': {'differential_phase_texture': [[0, 0, 80, 90], 1.0],
+                             'cross_correlation_ratio': [[0.94, 0.96, 1, 1], 1.0],
+                             'normalized_coherent_power': [[0.4, 0.5, 1, 1], 1.0],
+                             'height': [[0, 0, 5000, 6000], 0.0],
+                             'sounding_temperature': [[0, 3, 100, 100], 2.0],
+                             'signal_to_noise_ratio': [[8, 10, 1000, 1000], 1.0]},
+
+                    'snow': {'differential_phase_texture': [[0, 0, 80, 90], 1.0],
+                             'cross_correlation_ratio': [[0.85, 0.9, 1, 1], 1.0],
+                             'normalized_coherent_power': [[0.4, 0.5, 1, 1], 1.0],
+                             'height': [[0, 0, 25000, 25000], 0.0],
+                             'sounding_temperature': [[-100, -100, 0, 1.], 2.0],
+                             'signal_to_noise_ratio': [[8, 10, 1000, 1000], 1.0]},
+
+                    'no_scatter': {'differential_phase_texture': [[90, 90, 400, 400], 0.0],
+                                   'cross_correlation_ratio': [[0, 0, 0.1, 0.2], 0.0],
+                                   'normalized_coherent_power': [[0, 0, 0.1, 0.2], 0.0],
+                                   'height': [[0, 0, 25000, 25000], 0.0],
+                                   'sounding_temperature': [[-100, -100, 100, 100], 0.0],
+                                   'signal_to_noise_ratio': [[-100, -100, 8, 10], 6.0]},
+
+                    'melting': {'differential_phase_texture': [[20, 30, 80, 90], 0.0],
+                                'cross_correlation_ratio': [[0.6, 0.7, .94, .96], 4.],
+                                'normalized_coherent_power': [[0.4, 0.5, 1, 1], 0],
+                                'height': [[0, 0, 25000, 25000], 0.0],
+                                'sounding_temperature': [[-1., 0, 3.5, 5], 2.],
+                                'signal_to_noise_ratio': [[8, 10, 1000, 1000], 0.0]}}
+
+nsa_xsapr_ppi_hard_const = [['melting', 'sounding_temperature', (10, 100)],
+                            ['multi_trip', 'height', (10000, 1000000)],
+                            ['melting', 'sounding_temperature', (-10000, -2)],
+                            ['rain', 'sounding_temperature', (-1000, -5)],
+                            ['melting', 'velocity_texture', (3, 300)]]
+
 
 
 ##############################################################################
@@ -568,7 +665,31 @@ _DEFAULT_CMAC_VALUES = {
         'rain_rate_a_coef': 51.3,
         'rain_rate_b_coef': 0.81,
         'beam_width': 1.0,
-        'radar_height_offset': 10.0,}  # We expect clutter corrected fields now
+        'radar_height_offset': 10.0,},  # We expect clutter corrected fields now
+
+    # NSA X-SAPR CMAC 2.0 processing values.
+    'nsa_xsapr_ppi': {
+        'save_name': 'nsaxsaprcmacppi.c1',
+        'sonde_name': 'nsasondewnpnM1.b1',
+        'site_alt': 17.0,
+        'self_const': 60000.00,
+        'attenuation_a_coef': 0.17,
+        'c_coef': 0.05,
+        'd_coef': 1.0,
+        'beta_coef': 0.64884,  # ZDR corrections
+        'flip_phidp': False,
+        'phidp_flipped': ['uncorrected_differential_phase','differential_phase'],
+        'mbfs': nsa_xsapr_ppi_mbfs,
+        'hard_const': nsa_xsapr_ppi_hard_const,
+        'gen_clutter_from_refl': True,
+        'ref_offset': 0.0,
+        'gen_clutter_from_refl_diff': -0.2,
+        'gen_clutter_from_refl_alt': 2000.0,
+        'clutter_mask_z_for_texture': True,
+        'rain_rate_a_coef': 51.3,
+        'rain_rate_b_coef': 0.81,
+        'beam_width': 1.0,
+        'radar_height_offset': 10.0,},
 }
 
 
@@ -699,5 +820,10 @@ _DEFAULT_PLOT_VALUES = {
     # CACTI C-SAPR 2 plot values.
     'cacti_csapr2_ppi': {
         'save_name': 'cacticsaprcmacppi.c1',
-        'sweep': 3}
+        'sweep': 3},
+
+    # NSA X-SAPR plot values.
+    'nsa_xsapr_ppi': {
+        'save_name': 'nsaxsaprcmacppi.c1',
+        'sweep': 3},
 }
