@@ -105,7 +105,10 @@ def quicklooks(radar, config, image_directory=None,
                        dec_radar1[1], grid_lon, grid_lat)
         grid_lon, grid_lat = np.meshgrid(grid_lon, grid_lat)
 
-    sweep = plot_config['sweep']
+    if radar.nsweeps < 4:
+        sweep = 0
+    else:
+        sweep = plot_config['sweep']
 
     # Plot of the raw reflectivity from the radar.
     display = pyart.graph.RadarMapDisplay(radar)
@@ -279,10 +282,11 @@ def quicklooks(radar, config, image_directory=None,
     del fig, ax, display
 
     # Creating a plot with differential phase.
+    phase_field = field_config['input_phidp_field']
     display = pyart.graph.RadarMapDisplay(radar)
     fig, ax = plt.subplots(1, 1, subplot_kw=dict(projection=ccrs.PlateCarree()),
                           figsize=[12, 8])
-    display.plot_ppi_map('differential_phase', sweep=sweep,
+    display.plot_ppi_map(phase_field, sweep=sweep,
                          resolution='50m', ax=ax,
                          min_lat=min_lat, min_lon=min_lon,
                          max_lat=max_lat, max_lon=max_lon,

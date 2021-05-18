@@ -186,7 +186,7 @@ _DEFAULT_METADATA = {
 
     # CACTI C-SAPR 2 metadata.
     'cacti_csapr2_ppi': {
-        'site_id': 'cor',  # 'ARM Mobile Facility Argentina'
+        'site_id': 'cor',
         'facility_id': 'c1',
         'comment': 'This is highly experimental and initial data. There are '
                    + 'many known and unknown issues. Please do not use before '
@@ -215,7 +215,7 @@ _DEFAULT_METADATA = {
 
     # NSA X-SAPR 2 metadata.
     'nsa_xsapr_ppi': {
-        'site_id': 'nsa',  # 'ARM Mobile Facility Argentina'
+        'site_id': 'nsa',
         'facility_id': 'c1',
         'comment': 'This is highly experimental and initial data. There are '
                    + 'many known and unknown issues. Please do not use before '
@@ -481,40 +481,46 @@ cacti_csapr2_ppi_hard_const = [['melting', 'sounding_temperature', (10, 100)],
                                ['melting', 'velocity_texture', (3, 300)]]
 
 # NSA X-SAPR Fuzzy Values.
-nsa_xsapr_ppi_mbfs={'multi_trip': {'velocity_texture': [[0, 0, 1.8, 2], 1.0],
-                                   'cross_correlation_ratio': [[.5, .7, 1, 1], 0.0],
-                                   'normalized_coherent_power': [[0, 0, .5, .6], 3.0],
-                                   'height': [[0, 0, 5000, 8000], 1.0],
-                                   'sounding_temperature': [[-100, -100, 100, 100], 0.0],
-                                   'signal_to_noise_ratio': [[15, 20, 1000, 1000], 1.0]},
+nsa_xsapr_ppi_mbfs={'multi_trip': {
+                        'velocity_texture': [[2.0, 2.1, 130., 130.], 4.0],
+                        'cross_correlation_ratio_hv': [[.5, .7, 1, 1], 0.0],
+                        'normalized_coherent_power': [[0, 0, .5, .6], 1.0],
+                        'height': [[0, 0, 5000, 8000], 0.0],
+                        'sounding_temperature': [[-100, -100, 100, 100], 0.0],
+                        'signal_to_noise_ratio': [[5, 10, 1000, 1000], 1.0]},
 
-                    'rain': {'differential_phase_texture': [[0, 0, 80, 90], 1.0],
-                             'cross_correlation_ratio': [[0.94, 0.96, 1, 1], 1.0],
-                             'normalized_coherent_power': [[0.4, 0.5, 1, 1], 1.0],
-                             'height': [[0, 0, 5000, 6000], 0.0],
-                             'sounding_temperature': [[0, 3, 100, 100], 2.0],
-                             'signal_to_noise_ratio': [[8, 10, 1000, 1000], 1.0]},
+                    'rain': {
+                        'velocity_texture': [[0, 0, 2.0, 2.1], 1.0],
+                        'cross_correlation_ratio_hv': [[0.97, 0.98, 1, 1], 1.0],
+                        'normalized_coherent_power': [[0.4, 0.5, 1, 1], 1.0],
+                        'height': [[0, 0, 5000, 6000], 0.0],
+                        'sounding_temperature': [[2., 5., 100, 100], 2.0],
+                        'signal_to_noise_ratio': [[8, 10, 1000, 1000], 1.0]},
 
-                    'snow': {'differential_phase_texture': [[0, 0, 80, 90], 1.0],
-                             'cross_correlation_ratio': [[0.85, 0.9, 1, 1], 1.0],
-                             'normalized_coherent_power': [[0.4, 0.5, 1, 1], 1.0],
-                             'height': [[0, 0, 25000, 25000], 0.0],
-                             'sounding_temperature': [[-100, -100, 0, 1.], 2.0],
-                             'signal_to_noise_ratio': [[8, 10, 1000, 1000], 1.0]},
+                    'snow': {
+                        'velocity_texture': [[0, 0, 2.0, 2.1], 1.0],
+                        'cross_correlation_ratio_hv': [[0.65, 0.9, 1, 1], 1.0],
+                        'normalized_coherent_power': [[0.4, 0.5, 1, 1], 1.0],
+                        'height': [[0, 0, 25000, 25000], 0.0],
+                        'sounding_temperature': [[-100, -100, .5, 4.], 2.0],
+                        'signal_to_noise_ratio': [[8, 10, 1000, 1000], 1.0]},
 
-                    'no_scatter': {'differential_phase_texture': [[90, 90, 400, 400], 0.0],
-                                   'cross_correlation_ratio': [[0, 0, 0.1, 0.2], 0.0],
-                                   'normalized_coherent_power': [[0, 0, 0.1, 0.2], 0.0],
-                                   'height': [[0, 0, 25000, 25000], 0.0],
-                                   'sounding_temperature': [[-100, -100, 100, 100], 0.0],
-                                   'signal_to_noise_ratio': [[-100, -100, 8, 10], 6.0]},
+                    'no_scatter': {
+                        'velocity_texture': [[2.0, 2.1, 330., 330.], 2.0],
+                        'cross_correlation_ratio_hv': [[0, 0, 0.1, 0.2], 0.0],
+                        'normalized_coherent_power': [[0, 0, 0.1, 0.2], 0.0],
+                        'height': [[0, 0, 25000, 25000], 0.0],
+                        'sounding_temperature': [[-100, -100, 100, 100], 0.0],
+                        'signal_to_noise_ratio': [[-100, -100, 5, 10], 4.0]},
 
-                    'melting': {'differential_phase_texture': [[20, 30, 80, 90], 0.0],
-                                'cross_correlation_ratio': [[0.6, 0.7, .94, .96], 4.],
-                                'normalized_coherent_power': [[0.4, 0.5, 1, 1], 0],
-                                'height': [[0, 0, 25000, 25000], 0.0],
-                                'sounding_temperature': [[-1., 0, 3.5, 5], 2.],
-                                'signal_to_noise_ratio': [[8, 10, 1000, 1000], 0.0]}}
+                    'melting': {
+                        'velocity_texture': [[0, 0, 2.0, 2.1], 0.0],
+                        'cross_correlation_ratio_hv': [[0.6, 0.65, .9, .96], 2.0],
+                        'normalized_coherent_power': [[0.4, 0.5, 1, 1], 0],
+                        'height': [[0, 0, 25000, 25000], 0.0],
+                        'sounding_temperature': [[0, 0.1, 2, 4], 4.0],
+                        'signal_to_noise_ratio': [[8, 10, 1000, 1000], 0.0]}}
+
 
 nsa_xsapr_ppi_hard_const = [['melting', 'sounding_temperature', (10, 100)],
                             ['multi_trip', 'height', (10000, 1000000)],
@@ -669,8 +675,8 @@ _DEFAULT_CMAC_VALUES = {
 
     # NSA X-SAPR CMAC 2.0 processing values.
     'nsa_xsapr_ppi': {
-        'save_name': 'nsaxsaprcmacppi.c1',
-        'sonde_name': 'nsasondewnpnM1.b1',
+        'save_name': 'nsaxsaprcmacppiC1.c1',
+        'sonde_name': 'nsasondewnpnC1.b1',
         'site_alt': 17.0,
         'self_const': 60000.00,
         'attenuation_a_coef': 0.17,
