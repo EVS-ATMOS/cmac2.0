@@ -82,7 +82,7 @@ def tall_clutter(files, config,
             height = radar.gate_z["data"]
             up_in_the_air = height > max_height
             the_mask = np.logical_or.reduce(
-                (ncp < 0.8, reflect_array.mask, up_in_the_air))
+                (ncp < 0.9, reflect_array.mask, up_in_the_air))
             reflect_array = np.ma.masked_where(the_mask, reflect_array)
             del radar
             if reflect_array.shape == first_shape:
@@ -101,9 +101,9 @@ def tall_clutter(files, config,
                 ncp = deepcopy(radar.fields[ncp_field]['data'])
                 height = radar.gate_z["data"]
                 reflect_array = np.ma.masked_where(
-                        np.logical_and(height > max_height, ncp < 0.8),
+                        np.logical_or(height > max_height, ncp < 0.8),
                         reflect_array)
-               
+                    
                 if first_shape == 0:
                     first_shape = reflect_array.shape
                     clutter_radar = radar
