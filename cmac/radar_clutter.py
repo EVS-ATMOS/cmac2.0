@@ -21,8 +21,8 @@ except ImportError:
 def tall_clutter(files, config, 
                  clutter_thresh_min=0.0002,
                  clutter_thresh_max=0.25, radius=1,
-                 write_radar=True, out_file=None,
-                 use_dask=False):
+                 max_height=2000., write_radar=True,
+                 out_file=None, use_dask=False):
     """
     Wind Farm Clutter Calculation
 
@@ -47,6 +47,8 @@ def tall_clutter(files, config,
     radius : int
         Radius of the area surrounding the clutter gate that will
         be also flagged as clutter.
+    max_height: float
+        Maximum height above the radar to mark a gate as clutter.
     write_radar : bool
         Whether to or not, to write the clutter radar as a netCDF file.
         Default is True.
@@ -78,7 +80,7 @@ def tall_clutter(files, config,
             reflect_array = deepcopy(radar.fields[refl_field]['data'])
             ncp = radar.fields[ncp_field]['data']
             height = radar.gate_z["data"]
-            up_in_the_air = height > 2000.0
+            up_in_the_air = height > max_height
             the_mask = np.logical_or.reduce(
                 (ncp < 0.8, reflect_array.mask, up_in_the_air))
             reflect_array = np.ma.masked_where(the_mask, reflect_array)
@@ -97,8 +99,11 @@ def tall_clutter(files, config,
                 radar = pyart.io.read(file)
                 reflect_array = radar.fields[refl_field]['data']
                 ncp = deepcopy(radar.fields[ncp_field]['data'])
-                #reflect_array = np.ma.masked_where(ncp < 0.7, reflect_array)
-
+                height = radar.gate_z["data"]
+                reflect_array = np.ma.masked_where(
+                        np.logical_and(height > max_height, ncp < 0.8),
+                        reflect_array)
+               
                 if first_shape == 0:
                     first_shape = reflect_array.shape
                     clutter_radar = radar
@@ -114,7 +119,7 @@ def tall_clutter(files, config,
         clutter_values = stdev / mean
         clutter_values = np.ma.masked_invalid(clutter_values)
         clutter_values_no_mask = clutter_values.filled(
-            clutter_values_max + 1)
+            clutter_thresh_max + 1)
     else:
         cluster = LocalCluster(n_workers=20, processes=True)
         client = Client(cluster)

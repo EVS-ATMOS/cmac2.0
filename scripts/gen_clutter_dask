@@ -35,6 +35,9 @@ def main():
     parser.add_argument(
         '-ra', '--radius', type=int, default=1,
         help='Size of circle radius for changing surrounding gates to clutter')
+    parser.add_argument(
+            '-ht', '--height', type=float, default=2000.0, 
+            help='Maximum height to mark as clutter')
     args = parser.parse_args()
 
     if os.path.isdir(args.radar_path):
@@ -53,7 +56,8 @@ def main():
                  clutter_thresh_min=args.clutter_thresh_min,
                  clutter_thresh_max=args.clutter_thresh_max,
                  radius=args.radius, write_radar=True,
-                 out_file=args.out_file_name, use_dask=True)
+                 max_height=args.height,
+                 out_file=args.out_file_name, use_dask=False)
 
     print('Time to make clutter file: ' + str(time() - bt))
 
