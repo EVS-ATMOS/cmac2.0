@@ -8,6 +8,7 @@ import importlib
 
 import netCDF4
 import pyart
+import numpy as np
 
 from cmac import cmac, get_cmac_values, quicklooks, area_coverage
 
@@ -66,7 +67,24 @@ def main():
     if args.clutter_file is not None:
         # Load clutter files.
         clutter_radar = pyart.io.read(args.clutter_file)
-        clutter_field_dict = clutter_radar.fields['ground_clutter']
+        clutter_field_dict = clutter_radar.fields['ground_clutter'].copy()
+        # For XSAPR data at NSA, sometimes only 3 of 6 sweeps present
+        # Just copy clutter information from bottom sweeps
+        if clutter_radar.nsweeps > radar.nsweeps:
+            fname = [x for x in radar.fields.keys()][0]
+            clutter_field_dict["data"] = np.zeros_like(
+                    radar.fields[fname]["data"])
+            i = 0
+            for azi_angle in radar.fixed_angle["data"]:
+                ind = np.argwhere(clutter_radar.fixed_angle["data"] == azi_angle)
+                if len(ind) > 0:
+                    clutter = clutter_radar.get_field(
+                            int(ind), 'ground_clutter')
+                    
+                    start, end = radar.get_start_end(i)
+                    clutter_field_dict["data"][
+                            int(start):int(end+1)] = clutter
+                i = i + 1
         radar.add_field(
             'ground_clutter', clutter_field_dict, replace_existing=True)
         del clutter_radar
@@ -94,7 +112,7 @@ def main():
     cmac_config = get_cmac_values(args.config)
     save_name = cmac_config['save_name']
 
-    ref_10_per, ref_40_per = area_coverage(radar)
+    ref_10_per, ref_40_per = area_coverage(cmac_radar)
     cmac_radar.metadata['precipitation_coverage_percentage'] = ref_10_per
     cmac_radar.metadata['convection_coverage_percentage'] = ref_40_per
 
