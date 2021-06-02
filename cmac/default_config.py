@@ -687,7 +687,7 @@ _DEFAULT_CMAC_VALUES = {
         'phidp_flipped': ['uncorrected_differential_phase','differential_phase'],
         'mbfs': nsa_xsapr_ppi_mbfs,
         'hard_const': nsa_xsapr_ppi_hard_const,
-        'gen_clutter_from_refl': True,
+        'gen_clutter_from_refl': False,
         'ref_offset': 0.0,
         'gen_clutter_from_refl_diff': -0.2,
         'gen_clutter_from_refl_alt': 2000.0,
