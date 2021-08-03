@@ -19,7 +19,8 @@ more.
 """
 
 from .cmac_radar import cmac, area_coverage
-from .cmac_quicklooks import quicklooks
+from .cmac_ppi_quicklooks import quicklooks_ppi
+from .cmac_rhi_quicklooks import quicklooks_rhi
 from .cmac_processing import snr_and_sounding, do_my_fuzz
 from .cmac_processing import get_texture, cum_score_fuzzy_logic
 from .cmac_processing import return_csu_kdp, retrieve_qvp, beam_block
