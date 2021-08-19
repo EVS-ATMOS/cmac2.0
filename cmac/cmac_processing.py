@@ -157,7 +157,6 @@ def cum_score_fuzzy_logic(radar, mbfs=None,
     gid = {}
     gid['data'] = max_score
     gid['units'] = ''
-    gid['standard_name'] = 'gate_id'
     strgs = ''
     i = 0
     for key in scores.keys():
@@ -513,5 +512,4 @@ def beam_block(radar, tif_file, radar_height_offset=10.0,
     pbb_all = np.ma.concatenate(pbb_arrays)
     cbb_all = np.ma.concatenate(cbb_arrays)
     del data_raster
-    print('Beam blockage complete.')
     return pbb_all, cbb_all
