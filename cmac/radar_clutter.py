@@ -165,7 +165,6 @@ def tall_clutter(files, config,
     clutter_dict = _clutter_to_dict(clutter_array)
     clutter_value_dict = _clutter_to_dict(clutter_values)
     clutter_value_dict["long_name"] = "Clutter value (std. dev/mean Z)"
-    clutter_value_dict["standard_name"] = "clutter_value"
     clutter_radar.add_field('ground_clutter', clutter_dict,
                             replace_existing=True)
     clutter_radar.add_field('clutter_value', clutter_value_dict,
@@ -262,7 +261,6 @@ def _clutter_to_dict(clutter_array):
     clutter_dict = {}
     clutter_dict['units'] = '1'
     clutter_dict['data'] = clutter_array
-    clutter_dict['standard_name'] = 'ground_clutter'
     clutter_dict['long_name'] = 'Ground Clutter'
     clutter_dict['notes'] = '0: No Clutter, 1: Clutter'
     return clutter_dict
