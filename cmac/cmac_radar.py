@@ -247,13 +247,17 @@ def cmac(radar, sonde, config, geotiff=None, flip_velocity=False,
 
     radar.add_field('corrected_differential_phase', phidp,
                     replace_existing=True)
+    radar.fields['corrected_differential_phase']['long_name'] = 'Corrected differential propagation phase shift'
     radar.add_field('filtered_corrected_differential_phase', phidp_filt,
                     replace_existing=True)
+    radar.fields[
+        'filtered_corrected_differential_phase']['long_name'] = 'Filtered corrected differential propagation phase shift'
     radar.add_field('corrected_specific_diff_phase', kdp,
                     replace_existing=True)
     radar.add_field('filtered_corrected_specific_diff_phase', kdp_filt,
                     replace_existing=True)
-    radar.fields['filtered_corrected_specific_diff_phase']['long_name'] = 'Filtered Corrected Specific differential phase (KDP)'
+    radar.fields[
+        'filtered_corrected_specific_diff_phase']['long_name'] = 'Filtered Corrected Specific differential phase (KDP)'
     radar.fields['filtered_corrected_differential_phase']['long_name'] = 'Filtered Corrected Differential Phase'
     if 'clutter_masked_velocity' in radar.fields.keys():
         radar.fields['clutter_masked_velocity']['long_name'] = 'Radial mean Doppler velocity, positive for motion away from the instrument, clutter removed'
@@ -319,7 +323,7 @@ def cmac(radar, sonde, config, geotiff=None, flip_velocity=False,
         radar.fields['corrected_velocity']['valid_max'], 4)
     radar.fields['simulated_velocity']['units'] = 'm/s'
     radar.fields['velocity_texture']['units'] = 'm/s'
-
+    radar.fields['unfolded_differential_phase']['long_name'] = 'Unfolded differential propagation phase shift'
     cat_dict = {}
     for pair_str in radar.fields['gate_id']['notes'].split(','):
         if verbose:
