@@ -71,19 +71,24 @@ def cmac(radar, sonde, config, geotiff=None, flip_velocity=False,
         cmac_config['gen_clutter_from_refl'] = False
 
     if cmac_config['gen_clutter_from_refl']:
-        new_clutter_field = gen_clutter_field_from_refl(radar, field_config['input_clutter_corrected_reflectivity'],
-                                                        field_config['reflectivity'],
-                                                        diff_dbz=cmac_config['gen_clutter_from_refl_diff'],
-                                                        max_h=cmac_config['gen_clutter_from_refl_alt'])
-        radar.add_field(field_config['clutter'], new_clutter_field, replace_existing=True)
+        new_clutter_field = gen_clutter_field_from_refl(
+            radar, field_config['input_clutter_corrected_reflectivity'],
+            field_config['reflectivity'],
+            diff_dbz=cmac_config['gen_clutter_from_refl_diff'],
+            max_h=cmac_config['gen_clutter_from_refl_alt'])
+        radar.add_field(
+            field_config['clutter'], new_clutter_field, replace_existing=True)
         radar.fields[field_config['clutter']]['units'] = '1'
+        radar.fields[field_config['clutter']]['valid_max'] = 1
+        radar.fields[field_config['clutter']]['valid_min'] = 0
     # ZDR offsets
     if 'zdr_offset' in cmac_config.keys():
         if 'offset_zdrs' in cmac_config.keys():
             for fld in cmac_config['offset_zdrs']:
                 radar.fields[fld]['data'] += cmac_config['zdr_offset']
         else:
-            radar.fields[field_config['input_zdr']]['data'] += cmac_config['zdr_offset']
+            radar.fields[
+                field_config['input_zdr']]['data'] += cmac_config['zdr_offset']
 
 
     # flipping phidp
@@ -91,11 +96,14 @@ def cmac(radar, sonde, config, geotiff=None, flip_velocity=False,
         cmac_config['flip_phidp'] = False
 
     if cmac_config['flip_phidp']:
-        if 'phidp_flipped' in cmac_config.keys(): # user specifies fields to flip
+        # user specifies fields to flip
+        if 'phidp_flipped' in cmac_config.keys():
             for fld in cmac_config['phidp_flipped']:
                 radar.fields[fld]['data'] = radar.fields[fld]['data'] * -1.0
         else:  # just flip defined phidp field
-            radar.fields[field_config['input_phidp_field']]['data'] = radar.fields[field_config['input_phidp_field']]['data']*-1.0
+            radar.fields[
+                field_config['input_phidp_field']]['data'] = radar.fields[
+                    field_config['input_phidp_field']]['data']*-1.0
 
     if flip_velocity:
         radar.fields[vel_field]['data'] = radar.fields[
@@ -126,7 +134,7 @@ def cmac(radar, sonde, config, geotiff=None, flip_velocity=False,
     if verbose:
         print('##')
         print('## These radar fields are being added:')
-    temp_dict['units'] = 'deg_C'
+    temp_dict['units'] = 'degC'
     z_dict['units'] = 'm'
     radar.add_field('sounding_temperature', temp_dict, replace_existing=True)
     radar.add_field('height', z_dict, replace_existing=True)
@@ -165,6 +173,7 @@ def cmac(radar, sonde, config, geotiff=None, flip_velocity=False,
         notes = radar.fields['gate_id']['notes']
         radar.fields['gate_id']['notes'] = notes + ',5:clutter'
         radar.fields['gate_id']['valid_max'] = 5
+        radar.fields['gate_id']['valid_max'] = 0
     if 'classification_mask' in radar.fields.keys():
         clutter_data = radar.fields['classification_mask']['data']
         gate_data = radar.fields['gate_id']['data'].copy()
@@ -177,6 +186,7 @@ def cmac(radar, sonde, config, geotiff=None, flip_velocity=False,
         notes = radar.fields['gate_id']['notes']
         radar.fields['gate_id']['notes'] = notes + ',5:clutter'
         radar.fields['gate_id']['valid_max'] = 5
+        radar.fields['gate_id']['valid_max'] = 0
 
     if geotiff is not None:
         pbb_all, cbb_all = beam_block(
@@ -287,6 +297,7 @@ def cmac(radar, sonde, config, geotiff=None, flip_velocity=False,
         np.where(np.abs(radar.fields['sounding_temperature']['data']) < 0.1)])
     radar.fields['height_over_iso0'] = copy.deepcopy(radar.fields['height'])
     radar.fields['height_over_iso0']['data'] -= iso0
+    radar.fields['height_over_iso0']['long_name'] = 'Height of radar beam over freezing level'
     phidp_field = field_config['phidp_field']
     
     (spec_at, pia_dict, cor_z, spec_diff_at,

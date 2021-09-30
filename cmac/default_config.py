@@ -215,8 +215,9 @@ _DEFAULT_METADATA = {
 
     # NSA X-SAPR 2 metadata.
     'nsa_xsapr_ppi': {
+        'Conventions': 'CF/Radial instrument_parameters ARM-1.3',
         'site_id': 'nsa',
-        'facility_id': 'c1',
+        'facility_id': 'C1',
         'comment': 'This is highly experimental and initial data. There are '
                    + 'many known and unknown issues. Please do not use before '
                    + 'contacting the Translator responsible scollis@anl.gov',
@@ -225,21 +226,25 @@ _DEFAULT_METADATA = {
                         + 'engineering team radar@arm.gov and the data is '
                         + 'processed by the precipitation radar products team. '
                         + 'LP code courtesy of Scott Giangrande BNL.',
-        'version': '2.0 lite',
+        'process_version': 'CMAC 2.0',
         'vap_name': 'cmac',
-        'known_issues': (
-            'False phidp jumps in insect regions. Still uses old',
-            'Giangrande code.',
-            'Issues with some snow below melting layer.'),
+        'known_issues': 'False phidp jumps in insect regions. Still uses old '
+                        + 'Giangrande code. Issues with some snow below '
+                        + 'melting layer.',
         'developers': 'Robert Jackson, ANL. Zachary Sherman, ANL.',
         'translator': 'Scott Collis, ANL.',
         'mentors': 'Bradley Isom, PNNL. Iosif Lindenmaier, PNNL.',
-        'Conventions': 'CF/Radial instrument_parameters ARM-1.3',
         'references': 'See XSAPR Instrument Handbook',
         'source': 'Atmospheric Radiation Measurement (ARM) program X-band '
                   + 'Scanning ARM Precipitation Radar (XSAPR)',
-        'institution': 'United States Department of Energy - '
-                       + 'Atmospheric Radiation Measurement (ARM) program',
+        'institution': 'U.S. Department of Energy Atmospheric Radiation '
+                       + 'Measurement (ARM) Climate Research Facility',
+        'platform_id': 'xsaprcmacppi',
+        'dod_version': 'xsaprcmacppi-c1-1.0',
+        'input_datastream': 'nsaxsaprcfrppiC1.a1',
+        'data_level': 'c1',
+        'datastream': 'nsaxsaprcmacppiC1.c1',
+        'location_description': 'North Slope of Alaska (NSA), Barrow, Alaska',
         'doi': '10.5439/1781398',},
 }
 
