@@ -174,6 +174,7 @@ def cmac(radar, sonde, config, geotiff=None, flip_velocity=False,
         radar.fields['gate_id']['notes'] = notes + ',5:clutter'
         radar.fields['gate_id']['valid_max'] = 5
         radar.fields['gate_id']['valid_max'] = 0
+    
     if 'classification_mask' in radar.fields.keys():
         clutter_data = radar.fields['classification_mask']['data']
         gate_data = radar.fields['gate_id']['data'].copy()
@@ -230,9 +231,11 @@ def cmac(radar, sonde, config, geotiff=None, flip_velocity=False,
     radar.add_field('simulated_velocity', sim_vel, replace_existing=True)
 
     # Create the corrected velocity field from the region dealias algorithm.
+    speckled_cmac_gates = pyart.correct.despeckle_field(
+        radar, vel_field, gatefilter=cmac_gates)
     corr_vel = pyart.correct.dealias_region_based(
         radar, vel_field=vel_field, ref_vel_field='simulated_velocity',
-        keep_original=False, gatefilter=cmac_gates, centered=True)
+        keep_original=False, gatefilter=speckled_cmac_gates, centered=True)
 
     radar.add_field('corrected_velocity', corr_vel, replace_existing=True)
     if verbose:
@@ -251,6 +254,10 @@ def cmac(radar, sonde, config, geotiff=None, flip_velocity=False,
     phidp, kdp = pyart.correct.phase_proc_lp_gf(
         radar, gatefilter=cmac_gates, offset=ref_offset, debug=True,
         nowrap=50, fzl=fzl, self_const=self_const)
+
+    # We do not use KDP, phase above freezing level
+    kdp_gates = copy.deepcopy(cmac_gates)
+    kdp_gates.exclude_above('height', fzl)
     phidp_filt, kdp_filt = fix_phase_fields(
         copy.deepcopy(kdp), copy.deepcopy(phidp), radar.range['data'],
         cmac_gates)
@@ -328,6 +335,12 @@ def cmac(radar, sonde, config, geotiff=None, flip_velocity=False,
                     replace_existing=True)
 
     radar.fields['corrected_velocity']['units'] = 'm/s'
+    if 'valid_min' not in radar.fields['corrected_velocity'].keys():
+        radar.fields['corrected_velocity']['valid_min'] = -100.0
+
+    if 'valid_max' not in radar.fields['corrected_velocity'].keys():
+        radar.fields['corrected_velocity']['valid_max'] = 100.0
+
     radar.fields['corrected_velocity']['valid_min'] = np.round(
         radar.fields['corrected_velocity']['valid_min'], 4)
     radar.fields['corrected_velocity']['valid_max'] = np.round(

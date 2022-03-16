@@ -212,6 +212,36 @@ _DEFAULT_METADATA = {
         'institution': 'United States Department of Energy - '
                        + 'Atmospheric Radiation Measurement (ARM) program',
         'doi': '10.5439/1668872',},
+    
+    # CACTI C-SAPR 2 metadata.
+    'tracer_csapr2_ppi': {
+        'site_id': 'hou',
+        'facility_id': 's2',
+        'comment': 'This is highly experimental and initial data. There are '
+                   + 'many known and unknown issues. Please do not use before '
+                   + 'contacting the Translator responsible scollis@anl.gov',
+        'attributions': 'This data is collected by the ARM Climate Research '
+                        + 'facility. Radar system is operated by the radar '
+                        + 'engineering team radar@arm.gov and the data is '
+                        + 'processed by the precipitation radar products team. '
+                        + 'LP code courtesy of Scott Giangrande BNL.',
+        'version': '2.0 lite',
+        'vap_name': 'cmac',
+        'known_issues': (
+            'False phidp jumps in insect regions. Still uses old',
+            'Giangrande code.',
+            'Issues with some snow below melting layer.'),
+        'developers': 'Robert Jackson, ANL. Zachary Sherman, ANL.',
+        'translator': 'Scott Collis, ANL.',
+        'mentors': 'Bradley Isom, PNNL. Iosif Lindenmaier, PNNL.',
+        'Conventions': 'CF/Radial instrument_parameters ARM-1.3',
+        'references': 'See CSAPR2 Instrument Handbook',
+        'source': 'Atmospheric Radiation Measurement (ARM) program C-band '
+                  + 'Scanning ARM Precipitation Radar 2 (CSAPR2)',
+        'institution': 'United States Department of Energy - '
+                       + 'Atmospheric Radiation Measurement (ARM) program',
+        'doi': '10.5439/1668872',},
+ 
 
     # NSA X-SAPR 2 metadata.
     'nsa_xsapr_ppi': {
@@ -261,6 +291,7 @@ _DEFAULT_FIELD_NAMES = {
         # Radar field names
         'input_zdr': 'differential_reflectivity',
         'reflectivity': 'reflectivity',
+        'input_phidp_field': 'differential_phase',
         'velocity': 'velocity',
         'normalized_coherent_power': 'normalized_coherent_power',
         'cross_correlation_ratio': 'cross_correlation_ratio',
@@ -281,6 +312,7 @@ _DEFAULT_FIELD_NAMES = {
         # Radar field names
         'input_zdr': 'differential_reflectivity',
         'reflectivity': 'reflectivity',
+        'input_phidp_field': 'differential_phase',
         'velocity': 'velocity',
         'normalized_coherent_power': 'normalized_coherent_power',
         'cross_correlation_ratio': 'cross_correlation_ratio',
@@ -295,12 +327,34 @@ _DEFAULT_FIELD_NAMES = {
         'pia_field': 'path_integrated_attenuation',
         'phidp_field': 'filtered_corrected_differential_phase',
         'refl_field': 'corrected_reflectivity'},
-
+    
+    # X-SAPR I5 RHI field names.
+    'xsapr_i5_rhi': {
+        # Radar field names
+        'input_zdr': 'differential_reflectivity',
+        'reflectivity': 'reflectivity',
+        'input_phidp_field': 'differential_phase',
+        'velocity': 'velocity',
+        'normalized_coherent_power': 'normalized_coherent_power',
+        'cross_correlation_ratio': 'cross_correlation_ratio',
+        'differential_reflectivity': 'differential_reflectivity',
+        # Sonde field names
+        'altitude': 'alt',
+        'temperature': 'tdry',
+        'u_wind': 'u_wind',
+        'v_wind': 'v_wind',
+        # Input field names to attenuation code
+        'zdr_field': 'corrected_differential_reflectivity',
+        'pia_field': 'path_integrated_attenuation',
+        'phidp_field': 'filtered_corrected_differential_phase',
+        'refl_field': 'corrected_reflectivity'}, 
+    
     'xsapr_i5_cfr_ppi': {
         # Radar field names
         'input_zdr': 'differential_reflectivity',
         'reflectivity': 'reflectivity',
         'velocity': 'mean_doppler_velocity',
+        'input_phidp_field': 'differential_phase',
         'normalized_coherent_power': 'normalized_coherent_power',
         'cross_correlation_ratio': 'cross_correlation_ratio_hv',
         # Sonde field names
@@ -320,6 +374,7 @@ _DEFAULT_FIELD_NAMES = {
         'input_zdr': 'differential_reflectivity',
         'reflectivity': 'reflectivity',
         'velocity': 'velocity',
+        'input_phidp_field': 'differential_phase',
         'normalized_coherent_power': 'normalized_coherent_power',
         'cross_correlation_ratio': 'cross_correlation_ratio',
         'differential_reflectivity': 'differential_reflectivity',
@@ -340,6 +395,7 @@ _DEFAULT_FIELD_NAMES = {
         'input_zdr': 'differential_reflectivity',
         'reflectivity': 'reflectivity',
         'velocity': 'velocity',
+        'input_phidp_field': 'differential_phase',
         'normalized_coherent_power': 'normalized_coherent_power',
         'cross_correlation_ratio': 'cross_correlation_ratio',
         'differential_reflectivity': 'differential_reflectivity',
@@ -360,6 +416,7 @@ _DEFAULT_FIELD_NAMES = {
         'input_zdr': 'differential_reflectivity',
         'reflectivity': 'reflectivity',
         'velocity': 'velocity',
+        'input_phidp_field': 'differential_phase',
         'normalized_coherent_power': 'normalized_coherent_power',
         'cross_correlation_ratio': 'cross_correlation_ratio',
         'differential_reflectivity': 'differential_reflectivity',
@@ -380,6 +437,7 @@ _DEFAULT_FIELD_NAMES = {
         'input_zdr': 'differential_reflectivity',
         'reflectivity': 'reflectivity',
         'velocity': 'velocity',
+        'input_phidp_field': 'differential_phase',
         'normalized_coherent_power': 'normalized_coherent_power',
         'cross_correlation_ratio': 'cross_correlation_ratio',
         'differential_reflectivity': 'differential_reflectivity',
@@ -416,7 +474,30 @@ _DEFAULT_FIELD_NAMES = {
         'pia_field': 'path_integrated_attenuation',
         'phidp_field': 'filtered_corrected_differential_phase',  # output phidp, need to change
         'refl_field': 'corrected_reflectivity'},  # output Z field
-
+    
+    # CACTI C-SAPR 2 field names.
+    'tracer_csapr2_ppi': {
+        # Radar field names
+        'input_zdr': 'differential_reflectivity',
+        'reflectivity': 'reflectivity',  # need to change to input_reflectivity
+        'velocity': 'mean_doppler_velocity',
+        'normalized_coherent_power': 'normalized_coherent_power',
+        'cross_correlation_ratio': 'copol_correlation_coeff',
+        'input_phidp_field': 'uncorrected_differential_phase',
+        'input_clutter_corrected_reflectivity': 'reflectivity',
+        'clutter': 'ground_clutter',
+        'differential_reflectivity': 'differential_reflectivity',
+        # Sonde field names
+        'altitude': 'alt',
+        'temperature': 'tdry',
+        'u_wind': 'u_wind',
+        'v_wind': 'v_wind',
+        # Input field names to attenuation code
+        'zdr_field': 'corrected_differential_reflectivity',
+        'pia_field': 'path_integrated_attenuation',
+        'phidp_field': 'filtered_corrected_differential_phase',  # output phidp, need to change
+        'refl_field': 'corrected_reflectivity'},  # output Z field
+ 
     # NSA X-SAPR 2 field names.
     'nsa_xsapr_ppi': {
         # Radar field names
@@ -563,22 +644,6 @@ _DEFAULT_CMAC_VALUES = {
         'rain_rate_b_coef': 0.81},
 
     # X-SAPR I5 PPI CMAC 2.0 processing values.
-    'xsapr_i5_ppi': {
-        'save_name': 'sgpxsaprcmacsurI5.c1',
-        'sonde_name': 'sgpsondewnpnC1.b1',
-        'x_compass': 'XSW',
-        'site_alt': 328,
-        'ref_offset': 0.0,
-        'self_const': 60000.00,
-        'attenuation_a_coef': 0.17,
-        'c_coef': 0.05,
-        'd_coef': 1,
-        'beta_coef': 1,
-        'zdr_offset': 3.05,
-        'rain_rate_a_coef': 51.3,
-        'rain_rate_b_coef': 0.81},
-
-    # X-SAPR I5 PPI CMAC 2.0 processing values.
     'xsapr_i5_cfr_ppi': {
         'save_name': 'sgpxsaprcmacsurI5.c1',
         'sonde_name': 'sgpsondewnpnC1.b1',
@@ -638,6 +703,38 @@ _DEFAULT_CMAC_VALUES = {
         'rain_rate_a_coef': 51.3,
         'rain_rate_b_coef': 0.81},
 
+    # X-SAPR I5 Sector CMAC 2.0 processing values.
+    'xsapr_i5_ppi': {
+        'save_name': 'sgpxsaprcmacsecI5.c1',
+        'sonde_name': 'sgpsondewnpnC1.b1',
+        'x_compass': 'XSW',
+        'site_alt': 328,
+        'ref_offset': 0.0,
+        'self_const': 60000.00,
+        'attenuation_a_coef': 0.17,
+        'c_coef': 0.05,
+        'd_coef': 1,
+        'beta_coef': 1,
+        'zdr_offset': 3.05,
+        'rain_rate_a_coef': 51.3,
+        'rain_rate_b_coef': 0.81},
+    
+    # X-SAPR I5 RHI CMAC 2.0 processing values.
+    'xsapr_i5_rhi': {
+        'save_name': 'sgpxsaprcmacrhiI5.c1',
+        'sonde_name': 'sgpsondewnpnC1.b1',
+        'x_compass': 'XSW',
+        'site_alt': 328,
+        'ref_offset': 0.0,
+        'self_const': 60000.00,
+        'attenuation_a_coef': 0.17,
+        'c_coef': 0.05,
+        'd_coef': 1,
+        'beta_coef': 1,
+        'zdr_offset': 3.05,
+        'rain_rate_a_coef': 51.3,
+        'rain_rate_b_coef': 0.81},
+
     # X-SAPR I4 Sector CMAC 2.0 processing values.
     'xsapr_i4_sec': {
         'save_name': 'sgpxsaprcmacsecI4.c1',
@@ -659,6 +756,30 @@ _DEFAULT_CMAC_VALUES = {
         'save_name': 'corcsapr2cmacppi.c1',
         'sonde_name': 'corsondewnpnM1.b1',
         'site_alt': 1141,
+        'self_const': 60000.00,
+        'attenuation_a_coef': 0.08,
+        'c_coef': 0.3,
+        'd_coef': 1.804,
+        'beta_coef': 0.64884,  # ZDR corrections
+        'flip_phidp': True,
+        'phidp_flipped': ['uncorrected_differential_phase','differential_phase'],
+        'mbfs': cacti_csapr2_ppi_mbfs,
+        'hard_const': cacti_csapr2_ppi_hard_const,
+        'gen_clutter_from_refl': True,
+        'ref_offset': 0.0,
+        'gen_clutter_from_refl_diff': -0.2,
+        'gen_clutter_from_refl_alt': 2000.0,
+        'clutter_mask_z_for_texture': True,
+        'rain_rate_a_coef': 51.3,
+        'rain_rate_b_coef': 0.81,
+        'beam_width': 1.0,
+        'radar_height_offset': 10.0,},  # We expect clutter corrected fields now
+    
+    # CACTI C-SAPR 2 CMAC 2.0 processing values.
+    'tracer_csapr2_ppi': {
+        'save_name': 'houcsapr2cmacppiS2.c1',
+        'sonde_name': 'housondewnpnM1.b1',
+        'site_alt': 12,
         'self_const': 60000.00,
         'attenuation_a_coef': 0.08,
         'c_coef': 0.3,
@@ -832,6 +953,17 @@ _DEFAULT_PLOT_VALUES = {
     'cacti_csapr2_ppi': {
         'save_name': 'cacticsaprcmacppi.c1',
         'sweep': 3},
+  
+    # CACTI C-SAPR 2 plot values.
+    'tracer_csapr2_ppi': {
+        'save_name': 'houcsaprcmacppiS2.c1',
+        'sweep': 3},
+
+
+    # CACTI C-SAPR 2 plot values.
+    'xsapr_i5_rhi': {
+        'save_name': 'sgpxsaprcmacrhiI5.c1',
+        'sweep': 0},
 
     # NSA X-SAPR plot values.
     'nsa_xsapr_ppi': {
