@@ -640,8 +640,8 @@ _DEFAULT_CMAC_VALUES = {
         'd_coef': 1,
         'beta_coef': 1,
         'zdr_offset': 3.05,
-        'rain_rate_a_coef': 51.3,
-        'rain_rate_b_coef': 0.81},
+        'rain_rate_a_coef': 43.5,
+        'rain_rate_b_coef': 0.79},
 
     # X-SAPR I5 PPI CMAC 2.0 processing values.
     'xsapr_i5_cfr_ppi': {
@@ -652,8 +652,8 @@ _DEFAULT_CMAC_VALUES = {
         'ref_offset': 0.0,
         'self_const': 60000.00,
         'attenuation_a_coef': 0.17,
-        'rain_rate_a_coef': 51.3,
-        'rain_rate_b_coef': 0.81},
+        'rain_rate_a_coef': 43.5,
+        'rain_rate_b_coef': 0.79},
 
     # X-SAPR I4 PPI CMAC 2.0 processing values.
     'xsapr_i4_ppi': {
@@ -668,8 +668,8 @@ _DEFAULT_CMAC_VALUES = {
         'd_coef': 1,
         'beta_coef': 1,
         'zdr_offset': 3.05,
-        'rain_rate_a_coef': 51.3,
-        'rain_rate_b_coef': 0.81},
+        'rain_rate_a_coef': 43.5,
+        'rain_rate_b_coef': 0.79},
 
     # X-SAPR I6 Sector CMAC 2.0 processing values.
     'xsapr_i6_sec': {
@@ -684,8 +684,8 @@ _DEFAULT_CMAC_VALUES = {
         'd_coef': 1,
         'beta_coef': 1,
         'zdr_offset': 3.05,
-        'rain_rate_a_coef': 51.3,
-        'rain_rate_b_coef': 0.81},
+        'rain_rate_a_coef': 43.5,
+        'rain_rate_b_coef': 0.79},
 
     # X-SAPR I5 Sector CMAC 2.0 processing values.
     'xsapr_i5_sec': {
@@ -700,8 +700,8 @@ _DEFAULT_CMAC_VALUES = {
         'd_coef': 1,
         'beta_coef': 1,
         'zdr_offset': 3.05,
-        'rain_rate_a_coef': 51.3,
-        'rain_rate_b_coef': 0.81},
+        'rain_rate_a_coef': 43.5,
+        'rain_rate_b_coef': 0.79},
 
     # X-SAPR I5 Sector CMAC 2.0 processing values.
     'xsapr_i5_ppi': {
@@ -716,8 +716,8 @@ _DEFAULT_CMAC_VALUES = {
         'd_coef': 1,
         'beta_coef': 1,
         'zdr_offset': 3.05,
-        'rain_rate_a_coef': 51.3,
-        'rain_rate_b_coef': 0.81},
+        'rain_rate_a_coef': 43.5,
+        'rain_rate_b_coef': 0.79},
     
     # X-SAPR I5 RHI CMAC 2.0 processing values.
     'xsapr_i5_rhi': {
@@ -732,8 +732,8 @@ _DEFAULT_CMAC_VALUES = {
         'd_coef': 1,
         'beta_coef': 1,
         'zdr_offset': 3.05,
-        'rain_rate_a_coef': 51.3,
-        'rain_rate_b_coef': 0.81},
+        'rain_rate_a_coef': 43.5,
+        'rain_rate_b_coef': 0.79},
 
     # X-SAPR I4 Sector CMAC 2.0 processing values.
     'xsapr_i4_sec': {
@@ -748,8 +748,8 @@ _DEFAULT_CMAC_VALUES = {
         'd_coef': 1,
         'beta_coef': 1,
         'zdr_offset': 3.05,
-        'rain_rate_a_coef': 51.3,
-        'rain_rate_b_coef': 0.81},
+        'rain_rate_a_coef': 43.5,
+        'rain_rate_b_coef': 0.79},
 
     # CACTI C-SAPR 2 CMAC 2.0 processing values.
     'cacti_csapr2_ppi': {
@@ -770,12 +770,12 @@ _DEFAULT_CMAC_VALUES = {
         'gen_clutter_from_refl_diff': -0.2,
         'gen_clutter_from_refl_alt': 2000.0,
         'clutter_mask_z_for_texture': True,
-        'rain_rate_a_coef': 51.3,
-        'rain_rate_b_coef': 0.81,
+        'rain_rate_a_coef': 294.0,
+        'rain_rate_b_coef': 0.89,
         'beam_width': 1.0,
         'radar_height_offset': 10.0,},  # We expect clutter corrected fields now
     
-    # CACTI C-SAPR 2 CMAC 2.0 processing values.
+    # Tracer C-SAPR 2 CMAC 2.0 processing values.
     'tracer_csapr2_ppi': {
         'save_name': 'houcsapr2cmacppiS2.c1',
         'sonde_name': 'housondewnpnM1.b1',
@@ -794,8 +794,8 @@ _DEFAULT_CMAC_VALUES = {
         'gen_clutter_from_refl_diff': -0.2,
         'gen_clutter_from_refl_alt': 2000.0,
         'clutter_mask_z_for_texture': True,
-        'rain_rate_a_coef': 51.3,
-        'rain_rate_b_coef': 0.81,
+        'rain_rate_a_coef': 294.0,
+        'rain_rate_b_coef': 0.89,
         'beam_width': 1.0,
         'radar_height_offset': 10.0,},  # We expect clutter corrected fields now
 
@@ -818,8 +818,8 @@ _DEFAULT_CMAC_VALUES = {
         'gen_clutter_from_refl_diff': -0.2,
         'gen_clutter_from_refl_alt': 2000.0,
         'clutter_mask_z_for_texture': True,
-        'rain_rate_a_coef': 51.3,
-        'rain_rate_b_coef': 0.81,
+        'rain_rate_a_coef': 43.5,
+        'rain_rate_b_coef': 0.79,
         'beam_width': 1.0,
         'radar_height_offset': 10.0,},
 }

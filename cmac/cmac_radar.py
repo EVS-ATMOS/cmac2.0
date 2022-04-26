@@ -373,10 +373,13 @@ def cmac(radar, sonde, config, geotiff=None, flip_velocity=False,
     # This needs to be updated to a gatefilter.
     mask = radar.fields['reflectivity']['data'].mask
 
+    rain_rate_comment = (
+        'Rain rate calculated from specific_attenuation,'
+        + ' R=%s*specific_attenuation**%s, note R=0.0 where' % (
+            str(rr_a), str(rr_b))
+        + ' norm coherent power < 0.4 or rhohv < 0.8')
     radar.fields['rain_rate_A'].update({
-        'comment': 'Rain rate calculated from specific_attenuation,'
-                   + ' R=51.3*specific_attenuation**0.81, note R=0.0 where'
-                   + ' norm coherent power < 0.4 or rhohv < 0.8'})
+        'comment': rain_rate_comment})
 
     if verbose:
         print('## Rainfall rate as a function of A ##')
