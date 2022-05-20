@@ -117,7 +117,7 @@ def quicklooks_ppi(radar, config, sweep=None, image_directory=None,
                            subplot_kw=dict(projection=ccrs.PlateCarree()), 
                            figsize=[12, 8])
     ax.set_aspect('auto')
-    display.plot_ppi_map('reflectivity', sweep=sweep, resolution='50m', ax=ax,
+    display.plot_ppi_map(field_config['reflectivity'], sweep=sweep, resolution='50m', ax=ax,
                          vmin=-8, vmax=64, mask_outside=False,
                          cmap=pyart.graph.cm_colorblind.HomeyerRainbow,
                          min_lat=min_lat, min_lon=min_lon,
@@ -185,7 +185,7 @@ def quicklooks_ppi(radar, config, sweep=None, image_directory=None,
     display.cbs[-1].formatter = matplotlib.ticker.FixedFormatter(catty_list)
     display.cbs[-1].update_ticks()
     ax[0, 1].set_aspect('auto')
-    display.plot_ppi_map('reflectivity', sweep=sweep, vmin=-8, vmax=40.0, 
+    display.plot_ppi_map(field_config['reflectivity'], sweep=sweep, vmin=-8, vmax=40.0, 
                          ax=ax[0, 1], min_lon=min_lon, max_lon=max_lon,
                          min_lat=min_lat,
                          max_lat=max_lat, lat_lines=lal, lon_lines=lol,
@@ -239,7 +239,7 @@ def quicklooks_ppi(radar, config, sweep=None, image_directory=None,
     fig, ax = plt.subplots(1, 1, subplot_kw=dict(projection=ccrs.PlateCarree()),
                           figsize=[12, 8])
     ax.set_aspect('auto')
-    display.plot_ppi_map('reflectivity',
+    display.plot_ppi_map(field_config['reflectivity'],
                          sweep=sweep, resolution='50m',
                          vmin=-8, vmax=40, mask_outside=False,
                          cmap=pyart.graph.cm_colorblind.HomeyerRainbow,
@@ -535,10 +535,10 @@ def quicklooks_ppi(radar, config, sweep=None, image_directory=None,
     fig, ax = plt.subplots(1, 1, subplot_kw=dict(projection=ccrs.PlateCarree()),
                            figsize=[12, 8])
     ax.set_aspect('auto')
-    display.plot_ppi_map('normalized_coherent_power', sweep=sweep,
+    display.plot_ppi_map(field_config['normalized_coherent_power'], sweep=sweep,
                          resolution='50m',
                          title=_generate_title(
-                             radar, 'normalized_coherent_power',
+                             radar, field_config['normalized_coherent_power'],
                              sweep),
                          min_lat=min_lat, min_lon=min_lon,
                          max_lat=max_lat, max_lon=max_lon,

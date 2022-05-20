@@ -125,8 +125,9 @@ def cmac(radar, sonde, config, geotiff=None, flip_velocity=False,
         texture['data'][np.isnan(texture['data'])] = 0.0
     else:
         texture = get_texture(radar, vel_field)
-
-    snr = pyart.retrieve.calculate_snr_from_reflectivity(radar)
+    
+    if field_config['signal_to_noise_ratio'] is None:
+        snr = pyart.retrieve.calculate_snr_from_reflectivity(radar)
 
     if not verbose:
         print('## Adding radar fields...')
@@ -138,7 +139,11 @@ def cmac(radar, sonde, config, geotiff=None, flip_velocity=False,
     z_dict['units'] = 'm'
     radar.add_field('sounding_temperature', temp_dict, replace_existing=True)
     radar.add_field('height', z_dict, replace_existing=True)
-    radar.add_field('signal_to_noise_ratio', snr, replace_existing=True)
+    if field_config['signal_to_noise_ratio'] is None:
+        radar.add_field('signal_to_noise_ratio', snr, replace_existing=True)
+    else:
+        radar.fields['signal_to_noise_ratio'] = radar.fields.pop(field_config['signal_to_noise_ratio'])
+        
     radar.add_field('velocity_texture', texture, replace_existing=True)
     if verbose:
         print('##    sounding_temperature')
@@ -249,11 +254,12 @@ def cmac(radar, sonde, config, geotiff=None, flip_velocity=False,
     self_const = cmac_config['self_const']
     # Calculating differential phase fields.
 
-    radar.fields['differential_phase']['data'][
-        radar.fields['differential_phase']['data']<0] += 360.0
+    radar.fields[field_config['input_phidp_field']]['data'][
+        radar.fields[field_config['input_phidp_field']]['data'] < 0] += 360.0
     phidp, kdp = pyart.correct.phase_proc_lp_gf(
         radar, gatefilter=cmac_gates, offset=ref_offset, debug=True,
-        nowrap=50, fzl=fzl, self_const=self_const)
+        nowrap=50, fzl=fzl, self_const=self_const, phidp_field=field_config['input_phidp_field'],
+        refl_field=field_config['reflectivity'])
 
     # We do not use KDP, phase above freezing level
     kdp_gates = copy.deepcopy(cmac_gates)
@@ -370,8 +376,7 @@ def cmac(radar, sonde, config, geotiff=None, flip_velocity=False,
     rainrate['units'] = 'mm/hr'
     radar.fields.update({'rain_rate_A': rainrate})
 
-    # This needs to be updated to a gatefilter.
-    mask = radar.fields['reflectivity']['data'].mask
+    mask = cmac_gates.gate_excluded
 
     rain_rate_comment = (
         'Rain rate calculated from specific_attenuation,'

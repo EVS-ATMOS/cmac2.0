@@ -276,6 +276,40 @@ _DEFAULT_METADATA = {
         'datastream': 'nsaxsaprcmacppiC1.c1',
         'location_description': 'North Slope of Alaska (NSA), Barrow, Alaska',
         'doi': '10.5439/1781398',},
+    
+    # NSA X-SAPR 2 metadata.
+    'sail_xband_ppi': {
+        'Conventions': 'CF/Radial instrument_parameters ARM-1.3',
+        'site_id': 'guc',
+        'facility_id': 'C1',
+        'comment': 'This is highly experimental and initial data. There are '
+                   + 'many known and unknown issues. Please do not use before '
+                   + 'contacting the Translator responsible scollis@anl.gov',
+        'attributions': 'This data is collected by the ARM Climate Research '
+                        + 'facility. Radar system is operated by the radar '
+                        + 'engineering team radar@arm.gov and the data is '
+                        + 'processed by the precipitation radar products team. '
+                        + 'LP code courtesy of Scott Giangrande BNL.',
+        'process_version': 'CMAC 2.0',
+        'vap_name': 'cmac',
+        'known_issues': 'False phidp jumps in insect regions. Still uses old '
+                        + 'Giangrande code. Issues with some snow below '
+                        + 'melting layer.',
+        'developers': 'Robert Jackson, ANL. Zachary Sherman, ANL.',
+        'translator': 'Scott Collis, ANL.',
+        'mentors': 'Bradley Isom, PNNL. Iosif Lindenmaier, PNNL.',
+        'references': 'See XSAPR Instrument Handbook',
+        'source': 'Atmospheric Radiation Measurement (ARM) program X-band '
+                  + 'Scanning ARM Precipitation Radar (XSAPR)',
+        'institution': 'U.S. Department of Energy Atmospheric Radiation '
+                       + 'Measurement (ARM) Climate Research Facility',
+        'platform_id': 'xsaprcmacppi',
+        'dod_version': 'xsaprcmacppi-c1-1.0',
+        'input_datastream': 'nsaxsaprcfrppiC1.a1',
+        'data_level': 'c1',
+        'datastream': 'nsaxsaprcmacppiC1.c1',
+        'location_description': 'North Slope of Alaska (NSA), Barrow, Alaska',
+        'doi': '10.5439/1781398',},
 }
 
 ##############################################################################
@@ -296,6 +330,7 @@ _DEFAULT_FIELD_NAMES = {
         'normalized_coherent_power': 'normalized_coherent_power',
         'cross_correlation_ratio': 'cross_correlation_ratio',
         'differential_reflectivity': 'differential_reflectivity',
+        'signal_to_noise_ratio': None,
         # Sonde field names
         'altitude': 'alt',
         'temperature': 'tdry',
@@ -317,6 +352,7 @@ _DEFAULT_FIELD_NAMES = {
         'normalized_coherent_power': 'normalized_coherent_power',
         'cross_correlation_ratio': 'cross_correlation_ratio',
         'differential_reflectivity': 'differential_reflectivity',
+        'signal_to_noise_ratio': None,
         # Sonde field names
         'altitude': 'alt',
         'temperature': 'tdry',
@@ -338,6 +374,7 @@ _DEFAULT_FIELD_NAMES = {
         'normalized_coherent_power': 'normalized_coherent_power',
         'cross_correlation_ratio': 'cross_correlation_ratio',
         'differential_reflectivity': 'differential_reflectivity',
+        'signal_to_noise_ratio': None,
         # Sonde field names
         'altitude': 'alt',
         'temperature': 'tdry',
@@ -357,6 +394,7 @@ _DEFAULT_FIELD_NAMES = {
         'input_phidp_field': 'differential_phase',
         'normalized_coherent_power': 'normalized_coherent_power',
         'cross_correlation_ratio': 'cross_correlation_ratio_hv',
+        'signal_to_noise_ratio': None,
         # Sonde field names
         'altitude': 'alt',
         'temperature': 'tdry',
@@ -378,6 +416,7 @@ _DEFAULT_FIELD_NAMES = {
         'normalized_coherent_power': 'normalized_coherent_power',
         'cross_correlation_ratio': 'cross_correlation_ratio',
         'differential_reflectivity': 'differential_reflectivity',
+        'signal_to_noise_ratio': None,
         # Sonde field names
         'altitude': 'alt',
         'temperature': 'tdry',
@@ -399,6 +438,7 @@ _DEFAULT_FIELD_NAMES = {
         'normalized_coherent_power': 'normalized_coherent_power',
         'cross_correlation_ratio': 'cross_correlation_ratio',
         'differential_reflectivity': 'differential_reflectivity',
+        'signal_to_noise_ratio': None,
         # Sonde field names
         'altitude': 'alt',
         'temperature': 'tdry',
@@ -420,6 +460,7 @@ _DEFAULT_FIELD_NAMES = {
         'normalized_coherent_power': 'normalized_coherent_power',
         'cross_correlation_ratio': 'cross_correlation_ratio',
         'differential_reflectivity': 'differential_reflectivity',
+        'signal_to_noise_ratio': None,
         # Sonde field names
         'altitude': 'alt',
         'temperature': 'tdry',
@@ -441,6 +482,7 @@ _DEFAULT_FIELD_NAMES = {
         'normalized_coherent_power': 'normalized_coherent_power',
         'cross_correlation_ratio': 'cross_correlation_ratio',
         'differential_reflectivity': 'differential_reflectivity',
+        'signal_to_noise_ratio': None,
         # Sonde field names
         'altitude': 'alt',
         'temperature': 'tdry',
@@ -464,6 +506,7 @@ _DEFAULT_FIELD_NAMES = {
         'input_clutter_corrected_reflectivity': 'reflectivity',
         'clutter': 'ground_clutter',
         'differential_reflectivity': 'differential_reflectivity',
+        'signal_to_noise_ratio': None,
         # Sonde field names
         'altitude': 'alt',
         'temperature': 'tdry',
@@ -487,6 +530,7 @@ _DEFAULT_FIELD_NAMES = {
         'input_clutter_corrected_reflectivity': 'reflectivity',
         'clutter': 'ground_clutter',
         'differential_reflectivity': 'differential_reflectivity',
+        'signal_to_noise_ratio': None,
         # Sonde field names
         'altitude': 'alt',
         'temperature': 'tdry',
@@ -510,6 +554,30 @@ _DEFAULT_FIELD_NAMES = {
         'input_clutter_corrected_reflectivity': 'reflectivity',
         'clutter': 'ground_clutter',
         'differential_reflectivity': 'differential_reflectivity',
+        'signal_to_noise_ratio': None,
+        # Sonde field names
+        'altitude': 'alt',
+        'temperature': 'tdry',
+        'u_wind': 'u_wind',
+        'v_wind': 'v_wind',
+        # Input field names to attenuation code
+        'zdr_field': 'corrected_differential_reflectivity',
+        'pia_field': 'path_integrated_attenuation',
+        'phidp_field': 'filtered_corrected_differential_phase',  # output phidp, need to change
+        'refl_field': 'corrected_reflectivity'},  # output Z field
+    
+    # SAIL X-band radar names
+    'sail_xband_ppi': {
+        'input_zdr': 'ZDR',
+        'reflectivity': 'DBZ',
+        'normalized_coherent_power': 'NCP',
+        'cross_correlation_ratio': 'RHOHV',
+        'input_phidp_field': 'PHIDP',
+        'input_clutter_corrected_reflectivity': 'DBZ',
+        'velocity': 'VEL',
+        'differential_reflectivity': 'ZDR',
+        'signal_to_noise_ratio': 'SNR',
+        'clutter': 'ground_clutter',
         # Sonde field names
         'altitude': 'alt',
         'temperature': 'tdry',
@@ -822,6 +890,23 @@ _DEFAULT_CMAC_VALUES = {
         'rain_rate_b_coef': 0.79,
         'beam_width': 1.0,
         'radar_height_offset': 10.0,},
+    
+    # X-SAPR I4 Sector CMAC 2.0 processing values.
+    'sail_xband_ppi': {
+        'save_name': 'gucxprecipradarcmacM1.c1',
+        'sonde_name': 'gucsondewnpnM1.b1',
+        'x_compass': 'XSE',
+        'site_alt': 3149.19995117,
+        'ref_offset': 0.0,
+        'self_const': 60000.00,
+        'attenuation_a_coef': 0.17,
+        'c_coef': 0.05,
+        'd_coef': 1,
+        'beta_coef': 1,
+        'zdr_offset': 3.05,
+        'rain_rate_a_coef': 43.5,
+        'rain_rate_b_coef': 0.79},
+
 }
 
 
@@ -968,5 +1053,10 @@ _DEFAULT_PLOT_VALUES = {
     # NSA X-SAPR plot values.
     'nsa_xsapr_ppi': {
         'save_name': 'nsaxsaprcmacppi.c1',
+        'sweep': 3},
+    
+    # NSA X-SAPR plot values.
+    'sail_xband_ppi': {
+        'save_name': 'gucxprecipcmacppi.c1',
         'sweep': 3},
 }
