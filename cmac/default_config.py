@@ -1060,3 +1060,29 @@ _DEFAULT_PLOT_VALUES = {
         'save_name': 'gucxprecipcmacppi.c1',
         'sweep': 3},
 }
+
+#########################################################################
+# Z-S relationships for snowfall rates
+#
+# This dictionary contains the coefficients to the relationship Z = AS^B
+# for given Z-S relationships. The keys to this dictionary are the long
+# name of the relationship. Each dictionary member is a dictionary 
+# containing the A coefficient (A), B coefficient (B), and abbreviation
+# used for the variable name (abbreviation).
+#
+#########################################################################
+
+_DEFAULT_ZS_RELATIONSHIPS = {"Wolf and Snider (2012)":
+                            {"A": 110,
+                             "B": 2,
+                             "abbreviation": 'ws2012'},
+                              "WSR 88D High Plains":
+                             {"A": 130,
+                              "B": 2,
+                              "abbreviation": 'ws88dhp'},
+                              "WSR 88D Intermountain West":
+                            {"A": 40,
+                             "B": 2,
+                             "abbreviation": 'ws88diw'}
+                             }
+
