@@ -1077,12 +1077,17 @@ _DEFAULT_ZS_RELATIONSHIPS = {"Wolf and Snider (2012)":
                              "B": 2,
                              "abbreviation": 'ws2012'},
                               "WSR 88D High Plains":
-                             {"A": 130,
+                             {"A": 40,
                               "B": 2,
-                              "abbreviation": 'ws88dhp'},
-                              "WSR 88D Intermountain West":
-                            {"A": 40,
-                             "B": 2,
-                             "abbreviation": 'ws88diw'}
+                              "abbreviation": 'ws88diw'},
+                              "Matrosov et al.(2009) Braham(1990) 1":
+                              {"A": 67,
+                              "B": 1.28,
+                              "abbreviation": "m2009_1"},
+                              "Matrosov et al.(2009) Braham(1990) 2":
+                              {"A": 114,
+                              "B": 1.39,
+                              "abbreviation": "m2009_2"},
                              }
+                             
 

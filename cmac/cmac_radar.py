@@ -213,6 +213,13 @@ def cmac(radar, sonde, config, geotiff=None, flip_velocity=False,
         radar.add_field('partial_beam_blockage', pbb_dict)
         radar.add_field('cumulative_beam_blockage', cbb_dict)
 
+    if 'cbb_flag' in radar.fields.keys():
+        cbb = radar.fields['cbb_flag']['data']
+        radar.fields['gate_id']['data'][cbb == 1] = 6
+        notes = radar.fields['gate_id']['notes']
+        radar.fields['gate_id']['notes'] = notes + ',6:terrain_blockage'
+        radar.fields['gate_id']['valid_max'] = 6
+
     cat_dict = {}
     for pair_str in radar.fields['gate_id']['notes'].split(','):
         cat_dict.update(
@@ -255,17 +262,20 @@ def cmac(radar, sonde, config, geotiff=None, flip_velocity=False,
     fzl = get_melt(radar)
     
     # Is the freezing level realistic? If not, assume
+    
     ref_offset = cmac_config['ref_offset']
     self_const = cmac_config['self_const']
     # Calculating differential phase fields.
-
     radar.fields[field_config['input_phidp_field']]['data'][
         radar.fields[field_config['input_phidp_field']]['data'] < 0] += 360.0
+    kdp_gates = copy.deepcopy(cmac_gates)
+    kdp_gates.exclude_above('height', fzl)
+
     phidp, kdp = pyart.correct.phase_proc_lp_gf(
-        radar, gatefilter=cmac_gates, offset=ref_offset, debug=True,
+        radar, gatefilter=kdp_gates, offset=ref_offset, debug=True, LP_solver='cylp',
         nowrap=50, fzl=fzl, self_const=self_const, phidp_field=field_config['input_phidp_field'],
         refl_field=field_config['reflectivity'])
-
+    print("Processed phase")
     # We do not use KDP, phase above freezing level
     kdp_gates = copy.deepcopy(cmac_gates)
     kdp_gates.exclude_above('height', fzl)
