@@ -17,6 +17,38 @@ import skfuzzy as fuzz
 import wradlib as wrl
 
 
+def snow_rate(radar, swe_ratio, A, B, citation='Wolf and Snider 2012', abbrev='ws2012'):
+    """
+    Snow rate applied to a pyart.Radar object
+
+    Takes a given Snow Water Equivilent ratio (swe_ratio), A and B value
+    for the Z-S relationship and creates a radar field similar to DBZ
+    showing the radar estimated snowfall rate in mm/hr. Then the given
+    SWE_ratio, A and B are stored in the radar metadata for later
+    reference.
+
+    """
+    # Setting up for Z-S relationship:
+    snow_z = radar.fields['corrected_reflectivity']['data'].copy()
+    # Convert it from dB to linear units
+    z_lin = 10.0**(radar.fields['corrected_reflectivity']['data']/10.)
+    # Apply the Z-S relation.
+    snow_z = swe_ratio * (z_lin/A)**(1./B)
+    # Add the field back to the radar. Use reflectivity as a template
+    radar.add_field_like('corrected_reflectivity', 'snow_rate_%s' % abbrev,  snow_z,
+                         replace_existing=True)
+    # Update units and metadata
+    radar.fields['snow_rate_%s' % abbrev]['units'] = 'mm/h'
+    radar.fields['snow_rate_%s' % abbrev]['standard_name'] = 'snowfall_rate'
+    radar.fields['snow_rate_%s' % abbrev]['long_name'] = 'Snowfall rate from Z using %s' % citation
+    radar.fields['snow_rate_%s' % abbrev]['valid_min'] = 0
+    radar.fields['snow_rate_%s' % abbrev]['valid_max'] = 500
+    radar.fields['snow_rate_%s' % abbrev]['swe_ratio'] = swe_ratio
+    radar.fields['snow_rate_%s' % abbrev]['A'] = A
+    radar.fields['snow_rate_%s' % abbrev]['B'] = B
+    return radar
+
+
 def snr_and_sounding(radar, soundings_dir, override_file=None, verbose=True):
     if override_file is None:
         radar_start_date = netCDF4.num2date(radar.time['data'][0],

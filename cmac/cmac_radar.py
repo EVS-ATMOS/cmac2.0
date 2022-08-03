@@ -6,16 +6,18 @@ import copy
 import json
 import sys
 
-import netCDF4
+import xarray as xr
 import numpy as np
 import pyart
+import netCDF4
 
 from .cmac_processing import (
-    do_my_fuzz, get_melt, get_texture, fix_phase_fields, gen_clutter_field_from_refl, beam_block)
-from .config import get_cmac_values, get_field_names, get_metadata
+    do_my_fuzz, get_melt, get_texture, fix_phase_fields, gen_clutter_field_from_refl, beam_block,
+    snow_rate)
+from .config import get_cmac_values, get_field_names, get_metadata, get_zs_relationships
 
 def cmac(radar, sonde, config, geotiff=None, flip_velocity=False,
-         meta_append=None, verbose=True):
+         meta_append=None, verbose=True, snow_density=0.073):
     """
     Corrected Moments in Antenna Coordinates
 
@@ -23,7 +25,7 @@ def cmac(radar, sonde, config, geotiff=None, flip_velocity=False,
     ----------
     radar : Radar
         Radar object to use in the CMAC calculation.
-    sonde : Object
+    sonde : xarray Dataset
         Object containing all the sonde data.
     config : str
         A string pointing to dictionaries containing values for CMAC 2.0
@@ -40,6 +42,8 @@ def cmac(radar, sonde, config, geotiff=None, flip_velocity=False,
         be created by providing a dictionary or a json file.
     verbose : bool
         If True, this will display more statistics.
+    snow_density : float
+        1 / Snow water equivalent ratio for snowfall rate
 
     Returns
     -------
@@ -51,6 +55,7 @@ def cmac(radar, sonde, config, geotiff=None, flip_velocity=False,
     cmac_config = get_cmac_values(config)
     field_config = get_field_names(config)
     meta_config = get_metadata(config)
+    zs_relationship_dict = get_zs_relationships()
     # Over write site altitude
 
     if 'site_alt' in cmac_config.keys():
@@ -208,6 +213,13 @@ def cmac(radar, sonde, config, geotiff=None, flip_velocity=False,
         radar.add_field('partial_beam_blockage', pbb_dict)
         radar.add_field('cumulative_beam_blockage', cbb_dict)
 
+    if 'cbb_flag' in radar.fields.keys():
+        cbb = radar.fields['cbb_flag']['data']
+        radar.fields['gate_id']['data'][cbb == 1] = 6
+        notes = radar.fields['gate_id']['notes']
+        radar.fields['gate_id']['notes'] = notes + ',6:terrain_blockage'
+        radar.fields['gate_id']['valid_max'] = 6
+
     cat_dict = {}
     for pair_str in radar.fields['gate_id']['notes'].split(','):
         cat_dict.update(
@@ -226,10 +238,10 @@ def cmac(radar, sonde, config, geotiff=None, flip_velocity=False,
     # Create a simulated velocity field from the sonde object.
     u_field = field_config['u_wind']
     v_field = field_config['v_wind']
-    u_wind = sonde.variables[u_field][:]
-    v_wind = sonde.variables[v_field][:]
+    u_wind = sonde[u_field].values
+    v_wind = sonde[v_field].values
     alt_field = field_config['altitude']
-    sonde_alt = sonde.variables[alt_field][:]
+    sonde_alt = sonde[alt_field].values
     profile = pyart.core.HorizontalWindProfile.from_u_and_v(
         sonde_alt, u_wind, v_wind)
     sim_vel = pyart.util.simulated_vel_from_profile(radar, profile)
@@ -250,17 +262,20 @@ def cmac(radar, sonde, config, geotiff=None, flip_velocity=False,
     fzl = get_melt(radar)
     
     # Is the freezing level realistic? If not, assume
+    
     ref_offset = cmac_config['ref_offset']
     self_const = cmac_config['self_const']
     # Calculating differential phase fields.
-
     radar.fields[field_config['input_phidp_field']]['data'][
         radar.fields[field_config['input_phidp_field']]['data'] < 0] += 360.0
+    kdp_gates = copy.deepcopy(cmac_gates)
+    kdp_gates.exclude_above('height', fzl)
+
     phidp, kdp = pyart.correct.phase_proc_lp_gf(
-        radar, gatefilter=cmac_gates, offset=ref_offset, debug=True,
+        radar, gatefilter=kdp_gates, offset=ref_offset, debug=True, LP_solver='cylp',
         nowrap=50, fzl=fzl, self_const=self_const, phidp_field=field_config['input_phidp_field'],
         refl_field=field_config['reflectivity'])
-
+    print("Processed phase")
     # We do not use KDP, phase above freezing level
     kdp_gates = copy.deepcopy(cmac_gates)
     kdp_gates.exclude_above('height', fzl)
@@ -386,8 +401,26 @@ def cmac(radar, sonde, config, geotiff=None, flip_velocity=False,
     radar.fields['rain_rate_A'].update({
         'comment': rain_rate_comment})
 
+    snow_gates = pyart.correct.GateFilter(radar)
+    snow_gates.exclude_all()
+    snow_gates.include_equal('gate_id', cat_dict['snow'])
     if verbose:
         print('## Rainfall rate as a function of A ##')
+
+    
+    for zs_key in zs_relationship_dict.keys():
+        abbreviation = zs_relationship_dict[zs_key]["abbreviation"]
+        A = zs_relationship_dict[zs_key]["A"]
+        B = zs_relationship_dict[zs_key]["B"]
+        radar = snow_rate(radar, 1 / snow_density, A, B, zs_key, abbreviation)
+        radar.fields['snow_rate_%s' % abbreviation]['data'] = np.ma.masked_where(snow_gates.gate_excluded,
+            radar.fields['snow_rate_%s' % abbreviation]['data'])
+
+
+    # Calculating snowfall rate
+
+    if verbose:
+        print("## Snowfall rate from Z-S relationship")
 
     print('##')
     print('## All CMAC fields have been added to the radar object.')

@@ -1,23 +1,10 @@
-#PBS -l nodes=1:ppn=32
-#PBS -l walltime=3:00:00
-#PBS -q batch
-#PBS -l qos=std
-#PBS -W group_list=cades-arm
-#PBS -j oe
-#PBS -N IPythonMPI0
+#!/bin/bash
+#SBATCH -N 1
+#SBATCH --account=ATM124
+#SBATCH --time=24:00:00 
+#SBATCH --mail-user=rjackson@anl.gov
 
-echo "number of nodes"
-export PBS_NUM_NODES=`wc -l ${PBS_NODEFILE} | cut -f1 -d" "`
-echo $PBS_NUM_NODES
-source activate cmac_env
-cd /home/rjackson/cmac2.0/scripts
-export TMPDIR=/home/rjackson/temp_dir
-export MPLBACKEND="agg"
- 
-pbsdsh -c 1 -v -- $PBS_O_WORKDIR/start_scheduler.sh /home/rjackson/scheduler4.json /home/rjackson/temp_dir &
-sleep 30
-pbsdsh -u -v -- $PBS_O_WORKDIR/start_worker.sh /home/rjackson/scheduler4.json /home/rjackson/temp_dir 
-
-
-./cmac_dask /lustre/or-hydra/cades-arm/proj-shared/cmac_sgpxsaprppiI5.00/201708/ /lustre/or-hydra/cades-arm/proj-shared/sgpsondewnpnC1.b1/ config_xsapr_i5 --scheduler_file=/home/zsherman/scheduler.json -o /lustre/or-hydra/cades-arm/proj-shared/sgpxsaprcmacsurI5.c1 -id /lustre/or-hydra/cades-arm/proj-shared/sgpxsaprcmacsurI5.c1.png -ma config
-
+cd /gpfs/wolf/atm124/proj-shared/cmac2.0/scripts
+module load python
+source activate /ccsopen/home/rjackson/.conda/envs/cmac_env2
+python cmac_sail.py {$1}
