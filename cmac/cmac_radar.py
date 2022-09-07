@@ -17,7 +17,7 @@ from .cmac_processing import (
 from .config import get_cmac_values, get_field_names, get_metadata, get_zs_relationships
 
 def cmac(radar, sonde, config, geotiff=None, flip_velocity=False,
-         meta_append=None, verbose=True, snow_density=0.073):
+         meta_append=None, verbose=True, snow_density=1):
     """
     Corrected Moments in Antenna Coordinates
 

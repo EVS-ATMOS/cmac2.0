@@ -7,4 +7,4 @@
 cd /gpfs/wolf/atm124/proj-shared/cmac2.0/scripts
 module load python
 source activate /ccsopen/home/rjackson/.conda/envs/cmac_env2
-python cmac_sail.py {$1}
+python cmac_sail.py 202203
