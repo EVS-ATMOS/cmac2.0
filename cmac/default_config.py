@@ -277,11 +277,11 @@ _DEFAULT_METADATA = {
         'location_description': 'North Slope of Alaska (NSA), Barrow, Alaska',
         'doi': '10.5439/1781398',},
     
-    # NSA X-SAPR 2 metadata.
+    # SAIL X-band metadata.
     'sail_xband_ppi': {
         'Conventions': 'CF/Radial instrument_parameters ARM-1.3',
         'site_id': 'guc',
-        'facility_id': 'C1',
+        'facility_id': 'S2',
         'comment': 'This is highly experimental and initial data. There are '
                    + 'many known and unknown issues. Please do not use before '
                    + 'contacting the Translator responsible scollis@anl.gov',
@@ -303,11 +303,11 @@ _DEFAULT_METADATA = {
                   + 'Scanning ARM Precipitation Radar (XSAPR)',
         'institution': 'U.S. Department of Energy Atmospheric Radiation '
                        + 'Measurement (ARM) Climate Research Facility',
-        'platform_id': 'xsaprcmacppi',
-        'dod_version': 'xsaprcmacppi-c1-1.0',
-        'input_datastream': 'nsaxsaprcfrppiC1.a1',
+        'platform_id': 'xbandcmacppi',
+        'dod_version': 'xbandcmacppi-c1-2.0',
+        'input_datastream': 'gucxbandcmacppiC1.a1',
         'data_level': 'c1',
-        'datastream': 'nsaxsaprcmacppiC1.c1',
+        'datastream': 'gucxbandcmacppiS2.c1',
         'location_description': 'North Slope of Alaska (NSA), Barrow, Alaska',
         'doi': '10.5439/1781398',},
 }
@@ -893,7 +893,7 @@ _DEFAULT_CMAC_VALUES = {
     
     # X-SAPR I4 Sector CMAC 2.0 processing values.
     'sail_xband_ppi': {
-        'save_name': 'gucxprecipradarcmacM1.c1',
+        'save_name': 'gucxprecipradarcmacS2.c1',
         'sonde_name': 'gucsondewnpnM1.b1',
         'x_compass': 'XSE',
         'site_alt': 3149.19995117,
@@ -1058,6 +1058,7 @@ _DEFAULT_PLOT_VALUES = {
     # NSA X-SAPR plot values.
     'sail_xband_ppi': {
         'save_name': 'gucxprecipcmacppi.c1',
+        'facility': 'S2',
         'sweep': 3},
 }
 

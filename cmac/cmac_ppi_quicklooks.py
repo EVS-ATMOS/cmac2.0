@@ -149,9 +149,9 @@ def quicklooks_ppi(radar, config, sweep=None, image_directory=None,
                   'snow': 'cyan',
                   'melting': 'yellow'}
     lab_colors = ['red', 'cyan', 'grey', 'green', 'yellow']
-    if 'ground_clutter' in radar.fields.keys():
-        cat_colors['clutter'] = 'black'
-        lab_colors = np.append(lab_colors, 'black')
+    #if 'ground_clutter' in radar.fields.keys():
+    cat_colors['clutter'] = 'black'
+    lab_colors = np.append(lab_colors, 'black')
     if 'terrain_blockage' in radar.fields['gate_id']['notes']:
         cat_colors['terrain_blockage'] = 'brown'
         lab_colors = np.append(lab_colors, 'brown')
