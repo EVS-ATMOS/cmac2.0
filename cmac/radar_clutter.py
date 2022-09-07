@@ -262,5 +262,8 @@ def _clutter_to_dict(clutter_array):
     clutter_dict['units'] = '1'
     clutter_dict['data'] = clutter_array
     clutter_dict['long_name'] = 'Ground Clutter'
-    clutter_dict['notes'] = '0: No Clutter, 1: Clutter'
+    clutter_dict['valid_min'] = 0
+    clutter_dict['valid_max'] = 1
+    clutter_dict['flag_meanings'] = 'no_clutter clutter'
+    clutter_dict['flag_values'] = [0, 1]
     return clutter_dict
