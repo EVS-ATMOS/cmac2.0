@@ -36,6 +36,7 @@ def run_cmac_and_plotting(radar_file_path, rad_time, cmac_config, sonde_times,
     match_datetime = re.search(r'\d{4}\d{2}\d{2}.\d{6}', radar_file_path)
     match_month = re.search(r'\d{4}\d{2}', radar_file_path)
     file_datetime = match_datetime.group()
+    file_datetime = file_datetime.replace('-', '.')
     file_month = match_month.group()
     save_name = cmac_config['save_name']
     file_name = (out_path + file_month + '/' + save_name + '.'

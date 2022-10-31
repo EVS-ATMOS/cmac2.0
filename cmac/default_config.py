@@ -303,12 +303,12 @@ _DEFAULT_METADATA = {
                   + 'Scanning ARM Precipitation Radar (XSAPR)',
         'institution': 'U.S. Department of Energy Atmospheric Radiation '
                        + 'Measurement (ARM) Climate Research Facility',
-        'platform_id': 'xbandcmacppi',
-        'dod_version': 'xbandcmacppi-c1-2.0',
-        'input_datastream': 'gucxbandcmacppiC1.a1',
+        'platform_id': 'xprecipradarcmacppi',
+        'dod_version': 'xprecipradarcmacppi-c1-2.0',
+        'input_datastream': 'gucxprecipradarcmacppiC1.a1',
         'data_level': 'c1',
-        'datastream': 'gucxbandcmacppiS2.c1',
-        'location_description': 'North Slope of Alaska (NSA), Barrow, Alaska',
+        'datastream': 'gucxprecipradarcmacppiS2.c1',
+        'location_description': 'Gunnison, Colorado',
         'doi': '10.5439/1781398',},
 }
 
