@@ -308,7 +308,7 @@ _DEFAULT_METADATA = {
         'input_datastream': 'gucxbandcmacppiC1.a1',
         'data_level': 'c1',
         'datastream': 'gucxbandcmacppiS2.c1',
-        'location_description': 'North Slope of Alaska (NSA), Barrow, Alaska',
+        'location_description': 'Gunnison, Colorado',
         'doi': '10.5439/1781398',},
 }
 

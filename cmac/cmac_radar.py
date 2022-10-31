@@ -17,7 +17,7 @@ from .cmac_processing import (
 from .config import get_cmac_values, get_field_names, get_metadata, get_zs_relationships
 
 def cmac(radar, sonde, config, geotiff=None, flip_velocity=False,
-         meta_append=None, verbose=True, snow_density=1):
+         meta_append=None, verbose=True, snow_density=1, snowfall=True):
     """
     Corrected Moments in Antenna Coordinates
 
@@ -113,6 +113,7 @@ def cmac(radar, sonde, config, geotiff=None, flip_velocity=False,
     if flip_velocity:
         radar.fields[vel_field]['data'] = radar.fields[
             vel_field]['data'] * -1.0
+    print(sonde.variables[temp_field][:])
     z_dict, temp_dict = pyart.retrieve.map_profile_to_gates(
         sonde.variables[temp_field][:], sonde.variables[alt_field][:], radar)
 
@@ -183,7 +184,7 @@ def cmac(radar, sonde, config, geotiff=None, flip_velocity=False,
         notes = radar.fields['gate_id']['notes']
         radar.fields['gate_id']['notes'] = notes + ',5:clutter'
         radar.fields['gate_id']['valid_max'] = 5
-        radar.fields['gate_id']['valid_max'] = 0
+        radar.fields['gate_id']['valid_min'] = 0
     
     if 'classification_mask' in radar.fields.keys():
         clutter_data = radar.fields['classification_mask']['data']
@@ -197,7 +198,7 @@ def cmac(radar, sonde, config, geotiff=None, flip_velocity=False,
         notes = radar.fields['gate_id']['notes']
         radar.fields['gate_id']['notes'] = notes + ',5:clutter'
         radar.fields['gate_id']['valid_max'] = 5
-        radar.fields['gate_id']['valid_max'] = 0
+        radar.fields['gate_id']['valid_min'] = 0
 
     if geotiff is not None:
         pbb_all, cbb_all = beam_block(
@@ -401,19 +402,20 @@ def cmac(radar, sonde, config, geotiff=None, flip_velocity=False,
     radar.fields['rain_rate_A'].update({
         'comment': rain_rate_comment})
 
-    snow_gates = pyart.correct.GateFilter(radar)
-    snow_gates.exclude_all()
-    snow_gates.include_equal('gate_id', cat_dict['snow'])
-    if verbose:
-        print('## Rainfall rate as a function of A ##')
+    if snowfall == True:
+        snow_gates = pyart.correct.GateFilter(radar)
+        snow_gates.exclude_all()
+        snow_gates.include_equal('gate_id', cat_dict['snow'])
+        if verbose:
+            print('## Rainfall rate as a function of A ##')
 
     
-    for zs_key in zs_relationship_dict.keys():
-        abbreviation = zs_relationship_dict[zs_key]["abbreviation"]
-        A = zs_relationship_dict[zs_key]["A"]
-        B = zs_relationship_dict[zs_key]["B"]
-        radar = snow_rate(radar, 1 / snow_density, A, B, zs_key, abbreviation)
-        radar.fields['snow_rate_%s' % abbreviation]['data'] = np.ma.masked_where(snow_gates.gate_excluded,
+        for zs_key in zs_relationship_dict.keys():
+            abbreviation = zs_relationship_dict[zs_key]["abbreviation"]
+            A = zs_relationship_dict[zs_key]["A"]
+            B = zs_relationship_dict[zs_key]["B"]
+            radar = snow_rate(radar, 1 / snow_density, A, B, zs_key, abbreviation)
+            radar.fields['snow_rate_%s' % abbreviation]['data'] = np.ma.masked_where(snow_gates.gate_excluded,
             radar.fields['snow_rate_%s' % abbreviation]['data'])
 
 
