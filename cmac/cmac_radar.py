@@ -82,9 +82,7 @@ def cmac(radar, sonde, config, geotiff=None, flip_velocity=False,
             max_h=cmac_config['gen_clutter_from_refl_alt'])
         radar.add_field(
             field_config['clutter'], new_clutter_field, replace_existing=True)
-        radar.fields[field_config['clutter']]['units'] = '1'
-        radar.fields[field_config['clutter']]['valid_max'] = 1
-        radar.fields[field_config['clutter']]['valid_min'] = 0
+
     # ZDR offsets
     if 'zdr_offset' in cmac_config.keys():
         if 'offset_zdrs' in cmac_config.keys():
@@ -122,14 +120,17 @@ def cmac(radar, sonde, config, geotiff=None, flip_velocity=False,
     if cmac_config['clutter_mask_z_for_texture']:
         masked_vr = copy.deepcopy(radar.fields[vel_field])
         if 'ground_clutter' in radar.fields.keys():
-            masked_vr['data'] = np.ma.masked_where(radar.fields['ground_clutter']['data'] == 1, masked_vr['data'])
-            masked_vr['data'][radar.fields['ground_clutter']['data'] == 1] = np.nan
-        radar.add_field('clutter_masked_velocity', masked_vr, replace_existing=True)
+            masked_vr['data'] = np.ma.masked_where(
+                radar.fields['ground_clutter']['data'] == 1, masked_vr['data'])
+            masked_vr[
+                'data'][radar.fields['ground_clutter']['data'] == 1] = np.nan
+        radar.add_field(
+            'clutter_masked_velocity', masked_vr, replace_existing=True)
+        radar.fields[
+            'clutter_masked_velocity']['long_name'] = 'Radial mean Doppler velocity, positive for motion away from the instrument, clutter removed'
 
         texture = get_texture(radar, 'clutter_masked_velocity')
         texture['data'][np.isnan(texture['data'])] = 0.0
-        radar.fields['clutter_masked_velocity']['data'] = np.ma.masked_invalid(
-            radar.fields['clutter_masked_velocity']['data'])
     else:
         texture = get_texture(radar, vel_field)
     
@@ -149,7 +150,9 @@ def cmac(radar, sonde, config, geotiff=None, flip_velocity=False,
     if field_config['signal_to_noise_ratio'] is None:
         radar.add_field('signal_to_noise_ratio', snr, replace_existing=True)
     else:
-        radar.fields['signal_to_noise_ratio'] = radar.fields.pop(field_config['signal_to_noise_ratio'])
+        radar.fields[
+            'signal_to_noise_ratio'] = radar.fields.pop(
+                field_config['signal_to_noise_ratio'])
         
     radar.add_field('velocity_texture', texture, replace_existing=True)
     if verbose:
@@ -205,7 +208,7 @@ def cmac(radar, sonde, config, geotiff=None, flip_velocity=False,
         pbb_all, cbb_all = beam_block(
             radar, geotiff, cmac_config['radar_height_offset'],
             cmac_config['beam_width'])
-        radar.fields['gate_id']['data'][cbb_all > 0.30] = 6
+        radar.fields['gate_id']['data'][cbb_all > 0.80] = 6
         notes = radar.fields['gate_id']['notes']
         radar.fields['gate_id']['notes'] = notes + ',6:terrain_blockage'
         radar.fields['gate_id']['valid_max'] = 6
@@ -274,8 +277,9 @@ def cmac(radar, sonde, config, geotiff=None, flip_velocity=False,
     kdp_gates.exclude_above('height', fzl)
 
     phidp, kdp = pyart.correct.phase_proc_lp_gf(
-        radar, gatefilter=kdp_gates, offset=ref_offset, debug=True, LP_solver='cylp',
-        nowrap=50, fzl=fzl, self_const=self_const, phidp_field=field_config['input_phidp_field'],
+        radar, gatefilter=kdp_gates, offset=ref_offset, debug=True,
+        LP_solver='cylp', nowrap=50, fzl=fzl, self_const=self_const,
+        phidp_field=field_config['input_phidp_field'],
         refl_field=field_config['reflectivity'])
     print("Processed phase")
     # We do not use KDP, phase above freezing level
@@ -287,7 +291,8 @@ def cmac(radar, sonde, config, geotiff=None, flip_velocity=False,
 
     radar.add_field('corrected_differential_phase', phidp,
                     replace_existing=True)
-    radar.fields['corrected_differential_phase']['long_name'] = 'Corrected differential propagation phase shift'
+    radar.fields[
+        'corrected_differential_phase']['long_name'] = 'Corrected differential propagation phase shift'
     radar.add_field('filtered_corrected_differential_phase', phidp_filt,
                     replace_existing=True)
     radar.fields[
@@ -299,8 +304,6 @@ def cmac(radar, sonde, config, geotiff=None, flip_velocity=False,
     radar.fields[
         'filtered_corrected_specific_diff_phase']['long_name'] = 'Filtered Corrected Specific differential phase (KDP)'
     radar.fields['filtered_corrected_differential_phase']['long_name'] = 'Filtered Corrected Differential Phase'
-    if 'clutter_masked_velocity' in radar.fields.keys():
-        radar.fields['clutter_masked_velocity']['long_name'] = 'Radial mean Doppler velocity, positive for motion away from the instrument, clutter removed'
     if verbose:
         print('##    corrected_specific_diff_phase')
         print('##    filtered_corrected_specific_diff_phase')
