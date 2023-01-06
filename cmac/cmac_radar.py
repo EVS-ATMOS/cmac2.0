@@ -49,7 +49,6 @@ def cmac(radar, sonde, config, geotiff=None, flip_velocity=False,
     -------
     radar : Radar
         Radar object with new CMAC added fields.
-
     """
     # Retrieve values from the configuration file.
     cmac_config = get_cmac_values(config)
