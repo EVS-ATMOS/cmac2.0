@@ -131,8 +131,6 @@ def cmac(radar, sonde, config, geotiff=None, flip_velocity=False,
 
         texture = get_texture(radar, 'clutter_masked_velocity')
         texture['data'][np.isnan(texture['data'])] = 0.0
-        radar.fields['clutter_masked_velocity']['data'] = np.ma.masked_invalid(
-            radar.fields['clutter_masked_velocity']['data']
     else:
         texture = get_texture(radar, vel_field)
     
