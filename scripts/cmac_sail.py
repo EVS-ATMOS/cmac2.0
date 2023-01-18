@@ -200,7 +200,7 @@ if __name__ == "__main__":
     #cluster = SLURMCluster(project="atm124", memory="256GB", processes=24, cores=128, n_workers=48, walltime="6:00:00",
     #        job_extra=["--nodes=2"])
     #process_t(0)
-    #cluster = LocalCluster(n_workers=20, processes=True, threads_per_worker=1)
+    cluster = LocalCluster(n_workers=20, processes=True, threads_per_worker=1)
    
     ##for i in range(len(radar_times)):
     ##        process_t(i)
