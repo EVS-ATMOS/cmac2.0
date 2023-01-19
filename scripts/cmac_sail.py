@@ -158,7 +158,8 @@ def run_cmac_and_plotting(radar_file_path, rad_time, cmac_config, sonde_times,
                                 out_cdf[var][:],
                                 out_ds[var].attrs["_FillValue"])
                     else:
-                        set_or_create_attr(out_cdf[var], attr, out_ds[var].attrs[attr])
+                        #set_or_create_attr(out_cdf[var], attr, out_ds[var].attrs[attr])
+                        setattr(out_cdf[var], attr, out_ds[var].attrs[attr])
 
     out_cdf["range"].long_name = "Range to measurement volume"
     out_cdf["time"].long_name = "Time in Seconds from Volume Start"
@@ -199,12 +200,12 @@ if __name__ == "__main__":
     sonde_times = np.array([parse_sonde_date(x) for x in sonde_file_list])
     #cluster = SLURMCluster(project="atm124", memory="256GB", processes=24, cores=128, n_workers=48, walltime="6:00:00",
     #        job_extra=["--nodes=2"])
-    #process_t(0)
-    cluster = LocalCluster(n_workers=20, processes=True, threads_per_worker=1)
+    process_t(3132)
+    #cluster = LocalCluster(n_workers=20, processes=True, threads_per_worker=1)
    
     ##for i in range(len(radar_times)):
     ##        process_t(i)
-    with Client(cluster) as c:
-        results = c.map(process_t, range(len(radar_times)))
-        wait(results)
+    #with Client(cluster) as c:
+    #    results = c.map(process_t, range(len(radar_times)))
+    #    wait(results)
     print("processing finished: ", time.strftime("%H:%M:%S"))
