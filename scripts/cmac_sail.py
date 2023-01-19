@@ -18,8 +18,12 @@ import dask.bag as db
 import matplotlib.pyplot as plt
 
 from distributed import LocalCluster, Client, wait, progress
-from dask_jobqueue import SLURMCluster
+#from dask_jobqueue import SLURMCluster
 from copy import deepcopy
+
+import warnings
+warnings.filterwarnings("ignore", category=DeprecationWarning)
+warnings.filterwarnings("ignore", category=UserWarning)
 
 def parse_sonde_date(filename):
     fname = filename.split("/")[-1]
@@ -129,7 +133,7 @@ def run_cmac_and_plotting(radar_file_path, rad_time, cmac_config, sonde_times,
     
     # Produce the cmac_radar file from the cmac_radar object.
     # Check metadata and fill values
-    out_ds = xr.open_dataset('dod.nc')
+    out_ds = xr.open_dataset('dod.nc', mask_and_scale=False)
 
 
     pyart.io.write_cfradial(file_name, cmac_radar)
@@ -145,14 +149,17 @@ def run_cmac_and_plotting(radar_file_path, rad_time, cmac_config, sonde_times,
     # NetCDF4 time coverage
     out_cdf = netCDF4.Dataset(file_name, mode="a")
     for var in out_cdf.variables.keys():
-        print("Resetting" + var)
+        print("Resetting: " + var)
         for attr in out_ds[var].attrs:
                 if not out_ds[var].attrs[attr] == "":
-                    setattr(out_cdf[var], attr, out_ds[var].attrs[attr])
-                    if "_FillValue" in out_ds[var].attrs:
+                    #setattr(out_cdf[var], attr, out_ds[var].attrs[attr])
+                    if "_FillValue" in attr:
                         out_cdf[var][:] = np.nan_to_num(
                                 out_cdf[var][:],
                                 out_ds[var].attrs["_FillValue"])
+                    else:
+                        #set_or_create_attr(out_cdf[var], attr, out_ds[var].attrs[attr])
+                        setattr(out_cdf[var], attr, out_ds[var].attrs[attr])
 
     out_cdf["range"].long_name = "Range to measurement volume"
     out_cdf["time"].long_name = "Time in Seconds from Volume Start"
@@ -181,22 +188,24 @@ def process_t(index):
     run_cmac_and_plotting(radar_file, radar_time, cmac_config, sonde_times, sonde_file_list, None, None, out_path, img_dir) 
     
 if __name__ == "__main__":
+    print("process start time: ", time.strftime("%H:%M:%S"))
     month = sys.argv[1]
-    path = '/gpfs/wolf/atm124/proj-shared/sail/%s_glued/*.nc' % month
+    path = '/gpfs/wolf/atm124/proj-shared/gucxprecipradarS2.00/glue_files/%s_glued/*.nc' % month
     sonde_path = '/gpfs/wolf/atm124/proj-shared/gucsondewnpnM1.b1/*.cdf'
-    out_path = '/gpfs/wolf/atm124/proj-shared/gucxprecipradarcmacM1.c1/ppi/'
-    img_dir = '/gpfs/wolf/atm124/proj-shared/gucxprecipradarcmacM1.c1/png/'
+    out_path = '/gpfs/wolf/atm124/proj-shared/gucxprecipradarcmacS2.c1/ppi/'
+    img_dir = '/gpfs/wolf/atm124/proj-shared/gucxprecipradarcmacS2.c1/png/'
     file_list = sorted(glob.glob(path))
     sonde_file_list = glob.glob(sonde_path)
     radar_times = np.array([parse_radar_date(x) for x in file_list])
     sonde_times = np.array([parse_sonde_date(x) for x in sonde_file_list])
     #cluster = SLURMCluster(project="atm124", memory="256GB", processes=24, cores=128, n_workers=48, walltime="6:00:00",
     #        job_extra=["--nodes=2"])
-    #process_t(0)
-    cluster = LocalCluster(n_workers=12)
+    process_t(3132)
+    #cluster = LocalCluster(n_workers=20, processes=True, threads_per_worker=1)
    
-    #for i in range(len(radar_times)):
-    #    process_t(i)
-    with Client(cluster) as c:
-        results = c.map(process_t, range(len(radar_times)))
-        wait(results)
+    ##for i in range(len(radar_times)):
+    ##        process_t(i)
+    #with Client(cluster) as c:
+    #    results = c.map(process_t, range(len(radar_times)))
+    #    wait(results)
+    print("processing finished: ", time.strftime("%H:%M:%S"))
