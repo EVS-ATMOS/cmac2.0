@@ -290,26 +290,25 @@ _DEFAULT_METADATA = {
                         + 'engineering team radar@arm.gov and the data is '
                         + 'processed by the precipitation radar products team. '
                         + 'LP code courtesy of Scott Giangrande BNL.',
-        'process_version': 'CMAC 2.0',
+        'process_version': 'CMAC',
         'vap_name': 'cmac',
         'known_issues': 'False phidp jumps in insect regions. Still uses old '
                         + 'Giangrande code. Issues with some snow below '
                         + 'melting layer.',
-        'developers': 'Robert Jackson, ANL. Zachary Sherman, ANL.',
+        'developers': "Robert Jackson, ANL. Zachary Sherman, ANL., Maxwell Grover, ANL. Joseph OBrien, ANL.",
         'translator': 'Scott Collis, ANL.',
-        'mentors': 'Bradley Isom, PNNL. Iosif Lindenmaier, PNNL.',
-        'references': 'See XSAPR Instrument Handbook',
-        'source': 'Atmospheric Radiation Measurement (ARM) program X-band '
-                  + 'Scanning ARM Precipitation Radar (XSAPR)',
+        'mentors': "https://www.arm.gov/connect-with-arm/organization/instrument-mentors/list#xprecipradar",
+        'references': 'See XPRECIPRADAR Instrument Handbook',
+        'source': "Colorado State University X-Band Preciptiation Radar (XPRECIPRADAR) (DOI: 10.5439/1844501) "
         'institution': 'U.S. Department of Energy Atmospheric Radiation '
                        + 'Measurement (ARM) Climate Research Facility',
         'platform_id': 'xprecipradarcmacppi',
         'dod_version': 'xprecipradarcmacppi-c1-2.0',
-        'input_datastream': 'gucxprecipradarcmacppiC1.a1',
+        'input_datastream': 'gucxprecipradarS2.00',
         'data_level': 'c1',
         'datastream': 'gucxprecipradarcmacppiS2.c1',
         'location_description': 'Gunnison, Colorado',
-        'doi': '10.5439/1781398',},
+        'doi': '10.5439/1883164',},
 }
 
 ##############################################################################
