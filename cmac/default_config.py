@@ -295,11 +295,11 @@ _DEFAULT_METADATA = {
         'known_issues': 'False phidp jumps in insect regions. Still uses old '
                         + 'Giangrande code. Issues with some snow below '
                         + 'melting layer.',
-        'developers': "Robert Jackson, ANL. Zachary Sherman, ANL., Maxwell Grover, ANL. Joseph OBrien, ANL.",
+        'developers': "Robert Jackson, ANL., Zachary Sherman, ANL., Maxwell Grover, ANL., Joseph OBrien, ANL.",
         'translator': 'Scott Collis, ANL.',
         'mentors': "https://www.arm.gov/connect-with-arm/organization/instrument-mentors/list#xprecipradar",
         'references': 'See XPRECIPRADAR Instrument Handbook',
-        'source': "Colorado State University X-Band Preciptiation Radar (XPRECIPRADAR) (DOI: 10.5439/1844501) "
+        'source': "Colorado State University X-Band Precipitation Radar (XPRECIPRADAR) (DOI: 10.5439/1844501) ",
         'institution': 'U.S. Department of Energy Atmospheric Radiation '
                        + 'Measurement (ARM) Climate Research Facility',
         'platform_id': 'xprecipradarcmacppi',
