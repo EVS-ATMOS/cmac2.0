@@ -220,6 +220,11 @@ def cmac(radar, sonde, config, geotiff=None, flip_velocity=False,
 
     if 'cbb_flag' in radar.fields.keys():
         cbb = radar.fields['cbb_flag']['data']
+        if cbb.shape[0] < radar.fields['gate_id']['data'].shape[0]:
+            # find the difference in shape
+            sdiff = radar.fields['gate_id']['data'].shape[0] - cbb.shape[0]
+            # pad the cbb gate to match the radar
+            cbb = np.pad(cbb, ((0, sdiff), (0, 0)),  'maximum')
         radar.fields['gate_id']['data'][cbb == 1] = 6
         notes = radar.fields['gate_id']['notes']
         radar.fields['gate_id']['notes'] = notes + ',6:terrain_blockage'
@@ -267,7 +272,8 @@ def cmac(radar, sonde, config, geotiff=None, flip_velocity=False,
     fzl = get_melt(radar)
     
     # Is the freezing level realistic? If not, assume
-    
+    if fzl < radar.altitude["data"]:
+        fzl = radar.altitude["data"] + 500.
     ref_offset = cmac_config['ref_offset']
     self_const = cmac_config['self_const']
     # Calculating differential phase fields.

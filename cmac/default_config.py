@@ -312,6 +312,7 @@ _DEFAULT_METADATA = {
         'doi': '10.5439/1781398',},
 }
 
+_DEFAULT_METADATA['sail_xband_ppi_adi'] = _DEFAULT_METADATA['sail_xband_ppi']
 ##############################################################################
 # Default field names
 #
@@ -577,6 +578,29 @@ _DEFAULT_FIELD_NAMES = {
         'velocity': 'VEL',
         'differential_reflectivity': 'ZDR',
         'signal_to_noise_ratio': 'SNR',
+        'clutter': 'ground_clutter',
+        # Sonde field names
+        'altitude': 'alt',
+        'temperature': 'tdry',
+        'u_wind': 'u_wind',
+        'v_wind': 'v_wind',
+        # Input field names to attenuation code
+        'zdr_field': 'corrected_differential_reflectivity',
+        'pia_field': 'path_integrated_attenuation',
+        'phidp_field': 'filtered_corrected_differential_phase',  # output phidp, need to change
+        'refl_field': 'corrected_reflectivity'},  # output Z field
+
+    # SAIL X-band radar names
+    'sail_xband_ppi_adi': {
+        'input_zdr': 'differential_reflectivity',
+        'reflectivity': 'reflectivity',
+        'normalized_coherent_power': 'normalized_coherent_power',
+        'cross_correlation_ratio': 'cross_correlation_ratio',
+        'input_phidp_field': 'differential_phase_hv',
+        'input_clutter_corrected_reflectivity': 'reflectivity',
+        'velocity': 'velocity',
+        'differential_reflectivity': 'differential_reflectivity',
+        'signal_to_noise_ratio': 'signal_to_noise_ratio',
         'clutter': 'ground_clutter',
         # Sonde field names
         'altitude': 'alt',
@@ -909,6 +933,7 @@ _DEFAULT_CMAC_VALUES = {
 
 }
 
+_DEFAULT_CMAC_VALUES['sail_xband_ppi_adi'] = _DEFAULT_CMAC_VALUES['sail_xband_ppi']
 
 ##############################################################################
 # Default plot values
@@ -1061,6 +1086,8 @@ _DEFAULT_PLOT_VALUES = {
         'facility': 'S2',
         'sweep': 3},
 }
+
+_DEFAULT_PLOT_VALUES['sail_xband_ppi_adi'] = _DEFAULT_PLOT_VALUES['sail_xband_ppi']
 
 #########################################################################
 # Z-S relationships for snowfall rates
