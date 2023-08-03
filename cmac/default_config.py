@@ -892,7 +892,7 @@ _DEFAULT_CMAC_VALUES = {
     
     # X-SAPR I4 Sector CMAC 2.0 processing values.
     'sail_xband_ppi': {
-        'save_name': 'gucxprecipradarcmacS2.c1',
+        'save_name': 'gucxprecipradarcmacppiS2.c1',
         'sonde_name': 'gucsondewnpnM1.b1',
         'x_compass': 'XSE',
         'site_alt': 3149.19995117,

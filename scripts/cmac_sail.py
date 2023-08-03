@@ -138,14 +138,6 @@ def run_cmac_and_plotting(radar_file_path, rad_time, cmac_config, sonde_times,
 
     pyart.io.write_cfradial(file_name, cmac_radar)
     
-    def set_or_create_attr(var, attr_name, attr_value):
-        if attr_name in var.ncattrs():
-            var.setncattr(attr_name, attr_value)
-            return
-        var.UnusedNameAttribute = attr_value
-        var.renameAttribute("UnusedNameAttribute", attr_name)
-        return
-
     # NetCDF4 time coverage
     out_cdf = netCDF4.Dataset(file_name, mode="a")
     for var in out_cdf.variables.keys():
@@ -158,7 +150,6 @@ def run_cmac_and_plotting(radar_file_path, rad_time, cmac_config, sonde_times,
                                 out_cdf[var][:],
                                 out_ds[var].attrs["_FillValue"])
                     else:
-                        #set_or_create_attr(out_cdf[var], attr, out_ds[var].attrs[attr])
                         setattr(out_cdf[var], attr, out_ds[var].attrs[attr])
 
     out_cdf["range"].long_name = "Range to measurement volume"
