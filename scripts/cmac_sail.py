@@ -79,31 +79,6 @@ def run_cmac_and_plotting(radar_file_path, rad_time, cmac_config, sonde_times,
         radar.fields[field]["data"] = radar.fields[field]["data"][:, valid_rays:]
     radar.range["data"] = radar.range["data"][valid_rays:]
     radar.ngates = len(radar.range["data"])
-    #radar_start_date = netCDF4.num2date(radar.time['data'][0],
-     #                                   radar.time['units'], 
-      #                                  only_use_cftime_datetimes=False, only_use_python_datetimes=True)
-
-    #year_str = "%04d" % radar_start_date.year
-    #month_str = "%02d" % radar_start_date.month
-    #day_str = "%02d" % radar_start_date.day
-    #hour_str = "%02d" % radar_start_date.hour
-    #minute_str = "%02d" % radar_start_date.minute
-    #second_str = "%02d" % radar_start_date.second
-    #save_name = cmac_config['save_name']
-    #file_name = (out_path + year_str + month_str + '/' + save_name + '.'
-     #            + year_str + month_str + day_str + '.' + hour_str
-      #           + minute_str + second_str + '.nc')
-    #radtime = radar_time[
-    #rad_time = datetime.datetime.strptime(radar.time["units"][0:33], "seconds since %Y-%m-%dT%H:%M:%S")
-    # Load clutter files.
-    #clutter = pyart.io.read(
-     #   clutter_file_path+'clutter_corcsapr2cfrppiM1.a1'
-      #  + '.' + year_str + month_str + day_str + '.' + hour_str
-       # + minute_str + second_str + '.nc')
-    #clutter_field_dict = clutter.fields['ground_clutter']
-    #radar.add_field(
-     #   'ground_clutter', clutter_field_dict, replace_existing=True)
-    #del clutter
     sonde_index = np.argmin(np.abs(sonde_times - rad_time))
     sounding_file = sounding_files[sonde_index]
     # Retrieve closest sonde in time to the time of the radar file.
@@ -120,21 +95,13 @@ def run_cmac_and_plotting(radar_file_path, rad_time, cmac_config, sonde_times,
             sonde_index += 1
             sounding_file = sounding_files[sonde_index]
             sonde = xr.open_dataset(sounding_file)
-
-    #    del radar
-    #    sonde.close()
-    #    import gc
-    #    gc.collect()
-    #    return
     # Free up some memory.
     del radar
     sonde.close()
 
-    
     # Produce the cmac_radar file from the cmac_radar object.
     # Check metadata and fill values
     out_ds = xr.open_dataset('dod.nc', mask_and_scale=False)
-
 
     pyart.io.write_cfradial(file_name, cmac_radar)
     
@@ -181,21 +148,17 @@ def process_t(index):
 if __name__ == "__main__":
     print("process start time: ", time.strftime("%H:%M:%S"))
     month = sys.argv[1]
-    path = '/gpfs/wolf/atm124/proj-shared/gucxprecipradarS2.00/glue_files/%s_glued/*.nc' % month
-    sonde_path = '/gpfs/wolf/atm124/proj-shared/gucsondewnpnM1.b1/*.cdf'
-    out_path = '/gpfs/wolf/atm124/proj-shared/gucxprecipradarcmacS2.c1/ppi/'
-    img_dir = '/gpfs/wolf/atm124/proj-shared/gucxprecipradarcmacS2.c1/png/'
+    path = '/gpfs/wolf2/arm/atm124/proj-shared/gucxprecipradarS2.00/glue_files/%s_glued/*.nc' % month
+    sonde_path = '/gpfs/wolf2/arm/atm124/proj-shared/gucsondewnpnM1.b1/*.cdf'
+    out_path = '/gpfs/wolf2/arm/atm124/world-shared/gucxprecipradarcmacS2.c1/ppi/'
+    img_dir = '/gpfs/wolf2/arm/atm124/world-shared/gucxprecipradarcmacS2.c1/png/'
     file_list = sorted(glob.glob(path))
     sonde_file_list = glob.glob(sonde_path)
     radar_times = np.array([parse_radar_date(x) for x in file_list])
     sonde_times = np.array([parse_sonde_date(x) for x in sonde_file_list])
-    #cluster = SLURMCluster(project="atm124", memory="256GB", processes=24, cores=128, n_workers=48, walltime="6:00:00",
-    #        job_extra=["--nodes=2"])
-    #process_t(3132)
+    # For serial processing test, uncomment the below line. 
+    ##process_t(3132)
     cluster = LocalCluster(n_workers=20, processes=True, threads_per_worker=1)
-   
-    ##for i in range(len(radar_times)):
-    ##        process_t(i)
     with Client(cluster) as c:
         results = c.map(process_t, range(len(radar_times)))
         wait(results)
