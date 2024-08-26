@@ -18,7 +18,7 @@ from .config import get_cmac_values, get_field_names, get_metadata, get_zs_relat
 
 
 def cmac(radar, sonde, config, geotiff=None, flip_velocity=False,
-         meta_append=None, verbose=True, snow_density=1, snowfall=True):
+         meta_append=None, verbose=True, snow_density=0.073, snowfall=True):
     """
     Corrected Moments in Antenna Coordinates
 
@@ -111,7 +111,7 @@ def cmac(radar, sonde, config, geotiff=None, flip_velocity=False,
     if flip_velocity:
         radar.fields[vel_field]['data'] = radar.fields[
             vel_field]['data'] * -1.0
-    print(sonde.variables[temp_field][:])
+
     z_dict, temp_dict = pyart.retrieve.map_profile_to_gates(
         sonde.variables[temp_field][:], sonde.variables[alt_field][:], radar)
 
