@@ -92,8 +92,12 @@ def cmac(radar, sonde, config, geotiff=None, flip_velocity=False,
         else:
             radar.fields[
                 field_config['input_zdr']]['data'] += cmac_config['zdr_offset']
-
-
+    
+    # Reflectivity offsets
+    if cmac_config["ref_offset"]:
+        # note need input reflectivity, not corrected reflectivity variable name
+        radar.fields[field_config["reflectivity"]]['data'] += cmac_config["ref_offset"]
+        
     # flipping phidp
     if 'flip_phidp' not in cmac_config.keys():
         cmac_config['flip_phidp'] = False
