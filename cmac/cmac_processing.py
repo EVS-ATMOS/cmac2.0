@@ -496,7 +496,7 @@ def beam_block(radar, tif_file, radar_height_offset=10.0,
     data_raster = wrl.io.open_raster(rasterfile)
     rastervalues, rastercoords, proj = wrl.georef.extract_raster_dataset(
         data_raster, nodata=None)
-    #rastervalues_, rastercoords_, proj = wrl.georef.extract_raster_dataset(data_raster, nodata=-32768.)
+    #rastervalues_, rastercoords_, crs = wrl.georef.extract_raster_dataset(data_raster, nodata=-32768.)
     sitecoords = (np.float(radar.longitude['data']),
                   np.float(radar.latitude['data']),
                   np.float(radar.altitude['data'] + radar_height_offset))
@@ -513,14 +513,14 @@ def beam_block(radar, tif_file, radar_height_offset=10.0,
         azimuths = radar.azimuth['data'][index_start:index_end]
         rg, azg = np.meshgrid(_range, azimuths)
         rg, eleg = np.meshgrid(_range, elevs)
-        nrays = azimuths.shape[0]              # number of rays
-        nbins = radar.ngates                   # number of range bins
-        bw = beam_width                        # half power beam width (deg)
-        range_res = 100.                       # range resolution (meters)
+        nrays = azimuths.shape[0]                        # number of rays
+        nbins = radar.ngates                             # number of range bins
+        bw = beam_width                                  # half power beam width (deg)
+        range_res = radar.range['meters_between_gates']  # range resolution (meters)
         el = radar.fixed_angle['data'][i]
         coord = wrl.georef.sweep_centroids(nrays, range_res, nbins, el)
         coords = wrl.georef.spherical_to_proj(rg, azg, eleg,
-                                              sitecoords, proj=proj)
+                                              sitecoords, crs=crs)
         lon = coords[..., 0]
         lat = coords[..., 1]
         alt = coords[..., 2]
