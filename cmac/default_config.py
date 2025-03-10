@@ -516,7 +516,31 @@ _DEFAULT_FIELD_NAMES = {
         'pia_field': 'path_integrated_attenuation',
         'phidp_field': 'filtered_corrected_differential_phase',  # output phidp, need to change
         'refl_field': 'corrected_reflectivity'},  # output Z field
-    
+
+    # BNF C-SAPR 2 field names.
+    'bnf_csapr2_ppi': {
+        # Radar field names
+        'input_zdr': 'differential_reflectivity',
+        'reflectivity': 'reflectivity',  # need to change to input_reflectivity
+        'velocity': 'corrected_velocity',
+        'normalized_coherent_power': 'normalized_coherent_power',
+        'cross_correlation_ratio': 'cross_correlation_ratio',
+        'input_phidp_field': 'differential_phase',
+        'input_clutter_corrected_reflectivity': 'reflectivity',
+        'clutter': 'ground_clutter',
+        'differential_reflectivity': 'differential_reflectivity',
+        'signal_to_noise_ratio': None,
+        # Sonde field names
+        'altitude': 'alt',
+        'temperature': 'tdry',
+        'u_wind': 'u_wind',
+        'v_wind': 'v_wind',
+        # Input field names to attenuation code
+        'zdr_field': 'corrected_differential_reflectivity',
+        'pia_field': 'path_integrated_attenuation',
+        'phidp_field': 'filtered_corrected_differential_phase',  # output phidp, need to change
+        'refl_field': 'corrected_reflectivity'},  # output Z field
+
     # CACTI C-SAPR 2 field names.
     'tracer_csapr2_ppi': {
         # Radar field names

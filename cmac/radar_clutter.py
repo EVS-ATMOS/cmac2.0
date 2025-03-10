@@ -75,8 +75,12 @@ def tall_clutter(files, config,
     def get_reflect_array(file, first_shape):
         """ Retrieves a reflectivity array for a radar volume. """
         try:
-            radar = pyart.io.read(file, include_fields=[refl_field,
-                                        ncp_field, vel_field])
+            if '.h5' in file:
+                radar = pyart.aux_io.read_gamic(
+                    file, include_fields=[refl_field, ncp_field, vel_field])
+            else:
+                radar = pyart.io.read(file, include_fields=[refl_field,
+                                      ncp_field, vel_field])
             reflect_array = deepcopy(radar.fields[refl_field]['data'])
             ncp = radar.fields[ncp_field]['data']
             height = radar.gate_z["data"]
@@ -96,21 +100,31 @@ def tall_clutter(files, config,
         first_shape = 0
         for file in files:
             try:
-                radar = pyart.io.read(file)
-                reflect_array = radar.fields[refl_field]['data']
-                ncp = deepcopy(radar.fields[ncp_field]['data'])
-                height = radar.gate_z["data"]
-                reflect_array = np.ma.masked_where(
+                if '.h5' in file:
+                    radar = pyart.aux_io.read_gamic(file)
+                else:
+                    radar = pyart.io.read(file)
+                if radar.scan_type == 'ppi':
+                    print('File is PPI! Good to go!')
+                    print('Working on file: ' + file)
+                    reflect_array = radar.fields[refl_field]['data']
+                    ncp = deepcopy(radar.fields[ncp_field]['data'])
+                    height = radar.gate_z["data"]
+                    reflect_array = np.ma.masked_where(
                         np.logical_or(height > max_height, ncp < 0.8),
-                        reflect_array)
+                            reflect_array)
                     
-                if first_shape == 0:
-                    first_shape = reflect_array.shape
-                    clutter_radar = radar
-                    run_stats.push(reflect_array)
-                if reflect_array.shape == first_shape:
-                    run_stats.push(reflect_array)
-                del radar
+                    if first_shape == 0:
+                        first_shape = reflect_array.shape
+                        clutter_radar = radar
+                        run_stats.push(reflect_array)
+                    if reflect_array.shape == first_shape:
+                        run_stats.push(reflect_array)
+                    print('File completed: ' + file)
+                    del radar
+                else:
+                    del radar
+                    continue
             except(TypeError, OSError):
                 print(file + ' is corrupt...skipping!')
                 continue
@@ -127,7 +141,10 @@ def tall_clutter(files, config,
         i = 0
         while first_shape == 0:
             try:
-                radar = pyart.io.read(files[i])
+                if '.h5' in file:
+                    radar = pyart.aux_io.read_gamic(files[i])
+                else:
+                    radar = pyart.io.read(files[i])
                 reflect_array = radar.fields[refl_field]['data']
                 first_shape = reflect_array.shape
                 clutter_radar = radar
