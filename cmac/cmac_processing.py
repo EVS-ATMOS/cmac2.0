@@ -422,7 +422,7 @@ def gen_clutter_field_from_refl(radar, corrected_field, uncorrected_field, diff_
     new_grid = radar.fields[
         'attenuation_corrected_reflectivity_h']['data'] - radar.fields[
             'reflectivity']['data']
-    clutter = np.zeros(new_grid.shape, dtype=np.int)
+    clutter = np.zeros(new_grid.shape, dtype=int)
     possible_contamination = new_grid < diff_dbz
     clutter[possible_contamination] = 1
 
