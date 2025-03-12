@@ -551,12 +551,12 @@ _DEFAULT_FIELD_NAMES = {
         'reflectivity': 'reflectivity',  # need to change to input_reflectivity
         'velocity': 'mean_doppler_velocity',
         'normalized_coherent_power': 'normalized_coherent_power',
-        'cross_correlation_ratio': 'cross_correlation_ratio',
+        'cross_correlation_ratio': 'copol_correlation_coeff',
         'input_phidp_field': 'differential_phase',
         'input_clutter_corrected_reflectivity': 'reflectivity',
         'clutter': 'ground_clutter',
         'differential_reflectivity': 'differential_reflectivity',
-        'signal_to_noise_ratio': None,
+        'signal_to_noise_ratio': 'signal_to_noise_ratio_copolar_h',
         # Sonde field names
         'altitude': 'alt',
         'temperature': 'tdry',
@@ -932,12 +932,14 @@ _DEFAULT_CMAC_VALUES = {
         'mbfs': cacti_csapr2_ppi_mbfs,
         'hard_const': cacti_csapr2_ppi_hard_const,
         'gen_clutter_from_refl': True,
-        'ref_offset': -0.9,
+        'ref_offset': 0.8,
+        'zdr_offset': 0.7,
         'gen_clutter_from_refl_diff': -0.2,
         'gen_clutter_from_refl_alt': 2000.0,
         'clutter_mask_z_for_texture': True,
         'rain_rate_a_coef': 294.0,
         'rain_rate_b_coef': 0.89,
+        'kdp_method': "bringi",
         'beam_width': 1.0,
         'radar_height_offset': 10.0,},  # We expect clutter corrected fields now
 
@@ -1117,7 +1119,20 @@ _DEFAULT_PLOT_VALUES = {
     'tracer_csapr2_ppi': {
         'save_name': 'houcsaprcmacppiS2.c1',
         'sweep': 3},
+    
+    # CACTI C-SAPR 2 plot values.
+    'bnf_csapr2_rhi': {
+        'save_name': 'bnfcsaprcmacrhiS3.c1',
+        'sweep': 0},
 
+    # CACTI C-SAPR 2 plot values.
+    'bnf_csapr2_ppi': {
+        'save_name': 'bnfcsaprcmacppiS2.c1',
+        'min_lat': 33.7,
+        'max_lat': 35.65,
+        'min_lon': -88.4,
+        'max_lon': -85.9,
+        'sweep': 0},
 
     # CACTI C-SAPR 2 plot values.
     'xsapr_i5_rhi': {

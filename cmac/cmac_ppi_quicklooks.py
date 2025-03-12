@@ -55,15 +55,30 @@ def quicklooks_ppi(radar, config, sweep=None, image_directory=None,
     date_string = datetime.strftime(radar_start_date, '%Y%m%d.%H%M%S')
     combined_name = '.' + save_name + '.' + date_string
 
-    #min_lat = plot_config['min_lat']
-    #max_lat = plot_config['max_lat']
-    #min_lon = plot_config['min_lon']
-    #max_lon = plot_config['max_lon']
+    if 'min_lat' in plot_config.keys():
+        min_lat = plot_config['min_lat']
+    else:
+        min_lat = radar.gate_latitude['data'].min() - .1
+    
+    if 'max_lat' in plot_config.keys():
+        max_lat = plot_config['max_lat']
+    else:
+        max_lat = radar.gate_latitude['data'].max() + .1
 
-    max_lat = radar.gate_latitude['data'].max() + .1
-    min_lat = radar.gate_latitude['data'].min() - .1
-    max_lon = radar.gate_longitude['data'].max() + .1
-    min_lon = radar.gate_longitude['data'].min() - .1
+    if 'min_lon' in plot_config.keys():     
+        min_lon = plot_config['min_lon']
+    else:
+        min_lon = radar.gate_longitude['data'].min() - .1
+
+    if 'max_lon' in plot_config.keys():
+        max_lon = plot_config['max_lon']
+    else:
+        max_lon = radar.gate_longitude['data'].max() + .1
+
+    #max_lat = radar.gate_latitude['data'].max() + .1
+    #min_lat = radar.gate_latitude['data'].min() - .1
+    #max_lon = radar.gate_longitude['data'].max() + .1
+    #min_lon = radar.gate_longitude['data'].min() - .1
 
     # Creating a plot of reflectivity before CMAC.
     lal = np.arange(min_lat, max_lat, .8)
@@ -139,9 +154,9 @@ def quicklooks_ppi(radar, config, sweep=None, image_directory=None,
     cat_dict = {}
     print('##')
     print('## Keys for each gate id are as follows:')
-    for pair_str in radar.fields['gate_id']['notes'].split(','):
+    for i, pair_str in enumerate(radar.fields['gate_id']['flag_meanings'].split(' ')):
         print('##   ', str(pair_str))
-        cat_dict.update({pair_str.split(':')[1]:int(pair_str.split(':')[0])})
+        cat_dict.update({pair_str: i})
     sorted_cats = sorted(cat_dict.items(), key=operator.itemgetter(1))
     cat_colors = {'rain': 'green',
                   'multi_trip': 'red',
@@ -413,23 +428,24 @@ def quicklooks_ppi(radar, config, sweep=None, image_directory=None,
     del fig, ax, display
 
     # Creating a plot of snowfall rate from Wolf and Snider
-    display = pyart.graph.RadarMapDisplay(radar)
-    fig, ax = plt.subplots(1, 1, subplot_kw=dict(projection=ccrs.PlateCarree()),
-                          figsize=[12, 8])
-    ax.set_aspect('auto')
-    display.plot_ppi_map('snow_rate_ws2012', sweep=sweep, resolution='50m',
-                         vmin=0, vmax=50, min_lat=min_lat, min_lon=min_lon,
-                         max_lat=max_lat, ax=ax, max_lon=max_lon, lat_lines=lal,
-                         lon_lines=lol, projection=ccrs.PlateCarree())
-    if dd_lobes:
-        ax.contour(grid_lon, grid_lat, bca,
-                   levels=[np.pi/6, 5*np.pi/6], linewidths=2,
-                   colors='k')
-    fig.savefig(
-        image_directory
-        + '/snow_rate_ws2012' + combined_name + '.png')
-    plt.close(fig)
-    del fig, ax, display
+    if 'snow_rate_ws2012' in radar.fields.keys():
+        display = pyart.graph.RadarMapDisplay(radar)
+        fig, ax = plt.subplots(1, 1, subplot_kw=dict(projection=ccrs.PlateCarree()),
+                              figsize=[12, 8])
+        ax.set_aspect('auto')
+        display.plot_ppi_map('snow_rate_ws2012', sweep=sweep, resolution='50m',
+                             vmin=0, vmax=50, min_lat=min_lat, min_lon=min_lon,
+                             max_lat=max_lat, ax=ax, max_lon=max_lon, lat_lines=lal,
+                             lon_lines=lol, projection=ccrs.PlateCarree())
+        if dd_lobes:
+            ax.contour(grid_lon, grid_lat, bca,
+                       levels=[np.pi/6, 5*np.pi/6], linewidths=2,
+                       colors='k')
+        fig.savefig(
+             image_directory
+            + '/snow_rate_ws2012' + combined_name + '.png')
+        plt.close(fig)
+        del fig, ax, display
 
     # Creating a plot of filtered corrected differential phase.
     display = pyart.graph.RadarMapDisplay(radar)
