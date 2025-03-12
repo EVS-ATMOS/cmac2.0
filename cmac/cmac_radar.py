@@ -15,6 +15,7 @@ from .cmac_processing import (
     do_my_fuzz, get_melt, get_texture, fix_phase_fields, gen_clutter_field_from_refl, beam_block,
     snow_rate)
 from .config import get_cmac_values, get_field_names, get_metadata, get_zs_relationships
+from csu_radartools import csu_kdp
 
 
 def cmac(radar, sonde, config, geotiff=None, flip_velocity=False,
@@ -176,6 +177,9 @@ def cmac(radar, sonde, config, geotiff=None, flip_velocity=False,
     if 'hard_const' not in cmac_config:
         cmac_config['hard_const'] = None
 
+    if 'kdp_method' not in cmac_config:
+        cmac_config['kdp_method'] = 'lp'
+
     # Specifically for dealing with the ingested C-SAPR2 data
 
     my_fuzz, _ = do_my_fuzz(radar, rhv_field, ncp_field, verbose=verbose,
@@ -283,14 +287,36 @@ def cmac(radar, sonde, config, geotiff=None, flip_velocity=False,
     # Calculating differential phase fields.
     radar.fields[field_config['input_phidp_field']]['data'][
         radar.fields[field_config['input_phidp_field']]['data'] < 0] += 360.0
+    if not "unfolded_differential_phase" in radar.fields.keys():
+        radar.fields["unfolded_differential_phase"] = copy.deepcopy(
+                radar.fields[field_config['input_phidp_field']])
+
     kdp_gates = copy.deepcopy(cmac_gates)
     kdp_gates.exclude_above('height', fzl)
+    if cmac_config['kdp_method'] == 'lp':
+        phidp, kdp = pyart.correct.phase_proc_lp_gf(
+            radar, gatefilter=kdp_gates, offset=ref_offset, debug=True,
+            LP_solver='cylp', nowrap=50, fzl=fzl, self_const=self_const,
+            phidp_field=field_config['input_phidp_field'],
+            refl_field=field_config['reflectivity'])
+    elif cmac_config['kdp_method'] == 'bringi':
+        fill_value = radar.fields[field_config['input_phidp_field']]['data'].fill_value
+        dp = radar.fields[field_config['input_phidp_field']]['data']
+        dz = radar.fields[field_config['reflectivity']]['data']
+        dp = dp.filled(fill_value)
+        dz = dz.filled(fill_value)
+        rng = np.tile(radar.range['data'], (radar.nrays, 1)) / 1e3
+        kdp, phidp, _ = csu_kdp.calc_kdp_bringi(dp=dp, dz=dz, rng=rng,
+            bad=fill_value)
+        
+        kdp_data = np.ma.masked_where(kdp_gates.gate_excluded, kdp)
+        phidp_data = np.ma.masked_where(kdp_gates.gate_excluded, phidp)
+        phidp = copy.deepcopy(radar.fields[field_config['input_phidp_field']])
+        kdp = pyart.config.get_metadata("corrected_specific_differential_phase")
+        phidp["data"] = phidp_data
+        kdp["data"] = kdp_data
+        
 
-    phidp, kdp = pyart.correct.phase_proc_lp_gf(
-        radar, gatefilter=kdp_gates, offset=ref_offset, debug=True,
-        LP_solver='cylp', nowrap=50, fzl=fzl, self_const=self_const,
-        phidp_field=field_config['input_phidp_field'],
-        refl_field=field_config['reflectivity'])
     print("Processed phase")
     # We do not use KDP, phase above freezing level
     kdp_gates = copy.deepcopy(cmac_gates)
@@ -383,6 +409,7 @@ def cmac(radar, sonde, config, geotiff=None, flip_velocity=False,
         radar.fields['corrected_velocity']['valid_max'], 4)
     radar.fields['simulated_velocity']['units'] = 'm/s'
     radar.fields['velocity_texture']['units'] = 'm/s'
+    # BNF radar does not have "unfolded_differential_phase"
     radar.fields['unfolded_differential_phase']['long_name'] = 'Unfolded differential propagation phase shift'
     cat_dict = {}
     for pair_str in radar.fields['gate_id']['notes'].split(','):

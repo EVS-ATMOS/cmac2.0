@@ -78,10 +78,11 @@ def quicklooks_rhi(radar, config, sweep=None, image_directory=None):
     cat_dict = {}
     print('##')
     print('## Keys for each gate id are as follows:')
-    for pair_str in radar.fields['gate_id']['notes'].split(','):
+    for i, pair_str in enumerate(radar.fields['gate_id']['flag_meanings'].split(' ')):
         print('##   ', str(pair_str))
-        cat_dict.update({pair_str.split(':')[1]:int(pair_str.split(':')[0])})
+        cat_dict.update({pair_str: i})
     sorted_cats = sorted(cat_dict.items(), key=operator.itemgetter(1))
+
     cat_colors = {'rain': 'green',
                   'multi_trip': 'red',
                   'no_scatter': 'gray',
@@ -102,7 +103,6 @@ def quicklooks_rhi(radar, config, sweep=None, image_directory=None):
     ax[0, 0].set_aspect('auto')
     display.plot_rhi('gate_id', sweep=sweep, ax=ax[0, 0],
                      cmap=cmap, vmin=0, vmax=6)
-    plt.ylim(ymin, ymax)
 
     cbax = ax[0, 0]
     if 'ground_clutter' in radar.fields.keys() or 'terrain_blockage' in radar.fields['gate_id']['notes']:
@@ -119,21 +119,22 @@ def quicklooks_rhi(radar, config, sweep=None, image_directory=None):
     display.plot_rhi('reflectivity', sweep=sweep, vmin=-8, vmax=40.0, 
                          ax=ax[0, 1],
                          cmap=pyart.graph.cm_colorblind.HomeyerRainbow)
-    plt.ylim(ymin, ymax)
     ax[1, 0].set_aspect('auto')
     display.plot_rhi('velocity_texture', sweep=sweep, vmin=0, vmax=14,
                      ax=ax[1, 0],
                      title=_generate_title(
                          radar, 'velocity_texture', sweep),
                      cmap=pyart.graph.cm.NWSRef)
-    plt.ylim(ymin, ymax)
     
     rhv_field = field_config['cross_correlation_ratio']
     ax[1, 1].set_aspect('auto')
     display.plot_rhi(rhv_field, sweep=sweep, vmin=.5,
                      vmax=1, ax=ax[1, 1],
                      cmap=pyart.graph.cm.Carbone42)
-    plt.ylim(ymin, ymax)
+    for i in range(2):
+        for j in range(2):
+            ax[i, j].set_ylim([ymin, ymax])
+    fig.tight_layout()
     fig.savefig(
         image_directory
         + '/cmac_four_panel_plot' + combined_name + '.png')
