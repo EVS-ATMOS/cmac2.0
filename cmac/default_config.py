@@ -276,7 +276,34 @@ _DEFAULT_METADATA = {
         'datastream': 'nsaxsaprcmacppiC1.c1',
         'location_description': 'North Slope of Alaska (NSA), Barrow, Alaska',
         'doi': '10.5439/1781398',},
-    
+
+     'bnf_csapr2_ppi': {
+        'site_id': 'bnf',
+        'facility_id': 's3',
+        'comment': 'This is highly experimental and initial data. There are '
+                   + 'many known and unknown issues. Please do not use before '
+                   + 'contacting the Translator responsible scollis@anl.gov',
+        'attributions': 'This data is collected by the ARM Research '
+                        + 'facility. Radar system is operated by the radar '
+                        + 'engineering team radar@arm.gov and the data is '
+                        + 'processed by the precipitation radar products team. '
+                        + 'LP code courtesy of Scott Giangrande BNL.',
+        'version': '2.0 lite',
+        'vap_name': 'cmac',
+        'known_issues': (
+            'False phidp jumps in insect regions.'
+            + 'Issues with some snow below melting layer.'),
+        'developers': 'Robert Jackson, ANL. Zachary Sherman, ANL.',
+        'translator': 'Scott Collis, ANL.',
+        'mentors': 'Bradley Isom, PNNL. Iosif Lindenmaier, PNNL.',
+        'Conventions': 'CF/Radial instrument_parameters ARM-1.3',
+        'references': 'See CSAPR2 Instrument Handbook',
+        'source': 'Atmospheric Radiation Measurement (ARM) program C-band '
+                  + 'Scanning ARM Precipitation Radar 2 (CSAPR2)',
+        'institution': 'United States Department of Energy - '
+                       + 'Atmospheric Radiation Measurement (ARM) program',
+        'doi': '10.5439/1668872',}, 
+
     # SAIL X-band metadata.
     'sail_xband_ppi': {
         'Conventions': 'CF/Radial instrument_parameters ARM-1.3',
@@ -522,7 +549,7 @@ _DEFAULT_FIELD_NAMES = {
         # Radar field names
         'input_zdr': 'differential_reflectivity',
         'reflectivity': 'reflectivity',  # need to change to input_reflectivity
-        'velocity': 'corrected_velocity',
+        'velocity': 'mean_doppler_velocity',
         'normalized_coherent_power': 'normalized_coherent_power',
         'cross_correlation_ratio': 'cross_correlation_ratio',
         'input_phidp_field': 'differential_phase',
@@ -882,6 +909,30 @@ _DEFAULT_CMAC_VALUES = {
         'hard_const': cacti_csapr2_ppi_hard_const,
         'gen_clutter_from_refl': True,
         'ref_offset': 0.0,
+        'gen_clutter_from_refl_diff': -0.2,
+        'gen_clutter_from_refl_alt': 2000.0,
+        'clutter_mask_z_for_texture': True,
+        'rain_rate_a_coef': 294.0,
+        'rain_rate_b_coef': 0.89,
+        'beam_width': 1.0,
+        'radar_height_offset': 10.0,},  # We expect clutter corrected fields now
+
+    # Tracer C-SAPR 2 CMAC 2.0 processing values.
+    'bnf_csapr2_ppi': {
+        'save_name': 'bnfcsapr2cmacppiS3.c1',
+        'sonde_name': 'bnfsondewnpnM1.b1',
+        'site_alt': 12,
+        'self_const': 60000.00,
+        'attenuation_a_coef': 0.08,
+        'c_coef': 0.3,
+        'd_coef': 1.804,
+        'beta_coef': 0,  # ZDR corrections
+        'flip_phidp': True,
+        'phidp_flipped': ['uncorrected_differential_phase','differential_phase'],
+        'mbfs': cacti_csapr2_ppi_mbfs,
+        'hard_const': cacti_csapr2_ppi_hard_const,
+        'gen_clutter_from_refl': True,
+        'ref_offset': -0.9,
         'gen_clutter_from_refl_diff': -0.2,
         'gen_clutter_from_refl_alt': 2000.0,
         'clutter_mask_z_for_texture': True,
