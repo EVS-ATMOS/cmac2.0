@@ -18,6 +18,43 @@ to download ARM datastreams from Data Discovery, click `here <https://arm-doe.gi
 
 All ARM files are in the format that is needed by CMAC for processing.
 
+Background
+-----------
+
+In 2010 the Atmospheric Radiation Measurement (ARM) program procured a
+number of 3 and 5 cm wavelength scanning radars for documenting the
+macrophysical, microphysical and dynamical structure of precipitating
+systems. In order to maximize the scientific impact of these
+instruments, the program supported the development of an application
+chain to correct for various propagation and measurement issues so
+that "point" values of the moments of the radar spectrum and
+polarimetric measurements could be retrieved.
+
+Because these radars operate at shorter wavelengths than the more
+common 10 cm (S-band) radars, they are more strongly affected by
+two-way attenuation as the beam propagates through precipitation, and
+their shorter maximum unambiguous range leads to more frequent Doppler
+velocity aliasing. CMAC was built to robustly correct for these
+effects. Rather than have each processing step make its own
+conditional decision about where to run based on ad-hoc quality
+measurements, CMAC first performs a gate-by-gate identification of the
+dominant scattering process at each radar gate (e.g. rain, snow,
+melting layer, second-trip echo, or no significant scatterer). This
+gate ID is performed before any corrections are applied, and is used
+to construct `Py-ART <https://github.com/ARM-DOE/pyart>`_ gate filters
+that determine which corrections and retrievals should be applied at
+each gate — for example, dealiasing is run on every class except "no
+significant return", while attenuation correction is only applied to
+gates classified as rain.
+
+The full application chain includes velocity dealiasing, extraction of
+propagation differential phase from the measured differential phase,
+calculation of specific differential phase, calculation and
+integration of specific attenuation to correct reflectivity, and
+calculation of rain rate. For the underlying science, motivation and
+implementation details, see the technical report in
+`documents/technical_document/cmac2p0_technical_report.tex <documents/technical_document/cmac2p0_technical_report.tex>`_.
+
 Install
 -------
 
@@ -116,6 +153,8 @@ Documentation
 - `documents/cmac_config_reference.md <documents/cmac_config_reference.md>`_ —
   a reference for every section and key of the YAML config file accepted via
   ``config_file`` / ``--config-file``.
+- `documents/technical_document/cmac2p0_technical_report.tex <documents/technical_document/cmac2p0_technical_report.tex>`_ —
+  a technical report on the motivation, science and implementation of CMAC2.0.
 
 Lead Developers
 ---------------
