@@ -104,7 +104,18 @@ For backwards compatibility, the underscore forms of each long option
 There is currently a ``default_config.py`` file with dictionaries for
 radars. Additional radars can be added there, or supplied through a YAML
 file passed via ``--config-file`` and selected with the ``radar_config``
-positional argument.
+positional argument. See ``documents/cmac_config_reference.md`` for a full
+description of every section and key in that YAML file.
+
+Documentation
+-------------
+
+- `notebooks/getting_started_with_cmac.ipynb <notebooks/getting_started_with_cmac.ipynb>`_ —
+  a walkthrough of downloading a radar file and sounding, running ``cmac()``,
+  and generating quicklooks from a Jupyter notebook.
+- `documents/cmac_config_reference.md <documents/cmac_config_reference.md>`_ —
+  a reference for every section and key of the YAML config file accepted via
+  ``config_file`` / ``--config-file``.
 
 Lead Developers
 ---------------
