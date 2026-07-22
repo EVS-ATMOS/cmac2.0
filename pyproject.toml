@@ -3,7 +3,6 @@ requires = [
     "setuptools>=45",
     "wheel",
     "cython",
-    "oldest-supported-numpy; python_version<'3.9'",
     "numpy>=2.0; python_version>='3.9'",
 ]
 build-backend = "setuptools.build_meta"
@@ -30,3 +29,8 @@ test = [
 ext-modules = [
     { name = "cmac.calc_kdp_ray_fir", sources = ["cmac/calc_kdp_ray_fir.pyx"] }
 ]
+
+[tool.cibuildwheel]
+build = "cp310-* cp311-* cp312-* cp313-*"
+skip = "*-musllinux_i686 *-manylinux_i686 pp*"
+build-verbosity = 1
