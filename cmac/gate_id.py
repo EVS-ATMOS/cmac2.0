@@ -3,9 +3,16 @@ Helpers for interpreting the category metadata attached to a ``gate_id``
 (hydrometeor ID) radar field.
 
 CMAC's own gate id fields document their categories with a ``notes``
-attribute: a comma separated list of ``"index: label"`` pairs, e.g.
-``"0: multi_trip, 1: rain, 2: snow"``. The index/label separator within
-each pair may be either a colon or plain whitespace (``"0 multi_trip"``).
+attribute, which in practice shows up in a few different shapes:
+
+- ``"0: multi_trip, 1: rain, 2: snow"`` -- comma separated ``"index: label"``
+  pairs, colon separated.
+- ``"0 multi_trip, 1 rain, 2 snow"`` -- comma separated ``"index label"``
+  pairs, whitespace separated.
+- ``"multi_trip rain snow melting no_scatter clutter terrain_blockage"`` --
+  a plain, unindexed list of labels in order, with no indices or commas at
+  all.
+
 Fields that follow the CF conventions instead (or radar objects re-read
 from a file that converted ``notes`` on save) may document the same
 information with a ``flag_meanings`` attribute and a parallel
@@ -26,14 +33,24 @@ def _label_from_pair(pair_str):
     return parts[-1].strip()
 
 
-def _split_flag_meanings(flag_meanings):
-    """Split a ``flag_meanings`` attribute into its individual labels,
-    whether it is comma separated or plain whitespace separated."""
-    if ',' in flag_meanings:
-        parts = flag_meanings.split(',')
+def _split_list(text):
+    """Split a comma or whitespace separated list of labels into its
+    individual, stripped entries."""
+    if ',' in text:
+        parts = text.split(',')
     else:
-        parts = flag_meanings.split()
+        parts = text.split()
     return [part.strip() for part in parts if part.strip()]
+
+
+def _labels_from_notes(notes):
+    """Return the ordered list of category labels encoded in a ``notes``
+    attribute, handling both indexed ``"index: label"``/``"index label"``
+    pairs and a plain, unindexed list of labels."""
+    pieces = [p.strip() for p in notes.split(',') if p.strip()]
+    if len(pieces) > 1 or (pieces and ':' in pieces[0]):
+        return [_label_from_pair(piece) for piece in pieces]
+    return _split_list(notes)
 
 
 def get_gate_id_categories(gate_id_field):
@@ -47,13 +64,11 @@ def get_gate_id_categories(gate_id_field):
 
     """
     if 'notes' in gate_id_field:
-        cat_dict = {}
-        for i, pair_str in enumerate(gate_id_field['notes'].split(',')):
-            cat_dict[_label_from_pair(pair_str)] = i
-        return cat_dict
+        labels = _labels_from_notes(gate_id_field['notes'])
+        return {label: i for i, label in enumerate(labels)}
 
     if 'flag_meanings' in gate_id_field and 'flag_values' in gate_id_field:
-        labels = _split_flag_meanings(gate_id_field['flag_meanings'])
+        labels = _split_list(gate_id_field['flag_meanings'])
         values = gate_id_field['flag_values']
         return {label: int(value) for label, value in zip(labels, values)}
 
@@ -70,7 +85,7 @@ def gate_id_has_category(gate_id_field, category):
     ``flag_meanings``.
     """
     if 'notes' in gate_id_field:
-        return category in gate_id_field['notes']
+        return category in _labels_from_notes(gate_id_field['notes'])
     if 'flag_meanings' in gate_id_field:
-        return category in _split_flag_meanings(gate_id_field['flag_meanings'])
+        return category in _split_list(gate_id_field['flag_meanings'])
     return False
