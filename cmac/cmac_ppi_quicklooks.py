@@ -16,6 +16,7 @@ from pyart.graph.common import (
     generate_radar_name, generate_radar_time_begin)
 
 from .config import get_plot_values, get_field_names
+from .gate_id import get_gate_id_categories, gate_id_has_category
 
 plt.switch_backend('agg')
 
@@ -190,13 +191,12 @@ def quicklooks_ppi(radar, config, sweep=None, image_directory=None,
 
     # Four panel plot of gate_id, velocity_texture, reflectivity, and
     # cross_correlation_ratio.
-    cat_dict = {}
+    gate_id_field = radar.fields['gate_id']
+    cat_dict = get_gate_id_categories(gate_id_field)
     print('##')
     print('## Keys for each gate id are as follows:')
-    for i, pair_str in enumerate(radar.fields['gate_id']['notes'].split(',')):
-        pair_str = pair_str.split(':')[1].strip()
-        print('##   ', str(pair_str))
-        cat_dict.update({pair_str: i})
+    for label in sorted(cat_dict, key=cat_dict.get):
+        print('##   ', str(label))
     sorted_cats = sorted(cat_dict.items(), key=operator.itemgetter(1))
     cat_colors = dict(cat_colors_cfg)
     lab_colors = [cat_colors[kitty[0]] for kitty in sorted_cats]
@@ -218,7 +218,8 @@ def quicklooks_ppi(radar, config, sweep=None, image_directory=None,
                         colors='k')
 
     cbax = ax[0, 0]
-    if 'ground_clutter' in radar.fields.keys() or 'terrain_blockage' in radar.fields['gate_id']['notes']:
+    if ('ground_clutter' in radar.fields.keys()
+            or gate_id_has_category(gate_id_field, 'terrain_blockage')):
         tick_locs = np.linspace(
             0, len(sorted_cats) - 1, len(sorted_cats)) + 0.5
     else:
