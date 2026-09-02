@@ -3,6 +3,12 @@ channels:
   - conda-forge
   - defaults
 dependencies:
+  # conda-forge's Python bakes the flags of the GCC it was built with into
+  # sysconfig's CFLAGS. Compiling the Cython extension with the runner's older
+  # system gcc then fails on flags it does not know (e.g. `-partition=none`).
+  # c-compiler pulls in the matching conda-forge gcc and sets CC/CFLAGS on
+  # environment activation, so the extension builds against its own toolchain.
+  - c-compiler
   - arm_pyart
   - cartopy
   - cmweather
