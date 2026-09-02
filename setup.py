@@ -38,7 +38,7 @@ URL = 'https://github.com/EVS-ATMOS/cmac2.0'
 LICENSE = 'BSD'
 CLASSIFIERS = filter(None, CLASSIFIERS.split('\n'))
 MAJOR = 0
-MINOR = 1
+MINOR = 2
 MICRO = 0
 VERSION = '%d.%d.%d' % (MAJOR, MINOR, MICRO)
 
