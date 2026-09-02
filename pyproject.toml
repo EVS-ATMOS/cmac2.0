@@ -75,3 +75,16 @@ namespaces = false
 
 [tool.setuptools.cmdclass]
 build_ext = "_cmac_build.build_ext"
+
+[tool.cibuildwheel]
+# NumPy publishes no PyPy wheels any more, so a PyPy target could only be built
+# by compiling NumPy from source. Skip rather than ship an untested artifact.
+skip = "pp*"
+
+[tool.cibuildwheel.linux]
+# cibuildwheel defaults to the manylinux2014 image (glibc 2.17, GCC 10.2.1).
+# NumPy >= 2.3 publishes only manylinux_2_28 wheels, so nothing installable is
+# available in that image; pip falls back to the NumPy sdist and meson refuses
+# with "NumPy requires GCC >= 10.3". Build on manylinux_2_28, where the
+# published NumPy wheels install directly and no source build is attempted.
+manylinux-x86_64-image = "manylinux_2_28"
