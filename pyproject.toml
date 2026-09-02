@@ -1,17 +1,47 @@
 [build-system]
 requires = [
-    "setuptools>=45",
+    # >=77 for SPDX `license` / `license-files` support.
+    "setuptools>=77",
     "wheel",
     "cython",
-    "oldest-supported-numpy; python_version<'3.9'",
-    "numpy>=2.0; python_version>='3.9'",
+    # Building against NumPy 2 yields an extension that also runs on NumPy 1.
+    "numpy>=2.0",
 ]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "cmac"
+version = "0.2.0"
 description = "Corrected Moments in Antenna Coordinates"
-dynamic = ["readme", "version"]
+readme = "README.rst"
+requires-python = ">=3.10"
+license = "BSD-3-Clause"
+license-files = ["LICENSE", "LICENSE_GPL.txt"]
+authors = [
+    { name = "Scott Collis" },
+    { name = "Zachary Sherman" },
+    { name = "Robert Jackson" },
+]
+maintainers = [
+    { name = "Data Informatics and Geophysical Retrievals (DIGR)" },
+]
+classifiers = [
+    "Development Status :: 2 - Pre-Alpha",
+    "Intended Audience :: Science/Research",
+    "Intended Audience :: Developers",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Scientific/Engineering",
+    "Topic :: Scientific/Engineering :: Atmospheric Science",
+]
+
+[project.urls]
+Homepage = "https://github.com/ARM-Development/cmac"
+Source = "https://github.com/ARM-Development/cmac"
+Documentation = "https://www.arm.gov/data/data-sources/cmac-69"
 
 [project.optional-dependencies]
 # Install with `pip install -e .[test]` to get the testing extras.
@@ -26,7 +56,22 @@ test = [
     "act-atmos"]
 
 [tool.setuptools]
-# Explicitly register the extension modules to be compiled
+script-files = [
+    "scripts/cmac",
+    "scripts/cmac_animation",
+    "scripts/cmac_dask",
+]
+# Explicitly register the extension modules to be compiled. The NumPy include
+# directory and the NumPy API macro are added by _cmac_build.build_ext below.
 ext-modules = [
     { name = "cmac.calc_kdp_ray_fir", sources = ["cmac/calc_kdp_ray_fir.pyx"] }
 ]
+
+[tool.setuptools.packages.find]
+# namespaces = false matches the old find_packages() behaviour: cmac/tests has
+# no __init__.py and is deliberately left out of the distribution.
+include = ["cmac*"]
+namespaces = false
+
+[tool.setuptools.cmdclass]
+build_ext = "_cmac_build.build_ext"
