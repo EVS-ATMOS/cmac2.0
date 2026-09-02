@@ -21,11 +21,20 @@ NUMPY_API_MACRO = ("NPY_NO_DEPRECATED_API", "NPY_1_7_API_VERSION")
 
 # gcc: "unrecognized command-line option '-partition=none'"
 # clang: "unknown argument: '-partition=none'"
+# GCC quotes with U+2018/U+2019 under a UTF-8 locale, so the quoting around
+# the flag is matched loosely rather than assumed to be ASCII.
+QUOTES = "\"'`\u2018\u2019\u201c\u201d"
 UNSUPPORTED_FLAG = re.compile(
-    r"""(?:unrecognized\s+(?:command[-\s]line\s+)?option|unknown\s+argument:?)"""
-    r"""\s*['"]?(-[^\s'"();]+)""",
+    r"(?:unrecognized\s+(?:command[-\s]line\s+)?option"
+    r"|unknown\s+argument:?)"
+    r"\s*[" + QUOTES + r"]*\s*"
+    r"(-[^\s,;()" + QUOTES + r"]+)",
     re.IGNORECASE,
 )
+
+# Ask the compiler for ASCII diagnostics so the pattern above has the easiest
+# possible job; the loose quoting stays as a backstop if this is ignored.
+C_LOCALE_ENV = dict(os.environ, LC_ALL="C", LANG="C")
 
 # Every compiler/linker command line distutils may hand us. Which of these
 # exist varies with the setuptools version, so they are probed by name.
@@ -51,6 +60,7 @@ def _rejected_flags(command, source):
         list(command) + ["-c", source, "-o", os.devnull],
         capture_output=True,
         text=True,
+        env=C_LOCALE_ENV,
     )
     if probe.returncode == 0:
         return set()
