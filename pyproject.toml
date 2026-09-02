@@ -82,6 +82,12 @@ build_ext = "_cmac_build.build_ext"
 skip = "pp*"
 
 [tool.cibuildwheel.linux]
+# NumPy publishes no i686 wheels for any 2.x release, so a 32-bit build can
+# only get NumPy by compiling it from source in the manylinux2014_i686 image,
+# whose GCC 10.2.1 NumPy's own meson rejects. 64-bit only; no i686 wheel has
+# ever been published for this project anyway.
+archs = "x86_64"
+
 # cibuildwheel defaults to the manylinux2014 image (glibc 2.17, GCC 10.2.1).
 # NumPy >= 2.3 publishes only manylinux_2_28 wheels, so nothing installable is
 # available in that image; pip falls back to the NumPy sdist and meson refuses
