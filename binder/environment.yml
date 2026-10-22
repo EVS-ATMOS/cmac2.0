@@ -10,6 +10,9 @@ dependencies:
   - arm_pyart
   - xarray>=0.12.2
   - nb_conda
+  - certifi>=2026.10.19
+  - ca-certificates>=2026.10.19
+  - pip>=26.2.2
 # data science stuff
 # geospatial
   - cartopy
